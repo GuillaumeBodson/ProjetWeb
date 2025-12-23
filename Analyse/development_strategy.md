@@ -3,6 +3,40 @@
 ## Overview
 This document outlines the development standards and practices for the Paddle Sites Management web application. Following these guidelines ensures code quality, maintainability, and effective collaboration. 
 
+## Global development strategy
+
+### Big picture
+
+From the client needs, evaluate the big features and pages that has to be developed. The development will be organized page by page. So development order should be established. The next 2 pages should be deepen annalysed.
+
+### Analyse
+
+Once the order has been set, a more exhaustive analyse has to be made. 
+For each pages, a new md file should be created with the name of the page. In this file, there must be a table containing user stories. The user stories should follow this format: 
+| role        | condition             | action               | benefit                      |
+|-------------|-----------------------|----------------------|------------------------------|
+| As a [role] | (potential condition) | I can [do something] | So that I [get some benefit] |
+
+### Frontend-First Development
+The initial development phase will focus on **Angular frontend development** to: 
+- Visualize and validate user workflows
+- Define and prioritize features based on UI requirements
+- Identify the underlying data structures needed
+- Establish data formats and interfaces early
+- Create a foundation for backend API specifications
+
+This approach ensures that: 
+1. UI/UX can be tested and refined early
+2. Data requirements are clearly defined before backend development
+3. API contracts are established through TypeScript interfaces
+4. Backend development can follow TDD with clear requirements
+
+
+### Resposiveness
+
+To ensure responsivness and optimal performances on smaller screens, adopt the mobile first approach:
+Develop a feature for mobile size device and then adapt the display for larger screens.
+
 ## Code Quality Standards
 
 ### SOLID Principles
