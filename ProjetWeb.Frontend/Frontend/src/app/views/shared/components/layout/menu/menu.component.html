@@ -1,5 +1,5 @@
 <mat-toolbar color="primary">Menu
-  <button mat-icon-button (click)="layoutService.toggleMenu()" [hidden]="!this.layoutService.sideNavOpened()">
+  <button mat-icon-button aria-label="Toggle menu" (click)="layoutService.toggleMenu()" [hidden]="!layoutService.sideNavOpened()">
     <mat-icon>menu</mat-icon>
   </button>
 </mat-toolbar>

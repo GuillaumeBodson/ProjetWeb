@@ -15,6 +15,6 @@ import {LayoutService} from './views/shared/components/layout/layout.service';
 })
 export class App {
   protected readonly title = signal('Frontend');
-  layoutService = inject(LayoutService)
+  layoutService = inject(LayoutService);
 
 }

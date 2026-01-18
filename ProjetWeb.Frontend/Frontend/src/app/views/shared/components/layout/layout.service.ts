@@ -19,7 +19,7 @@ export class LayoutService {
   sideNavOpened = linkedSignal(this.isDesktop);
 
   toggleMenu() {
-    this.sideNavOpened.update(value => !value)
+    this.sideNavOpened.update(value => !value);
   }
 
 }

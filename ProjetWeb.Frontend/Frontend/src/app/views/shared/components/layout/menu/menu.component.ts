@@ -20,5 +20,5 @@ import {LayoutService} from '../layout.service';
 })
 export class MenuComponent {
 
-  layoutService = inject(LayoutService)
+  layoutService = inject(LayoutService);
 }
