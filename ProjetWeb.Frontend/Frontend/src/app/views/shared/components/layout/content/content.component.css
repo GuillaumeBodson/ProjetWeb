@@ -1,0 +1,5 @@
+.app-content {
+  padding: 16px;
+  min-height: calc(100vh - 128px); /* adjust for header + footer */
+  box-sizing: border-box;
+}

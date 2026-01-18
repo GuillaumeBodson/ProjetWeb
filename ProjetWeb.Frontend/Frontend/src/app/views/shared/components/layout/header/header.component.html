@@ -1,0 +1,7 @@
+<mat-toolbar class="sticky" color="secondary">
+  <button mat-icon-button aria-label="Toggle menu" (click)="layoutService.toggleMenu()" [hidden]="layoutService.sideNavOpened()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>{{ title() }}</span>
+
+</mat-toolbar>
