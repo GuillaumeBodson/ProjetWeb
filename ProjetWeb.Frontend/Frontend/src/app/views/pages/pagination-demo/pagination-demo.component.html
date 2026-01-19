@@ -1,7 +1,7 @@
 <section class="demo">
   <h2>Pagination demo (client-simulated server paging)</h2>
 
-  <div class="list" [class.loading]="loading">
+  <div class="list" [class.loading]="loading()">
     <div class="item" *ngFor="let item of (page$ | async)?.items">
       <span class="id">{{ item.id }}</span>
       <span class="name">{{ item.name }}</span>
@@ -12,7 +12,7 @@
     [totalItems]="(page$ | async)?.totalItems ?? 0"
     [pageIndex]="(request$ | async)?.pageIndex ?? 0"
     [pageSize]="(request$ | async)?.pageSize ?? 10"
-    [loading]="loading"
+    [loading]="loading()"
     (pageChange)="onPageChange($event)"
   />
 </section>
