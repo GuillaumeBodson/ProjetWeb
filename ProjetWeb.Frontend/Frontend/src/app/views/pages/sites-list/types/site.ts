@@ -6,3 +6,5 @@ export class Site {
   closedDays!: string[];
   courts!: string[];
 }
+
+export type SiteDto = Site;

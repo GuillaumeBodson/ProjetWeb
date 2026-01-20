@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule} from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
-import {PageRequest, PageResponse} from '../../shared/types/paging';
+import { PageRequest, PageResponse } from '../../shared/types/paging';
 import {
   BehaviorSubject,
   catchError,
