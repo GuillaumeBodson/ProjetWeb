@@ -17,7 +17,6 @@ type Item = { id: number; name: string };
 
 @Component({
   selector: 'app-pagination-demo',
-  standalone: true,
   imports: [CommonModule, PaginationComponent],
   templateUrl: './pagination-demo.component.html',
   styleUrl: './pagination-demo.component.css',
