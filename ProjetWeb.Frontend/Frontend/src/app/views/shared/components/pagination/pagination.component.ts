@@ -5,7 +5,6 @@ import { PageRequest } from '../../types/paging';
 
 @Component({
   selector: 'app-pagination',
-  standalone: true,
   imports: [CommonModule, MatPaginatorModule],
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.css',

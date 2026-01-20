@@ -5,6 +5,7 @@ export class Site {
   closingHours!: string;
   closedDays!: string[];
   courts!: string[];
+  revenue!: number;
 }
 
 export type SiteDto = Site;

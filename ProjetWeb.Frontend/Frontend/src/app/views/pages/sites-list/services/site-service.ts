@@ -71,7 +71,8 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '22:00',
       closedDays: ['Sunday'],
-      courts: ['Court A', 'Court B', 'Court C']
+      courts: ['Court A', 'Court B', 'Court C'],
+      revenue: 128450
     },
     {
       id: 2,
@@ -79,7 +80,8 @@ export class SiteService {
       openingHours: '07:30',
       closingHours: '21:30',
       closedDays: ['Monday'],
-      courts: ['Court 1', 'Court 2']
+      courts: ['Court 1', 'Court 2'],
+      revenue: 84200
     },
     {
       id: 3,
@@ -87,7 +89,8 @@ export class SiteService {
       openingHours: '09:00',
       closingHours: '20:00',
       closedDays: [],
-      courts: ['Indoor 1', 'Indoor 2', 'Outdoor 1']
+      courts: ['Indoor 1', 'Indoor 2', 'Outdoor 1'],
+      revenue: 61350
     },
     {
       id: 4,
@@ -95,7 +98,8 @@ export class SiteService {
       openingHours: '10:00',
       closingHours: '19:00',
       closedDays: ['Saturday'],
-      courts: ['Clay 1', 'Clay 2', 'Clay 3', 'Clay 4']
+      courts: ['Clay 1', 'Clay 2', 'Clay 3', 'Clay 4'],
+      revenue: 45500
     },
     {
       id: 5,
@@ -103,7 +107,8 @@ export class SiteService {
       openingHours: '06:00',
       closingHours: '23:00',
       closedDays: [],
-      courts: ['Hall A', 'Hall B']
+      courts: ['Hall A', 'Hall B'],
+      revenue: 173900
     },
     {
       id: 6,
@@ -111,7 +116,8 @@ export class SiteService {
       openingHours: '08:30',
       closingHours: '21:00',
       closedDays: ['Tuesday'],
-      courts: ['Lake 1', 'Lake 2', 'Lake 3']
+      courts: ['Lake 1', 'Lake 2', 'Lake 3'],
+      revenue: 98750
     },
     {
       id: 7,
@@ -119,7 +125,8 @@ export class SiteService {
       openingHours: '07:00',
       closingHours: '22:30',
       closedDays: [],
-      courts: ['Gym 1']
+      courts: ['Gym 1'],
+      revenue: 52100
     },
     {
       id: 8,
@@ -127,7 +134,8 @@ export class SiteService {
       openingHours: '09:30',
       closingHours: '18:30',
       closedDays: ['Sunday'],
-      courts: ['Hill 1', 'Hill 2']
+      courts: ['Hill 1', 'Hill 2'],
+      revenue: 33700
     },
     {
       id: 9,
@@ -135,7 +143,8 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '20:30',
       closedDays: ['Sunday'],
-      courts: ['Uni A', 'Uni B', 'Uni C', 'Uni D']
+      courts: ['Uni A', 'Uni B', 'Uni C', 'Uni D'],
+      revenue: 110500
     },
     {
       id: 10,
@@ -143,7 +152,8 @@ export class SiteService {
       openingHours: '11:00',
       closingHours: '17:00',
       closedDays: ['Wednesday'],
-      courts: ['Community 1', 'Community 2']
+      courts: ['Community 1', 'Community 2'],
+      revenue: 21400
     },
     {
       id: 11,
@@ -151,7 +161,8 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '19:30',
       closedDays: [],
-      courts: ['Forest 1', 'Forest 2', 'Forest 3']
+      courts: ['Forest 1', 'Forest 2', 'Forest 3'],
+      revenue: 58700
     },
     {
       id: 12,
@@ -159,7 +170,8 @@ export class SiteService {
       openingHours: '07:00',
       closingHours: '21:00',
       closedDays: ['Monday'],
-      courts: ['DT 1', 'DT 2']
+      courts: ['DT 1', 'DT 2'],
+      revenue: 76500
     },
     {
       id: 13,
@@ -167,7 +179,8 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '20:00',
       closedDays: ['Sunday'],
-      courts: ['Harbor 1']
+      courts: ['Harbor 1'],
+      revenue: 40900
     },
     {
       id: 14,
@@ -175,7 +188,8 @@ export class SiteService {
       openingHours: '09:00',
       closingHours: '18:00',
       closedDays: ['Thursday'],
-      courts: ['Meadow 1', 'Meadow 2', 'Meadow 3']
+      courts: ['Meadow 1', 'Meadow 2', 'Meadow 3'],
+      revenue: 37250
     },
     {
       id: 15,
@@ -183,7 +197,8 @@ export class SiteService {
       openingHours: '06:30',
       closingHours: '23:00',
       closedDays: [],
-      courts: ['Main 1', 'Main 2', 'Main 3', 'Main 4', 'Main 5']
+      courts: ['Main 1', 'Main 2', 'Main 3', 'Main 4', 'Main 5'],
+      revenue: 225000
     }
   ];
   /**
