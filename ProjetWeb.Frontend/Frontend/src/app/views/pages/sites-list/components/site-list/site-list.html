@@ -29,9 +29,9 @@
 </div>
 
 <app-pagination
-  [totalItems]="(this.siteService.page$ | async)?.totalItems ?? 0"
-  [pageIndex]="(this.siteService.request$ | async)?.pageIndex ?? 0"
-  [pageSize]="(this.siteService.request$ | async)?.pageSize ?? 10"
+  [totalItems]="(siteService.page$ | async)?.totalItems ?? 0"
+  [pageIndex]="(siteService.request$ | async)?.pageIndex ?? 0"
+  [pageSize]="(siteService.request$ | async)?.pageSize ?? 10"
   [loading]="loading()"
-  (pageChange)="this.siteService.onPageChange($event)"
+  (pageChange)="siteService.onPageChange($event)"
 />
