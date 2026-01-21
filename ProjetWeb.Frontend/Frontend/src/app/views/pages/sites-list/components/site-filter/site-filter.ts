@@ -1,9 +1,11 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SiteService} from '../../services/site-service';
 import {Comparison, Filter, FilterGroup} from '../../../../shared/types/filter';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
+import {MatExpansionModule, MatExpansionPanel} from '@angular/material/expansion';
+
 
 @Component({
   selector: 'app-site-filter',
@@ -12,13 +14,15 @@ import {MatButton} from '@angular/material/button';
     MatFormField,
     MatLabel,
     MatInput,
-    MatButton
+    MatButton,
+    MatExpansionModule
   ],
   templateUrl: './site-filter.html',
   styleUrl: './site-filter.css',
 })
 export class SiteFilter {
   siteService = inject(SiteService);
+  @ViewChild(MatExpansionPanel) panel?: MatExpansionPanel;
 
   form = new FormGroup({
     name: new FormControl<string>('',
@@ -47,6 +51,7 @@ export class SiteFilter {
     }
 
     this.siteService.setFilter(filters.Filters.length ? filters : null);
+    this.panel?.close();
   }
 
   clear(): void {
