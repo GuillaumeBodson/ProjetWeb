@@ -246,15 +246,15 @@ export class SiteService {
   }
 
   private applyFilter(sites: SiteDto[], filter: FilterGroup | null): SiteDto[] {
-    if (!filter || !filter.Filters?.length) {
+    if (!filter || !filter.filters?.length) {
       return sites;
     }
 
     // Very small demo implementation for the current in-memory dataset.
     // When you connect to your backend, you can remove this and send `filter` as part of the request.
-    return filter.Filters.reduce((acc, f) => {
-      const prop = (f.PropertyName ?? '').toLowerCase();
-      const value = f.ValueString ?? '';
+    return filter.filters.reduce((acc, f) => {
+      const prop = (f.propertyName ?? '').toLowerCase();
+      const value = f.valueString ?? '';
 
       if (!value) {
         return acc;
@@ -262,11 +262,11 @@ export class SiteService {
 
       switch (prop) {
         case 'name': {
-          if (f.Comparison === Comparison.CONTAINS) {
+          if (f.comparison === Comparison.CONTAINS) {
             const needle = value.toLowerCase();
             return acc.filter(s => (s.name ?? '').toLowerCase().includes(needle));
           }
-          if (f.Comparison === Comparison.EQUALS) {
+          if (f.comparison === Comparison.EQUALS) {
             return acc.filter(s => (s.name ?? '') === value);
           }
           return acc;
@@ -276,13 +276,13 @@ export class SiteService {
           if (Number.isNaN(n)) {
             return acc;
           }
-          if (f.Comparison === Comparison.GREATER_THAN) {
+          if (f.comparison === Comparison.GREATER_THAN) {
             return acc.filter(s => s.revenue > n);
           }
-          if (f.Comparison === Comparison.LESS_THAN) {
+          if (f.comparison === Comparison.LESS_THAN) {
             return acc.filter(s => s.revenue < n);
           }
-          if (f.Comparison === Comparison.EQUALS) {
+          if (f.comparison === Comparison.EQUALS) {
             return acc.filter(s => s.revenue === n);
           }
           return acc;

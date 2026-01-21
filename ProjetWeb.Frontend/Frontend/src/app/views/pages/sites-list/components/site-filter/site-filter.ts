@@ -35,22 +35,40 @@ export class SiteFilter {
 
   submit() {
     const v = this.form.value;
-    const filters: FilterGroup = new FilterGroup();
+    const filters: FilterGroup = {
+      filters: [],
+      filterAssociation: FilterAssociation.AND
+    };
 
     if (v.name) {
-      const filterName = new Filter('name', v.name, Comparison.CONTAINS);
-      filters.Filters.push(filterName);
+      const filterName: Filter = {
+        propertyName: 'name',
+        valueString: v.name,
+        comparison: Comparison.CONTAINS,
+        filterAssociation: FilterAssociation.AND
+      };
+      filters.filters.push(filterName);
     }
     if (v.revenueMin !== null && v.revenueMin !== undefined) {
-      const filterRevenueMin = new Filter('revenue', v.revenueMin.toString(), Comparison.GREATER_THAN);
-      filters.Filters.push(filterRevenueMin);
+      const filterRevenueMin: Filter = {
+        propertyName: 'revenue',
+        valueString: v.revenueMin.toString(),
+        comparison: Comparison.GREATER_THAN,
+        filterAssociation: FilterAssociation.AND
+      };
+      filters.filters.push(filterRevenueMin);
     }
     if (v.revenueMax !== null && v.revenueMax !== undefined) {
-      const filterRevenueMax = new Filter('revenue', v.revenueMax.toString(), Comparison.LESS_THAN);
-      filters.Filters.push(filterRevenueMax);
+      const filterRevenueMax: Filter = {
+        propertyName: 'revenue',
+        valueString: v.revenueMax.toString(),
+        comparison: Comparison.LESS_THAN,
+        filterAssociation: FilterAssociation.AND
+      };
+      filters.filters.push(filterRevenueMax);
     }
 
-    this.siteService.setFilter(filters.Filters.length ? filters : null);
+    this.siteService.setFilter(filters.filters.length ? filters : null);
     this.panel?.close();
   }
 
