@@ -36,14 +36,16 @@ export class SiteFilter {
   submit() {
     const v = this.form.value;
     const filters: FilterGroup = {
-      filters: []
+      filters: [],
+      filterAssociation: FilterAssociation.AND
     };
 
     if (v.name) {
       const filterName: Filter = {
         propertyName: 'name',
         valueString: v.name,
-        comparison: Comparison.CONTAINS
+        comparison: Comparison.CONTAINS,
+        filterAssociation: FilterAssociation.AND
       };
       filters.filters.push(filterName);
     }
@@ -51,7 +53,8 @@ export class SiteFilter {
       const filterRevenueMin: Filter = {
         propertyName: 'revenue',
         valueString: v.revenueMin.toString(),
-        comparison: Comparison.GREATER_THAN
+        comparison: Comparison.GREATER_THAN,
+        filterAssociation: FilterAssociation.AND
       };
       filters.filters.push(filterRevenueMin);
     }
@@ -59,7 +62,8 @@ export class SiteFilter {
       const filterRevenueMax: Filter = {
         propertyName: 'revenue',
         valueString: v.revenueMax.toString(),
-        comparison: Comparison.LESS_THAN
+        comparison: Comparison.LESS_THAN,
+        filterAssociation: FilterAssociation.AND
       };
       filters.filters.push(filterRevenueMax);
     }
