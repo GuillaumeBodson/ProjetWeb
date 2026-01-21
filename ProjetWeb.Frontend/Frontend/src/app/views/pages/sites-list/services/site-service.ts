@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
+  combineLatest,
   distinctUntilChanged,
   merge,
   Observable,
@@ -10,8 +11,9 @@ import {
   Subject,
   switchMap
 } from 'rxjs';
-import { SiteDto } from '../types/site';
-import { PageRequest, PageResponse } from '../../../shared/types/paging';
+import {SiteDto} from '../types/site';
+import {PageRequest, PageResponse} from '../../../shared/types/paging';
+import {Comparison, FilterGroup} from '../../../shared/types/filter';
 
 
 @Injectable({
@@ -23,22 +25,30 @@ export class SiteService {
   private readonly requestSubject = new BehaviorSubject<PageRequest>({ pageIndex: 0, pageSize: 10 });
   readonly request$ = this.requestSubject.asObservable();
 
+  private readonly filterSubject = new BehaviorSubject<FilterGroup | null>(null);
+  readonly filter$ = this.filterSubject.asObservable().pipe(
+    distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+  );
+
   private readonly refreshTrigger$ = new Subject<void>();
 
   /**
-   * Emits a new page response whenever the request changes or a refresh is triggered.
+   * Emits a new page response whenever the request/filter changes or a refresh is triggered.
    */
   readonly page$: Observable<PageResponse<SiteDto>> = merge(
-    this.request$.pipe(
-      distinctUntilChanged((a, b) => a.pageIndex === b.pageIndex && a.pageSize === b.pageSize)
-    ),
-    // When refresh is triggered, re-emit current request
-    this.refreshTrigger$.pipe(switchMap(() => this.request$))
+    combineLatest([
+      this.request$.pipe(
+        distinctUntilChanged((a, b) => a.pageIndex === b.pageIndex && a.pageSize === b.pageSize)
+      ),
+      this.filter$
+    ]),
+    // When refresh is triggered, re-emit current (request, filter)
+    this.refreshTrigger$.pipe(switchMap(() => combineLatest([this.request$, this.filter$])))
   ).pipe(
-    switchMap((req) =>
-      this.fetchPage(req).pipe(
+    switchMap(([req, filter]) =>
+      this.fetchPage(req, filter).pipe(
         catchError((err) => {
-          console.error('Failed to fetch sites page', { request: req, error: err });
+          console.error('Failed to fetch sites page', { request: req, filter, error: err });
           return of({
             items: [],
             pageIndex: req.pageIndex,
@@ -53,6 +63,22 @@ export class SiteService {
 
   onPageChange(req: PageRequest): void {
     this.requestSubject.next(req);
+  }
+
+  /**
+   * Updates the current filter and resets to the first page.
+   * Use `null` (clearFilter) when no filters are applied.
+   */
+  setFilter(filter: FilterGroup | null): void {
+    this.filterSubject.next(filter);
+
+    // Reset to first page when the filter changes.
+    const current = this.requestSubject.value;
+    this.requestSubject.next({ ...current, pageIndex: 0 });
+  }
+
+  clearFilter(): void {
+    this.setFilter(null);
   }
 
   /** Re-fetches the current page (useful after create/update/delete). */
@@ -203,17 +229,67 @@ export class SiteService {
   ];
   /**
    * Replace with real HttpClient call in a service.
-   * Current version pages the in-memory `sites` array.
+   * Current version pages/filters the in-memory `sites` array.
    */
-  private fetchPage(req: PageRequest): Observable<PageResponse<SiteDto>> {
+  private fetchPage(req: PageRequest, filter: FilterGroup | null): Observable<PageResponse<SiteDto>> {
+    const filtered = this.applyFilter(this.sites, filter);
+
     const start = req.pageIndex * req.pageSize;
-    const items = this.sites.slice(start, start + req.pageSize);
+    const items = filtered.slice(start, start + req.pageSize);
 
     return of({
       items,
       pageIndex: req.pageIndex,
       pageSize: req.pageSize,
-      totalItems: this.sites.length
+      totalItems: filtered.length
     });
+  }
+
+  private applyFilter(sites: SiteDto[], filter: FilterGroup | null): SiteDto[] {
+    if (!filter || !filter.filters?.length) {
+      return sites;
+    }
+
+    // Very small demo implementation for the current in-memory dataset.
+    // When you connect to your backend, you can remove this and send `filter` as part of the request.
+    return filter.filters.reduce((acc, f) => {
+      const prop = (f.propertyName ?? '').toLowerCase();
+      const value = f.valueString ?? '';
+
+      if (!value) {
+        return acc;
+      }
+
+      switch (prop) {
+        case 'name': {
+          if (f.comparison === Comparison.CONTAINS) {
+            const needle = value.toLowerCase();
+            return acc.filter(s => (s.name ?? '').toLowerCase().includes(needle));
+          }
+          if (f.comparison === Comparison.EQUALS) {
+            return acc.filter(s => (s.name ?? '') === value);
+          }
+          return acc;
+        }
+        case 'revenue': {
+          const n = Number(value);
+          if (Number.isNaN(n)) {
+            return acc;
+          }
+          if (f.comparison === Comparison.GREATER_THAN) {
+            return acc.filter(s => s.revenue > n);
+          }
+          if (f.comparison === Comparison.LESS_THAN) {
+            return acc.filter(s => s.revenue < n);
+          }
+          if (f.comparison === Comparison.EQUALS) {
+            return acc.filter(s => s.revenue === n);
+          }
+          return acc;
+        }
+        default:
+          return acc;
+      }
+    }, sites);
   }
 }

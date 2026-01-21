@@ -5,13 +5,15 @@ import { AsyncPipe } from '@angular/common';
 import { Site } from '../../types/site';
 import { map } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
+import {SiteFilter} from '../site-filter/site-filter';
 
 @Component({
   selector: 'app-site-list',
   imports: [
     PaginationComponent,
     AsyncPipe,
-    MatTableModule
+    MatTableModule,
+    SiteFilter
   ],
   templateUrl: './site-list.html',
   styleUrl: './site-list.css',

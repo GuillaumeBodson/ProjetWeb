@@ -1,5 +1,7 @@
 <h2>List of all the Padel sites!</h2>
 
+<app-site-filter/>
+
 <div class="list" [class.loading]="loading()">
   <table mat-table [dataSource]="(items$ | async) ?? []" class="mat-elevation-z1">
 
