@@ -1,0 +1,29 @@
+.demo {
+  padding: 1rem;
+}
+
+.list {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.list.loading {
+  opacity: 0.6;
+}
+
+.item {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.id {
+  width: 4rem;
+  font-weight: 600;
+}
