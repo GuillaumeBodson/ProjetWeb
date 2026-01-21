@@ -1,7 +1,7 @@
 import {Component, inject, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors, Validators} from '@angular/forms';
 import {SiteService} from '../../services/site-service';
-import {Comparison, Filter, FilterGroup} from '../../../../shared/types/filter';
+import {Comparison, Filter, FilterAssociation, FilterGroup} from '../../../../shared/types/filter';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
 import {MatExpansionModule, MatExpansionPanel} from '@angular/material/expansion';
