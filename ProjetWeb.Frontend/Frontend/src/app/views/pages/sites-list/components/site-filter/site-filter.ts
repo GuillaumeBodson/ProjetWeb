@@ -12,7 +12,7 @@ function revenueRangeValidator(): ValidatorFn {
     const revenueMin = control.get('revenueMin')?.value;
     const revenueMax = control.get('revenueMax')?.value;
 
-    if (revenueMin !== null && revenueMax !== null && revenueMin > revenueMax) {
+    if (revenueMin != null && revenueMax != null && revenueMin > revenueMax) {
       return { revenueRange: true };
     }
 
