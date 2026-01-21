@@ -1,11 +1,24 @@
 import {Component, inject, ViewChild} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors, Validators} from '@angular/forms';
 import {SiteService} from '../../services/site-service';
 import {Comparison, Filter, FilterGroup} from '../../../../shared/types/filter';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
 import {MatExpansionModule, MatExpansionPanel} from '@angular/material/expansion';
 
+
+function revenueRangeValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const revenueMin = control.get('revenueMin')?.value;
+    const revenueMax = control.get('revenueMax')?.value;
+
+    if (revenueMin !== null && revenueMax !== null && revenueMin > revenueMax) {
+      return { revenueRange: true };
+    }
+
+    return null;
+  };
+}
 
 @Component({
   selector: 'app-site-filter',
@@ -31,7 +44,7 @@ export class SiteFilter {
       [Validators.min(0)]),
     revenueMin: new FormControl<number | null>(null,
       [Validators.min(0)]),
-  });
+  }, { validators: revenueRangeValidator() });
 
   submit() {
     const v = this.form.value;

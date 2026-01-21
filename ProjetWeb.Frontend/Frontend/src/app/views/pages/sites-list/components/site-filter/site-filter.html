@@ -23,6 +23,12 @@
           <input matInput type="number" formControlName="revenueMin" placeholder="amount">
         </mat-form-field>
       </div>
+      
+      @if (form.hasError('revenueRange')) {
+        <div class="text-red-600 text-sm mb-2">
+          Minimum revenue cannot be greater than maximum revenue.
+        </div>
+      }
 
       <div class="grid">
         <button mat-button type="submit" [disabled]="!form.valid" (click)="submit()" color="primary">Submit</button>
