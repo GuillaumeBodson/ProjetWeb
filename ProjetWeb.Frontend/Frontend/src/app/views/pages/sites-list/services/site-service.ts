@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -11,9 +11,9 @@ import {
   Subject,
   switchMap
 } from 'rxjs';
-import { SiteDto } from '../types/site';
-import { PageRequest, PageResponse } from '../../../shared/types/paging';
-import { FilterGroup } from '../../../shared/types/filter';
+import {SiteDto} from '../types/site';
+import {PageRequest, PageResponse} from '../../../shared/types/paging';
+import {Comparison, FilterGroup} from '../../../shared/types/filter';
 
 
 @Injectable({
@@ -262,11 +262,11 @@ export class SiteService {
 
       switch (prop) {
         case 'name': {
-          if (f.Comparison === 'CONTAINS') {
+          if (f.Comparison === Comparison.CONTAINS) {
             const needle = value.toLowerCase();
             return acc.filter(s => (s.name ?? '').toLowerCase().includes(needle));
           }
-          if (f.Comparison === 'EQUALS') {
+          if (f.Comparison === Comparison.EQUALS) {
             return acc.filter(s => (s.name ?? '') === value);
           }
           return acc;
@@ -276,13 +276,13 @@ export class SiteService {
           if (Number.isNaN(n)) {
             return acc;
           }
-          if (f.Comparison === 'GREATER_THAN') {
+          if (f.Comparison === Comparison.GREATER_THAN) {
             return acc.filter(s => s.revenue > n);
           }
-          if (f.Comparison === 'LESS_THAN') {
+          if (f.Comparison === Comparison.LESS_THAN) {
             return acc.filter(s => s.revenue < n);
           }
-          if (f.Comparison === 'EQUALS') {
+          if (f.Comparison === Comparison.EQUALS) {
             return acc.filter(s => s.revenue === n);
           }
           return acc;

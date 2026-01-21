@@ -38,15 +38,15 @@ export class SiteFilter {
     const filters: FilterGroup = new FilterGroup();
 
     if (v.name) {
-      const filterName = new Filter('Name', v.name, Comparison.CONTAINS);
+      const filterName = new Filter('name', v.name, Comparison.CONTAINS);
       filters.Filters.push(filterName);
     }
     if (v.revenueMin !== null && v.revenueMin !== undefined) {
-      const filterRevenueMin = new Filter('Revenue', v.revenueMin.toString(), Comparison.GREATER_THAN);
+      const filterRevenueMin = new Filter('revenue', v.revenueMin.toString(), Comparison.GREATER_THAN);
       filters.Filters.push(filterRevenueMin);
     }
     if (v.revenueMax !== null && v.revenueMax !== undefined) {
-      const filterRevenueMax = new Filter('Revenue', v.revenueMax.toString(), Comparison.LESS_THAN);
+      const filterRevenueMax = new Filter('revenue', v.revenueMax.toString(), Comparison.LESS_THAN);
       filters.Filters.push(filterRevenueMax);
     }
 
@@ -57,5 +57,6 @@ export class SiteFilter {
   clear(): void {
     this.form.reset({ name: '', revenueMax: null, revenueMin: null });
     this.siteService.clearFilter();
+    this.panel?.close();
   }
 }
