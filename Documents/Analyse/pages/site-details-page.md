@@ -5,7 +5,7 @@
 | admin | | consult the details of a `site` | Receive informations about a specific `site` |
 | admin | | Edit properties of a `site` | Modify `site` properties to better align with the current situation |
 | admin | | Consult the statistics | See information that help evaluate the `site` situation |
-| admin | | navigate between statistics and details easily | have a clean screen and pleasnt navigation |
+| admin | | navigate between statistics and details easily | have a clean screen and pleasant navigation |
 |      |           |        |         |
 |      |           |        |         |
 |      |           |        |         |
