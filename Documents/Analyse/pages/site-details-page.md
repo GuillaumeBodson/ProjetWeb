@@ -24,7 +24,7 @@
 | SecondaryColor | string | x | o |
 | OpeningHours | string | x |o|
 | ClosingHours | string | x |o|
-| closedDays | `Date`[] | x | o|
+| ClosedDays | `Date`[] | x | o|
 | Courts | `Court` [] | x | o        |
 |      |           |        |         |
 |      |           |        |         |
