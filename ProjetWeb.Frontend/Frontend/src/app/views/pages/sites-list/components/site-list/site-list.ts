@@ -6,6 +6,8 @@ import { Site } from '../../types/site';
 import { map } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import {SiteFilter} from '../site-filter/site-filter';
+import { MatButtonModule } from '@angular/material/button';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-site-list',
@@ -13,7 +15,9 @@ import {SiteFilter} from '../site-filter/site-filter';
     PaginationComponent,
     AsyncPipe,
     MatTableModule,
-    SiteFilter
+    SiteFilter,
+    MatButtonModule,
+    RouterLink
   ],
   templateUrl: './site-list.html',
   styleUrl: './site-list.css',
@@ -25,5 +29,5 @@ export class SiteList {
   readonly siteService = inject(SiteService);
   readonly items$ = this.siteService.page$.pipe(map(page => page.items as Site[]));
 
-  readonly displayedColumns = ['name', 'courts', 'revenue']
+  readonly displayedColumns = ['name', 'courts', 'revenue', 'actions']
 }

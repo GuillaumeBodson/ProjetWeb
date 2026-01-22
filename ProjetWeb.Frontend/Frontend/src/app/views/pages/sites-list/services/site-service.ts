@@ -97,8 +97,9 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '22:00',
       closedDays: ['Sunday'],
-      courts: ['Court A', 'Court B', 'Court C'],
-      revenue: 128450
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
+      revenue: 128450,
+      bookings: []
     },
     {
       id: 2,
@@ -106,8 +107,9 @@ export class SiteService {
       openingHours: '07:30',
       closingHours: '21:30',
       closedDays: ['Monday'],
-      courts: ['Court 1', 'Court 2'],
-      revenue: 84200
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
+      revenue: 84200,
+      bookings: []
     },
     {
       id: 3,
@@ -115,8 +117,9 @@ export class SiteService {
       openingHours: '09:00',
       closingHours: '20:00',
       closedDays: [],
-      courts: ['Indoor 1', 'Indoor 2', 'Outdoor 1'],
-      revenue: 61350
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
+      revenue: 61350,
+      bookings: []
     },
     {
       id: 4,
@@ -124,8 +127,9 @@ export class SiteService {
       openingHours: '10:00',
       closingHours: '19:00',
       closedDays: ['Saturday'],
-      courts: ['Clay 1', 'Clay 2', 'Clay 3', 'Clay 4'],
-      revenue: 45500
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }],
+      revenue: 45500,
+      bookings: []
     },
     {
       id: 5,
@@ -133,8 +137,9 @@ export class SiteService {
       openingHours: '06:00',
       closingHours: '23:00',
       closedDays: [],
-      courts: ['Hall A', 'Hall B'],
-      revenue: 173900
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
+      revenue: 173900,
+      bookings: []
     },
     {
       id: 6,
@@ -142,8 +147,9 @@ export class SiteService {
       openingHours: '08:30',
       closingHours: '21:00',
       closedDays: ['Tuesday'],
-      courts: ['Lake 1', 'Lake 2', 'Lake 3'],
-      revenue: 98750
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
+      revenue: 98750,
+      bookings: []
     },
     {
       id: 7,
@@ -151,8 +157,9 @@ export class SiteService {
       openingHours: '07:00',
       closingHours: '22:30',
       closedDays: [],
-      courts: ['Gym 1'],
-      revenue: 52100
+      courts: [{ id: 1, number: 1 }],
+      revenue: 52100,
+      bookings: []
     },
     {
       id: 8,
@@ -160,8 +167,9 @@ export class SiteService {
       openingHours: '09:30',
       closingHours: '18:30',
       closedDays: ['Sunday'],
-      courts: ['Hill 1', 'Hill 2'],
-      revenue: 33700
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
+      revenue: 33700,
+      bookings: []
     },
     {
       id: 9,
@@ -169,8 +177,9 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '20:30',
       closedDays: ['Sunday'],
-      courts: ['Uni A', 'Uni B', 'Uni C', 'Uni D'],
-      revenue: 110500
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }],
+      revenue: 110500,
+      bookings: []
     },
     {
       id: 10,
@@ -178,8 +187,9 @@ export class SiteService {
       openingHours: '11:00',
       closingHours: '17:00',
       closedDays: ['Wednesday'],
-      courts: ['Community 1', 'Community 2'],
-      revenue: 21400
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
+      revenue: 21400,
+      bookings: []
     },
     {
       id: 11,
@@ -187,8 +197,9 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '19:30',
       closedDays: [],
-      courts: ['Forest 1', 'Forest 2', 'Forest 3'],
-      revenue: 58700
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
+      revenue: 58700,
+      bookings: []
     },
     {
       id: 12,
@@ -196,8 +207,9 @@ export class SiteService {
       openingHours: '07:00',
       closingHours: '21:00',
       closedDays: ['Monday'],
-      courts: ['DT 1', 'DT 2'],
-      revenue: 76500
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
+      revenue: 76500,
+      bookings: []
     },
     {
       id: 13,
@@ -205,8 +217,9 @@ export class SiteService {
       openingHours: '08:00',
       closingHours: '20:00',
       closedDays: ['Sunday'],
-      courts: ['Harbor 1'],
-      revenue: 40900
+      courts: [{ id: 1, number: 1 }],
+      revenue: 40900,
+      bookings: []
     },
     {
       id: 14,
@@ -214,8 +227,9 @@ export class SiteService {
       openingHours: '09:00',
       closingHours: '18:00',
       closedDays: ['Thursday'],
-      courts: ['Meadow 1', 'Meadow 2', 'Meadow 3'],
-      revenue: 37250
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
+      revenue: 37250,
+      bookings: []
     },
     {
       id: 15,
@@ -223,8 +237,9 @@ export class SiteService {
       openingHours: '06:30',
       closingHours: '23:00',
       closedDays: [],
-      courts: ['Main 1', 'Main 2', 'Main 3', 'Main 4', 'Main 5'],
-      revenue: 225000
+      courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }, { id: 5, number: 5 }],
+      revenue: 225000,
+      bookings: []
     }
   ];
   /**
@@ -291,5 +306,24 @@ export class SiteService {
           return acc;
       }
     }, sites);
+  }
+
+  /** Returns a single site by id from the in-memory dataset. */
+  getById(id: number): Observable<SiteDto | null> {
+    return of(this.sites.find(s => s.id === id) ?? null);
+  }
+
+  /** Updates a site in the in-memory dataset and triggers a refresh for list subscribers. */
+  update(site: SiteDto): Observable<SiteDto> {
+    const idx = this.sites.findIndex(s => s.id === site.id);
+
+    if (idx >= 0) {
+      this.sites[idx] = { ...site };
+    } else {
+      this.sites.unshift({ ...site });
+    }
+
+    this.refresh();
+    return of(this.sites[idx >= 0 ? idx : 0]);
   }
 }
