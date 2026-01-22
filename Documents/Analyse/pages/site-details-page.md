@@ -20,11 +20,11 @@
 |------|-----------|--------|---------|
 | Id | int | x | x |
 | Name | string | x | o |
-| PrimaryColor | string | x |  o |
+| PrimaryColor | string | x | o |
 | SecondaryColor | string | x | o |
-| OpeningHours | string | x |o|
-| ClosingHours | string | x |o|
-| ClosedDays | `Date`[] | x | o|
-| Courts | `Court` [] | x | o        |
+| OpeningHours | string | x | o |
+| ClosingHours | string | x | o |
+| closedDays | `Date`[] | x | o |
+| Courts | `Court` [] | x | o |
 |      |           |        |         |
 |      |           |        |         |
