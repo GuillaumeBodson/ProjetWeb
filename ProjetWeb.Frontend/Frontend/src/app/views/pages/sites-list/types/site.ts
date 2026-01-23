@@ -5,7 +5,7 @@ export interface Site {
   name: string;
   openingHours: string;
   closingHours: string;
-  closedDays: string[];
+  closedDays: Date[];
   courts: Court[];
   revenue: number;
   bookings: Booking[];

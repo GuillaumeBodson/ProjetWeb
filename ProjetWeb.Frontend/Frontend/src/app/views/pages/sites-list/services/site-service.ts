@@ -1,3 +1,4 @@
+// Frontend/src/app/views/pages/sites-list/services/site-service.ts
 import {Injectable} from '@angular/core';
 import {
   BehaviorSubject,
@@ -15,12 +16,10 @@ import {SiteDto} from '../types/site';
 import {PageRequest, PageResponse} from '../../../shared/types/paging';
 import {Comparison, FilterGroup} from '../../../shared/types/filter';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class SiteService {
-
 
   private readonly requestSubject = new BehaviorSubject<PageRequest>({ pageIndex: 0, pageSize: 10 });
   readonly request$ = this.requestSubject.asObservable();
@@ -86,6 +85,31 @@ export class SiteService {
     this.refreshTrigger$.next();
   }
 
+  private static weekdayToDate(weekday: string, base: Date = new Date()): Date {
+    const map: Record<string, number> = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6
+    };
+
+    const target = map[weekday.trim().toLowerCase()];
+    if (target === undefined) {
+      throw new Error(`Invalid weekday: ${weekday}`);
+    }
+
+    const d = new Date(base);
+    d.setHours(0, 0, 0, 0);
+
+    const current = d.getDay();
+    const delta = (target - current + 7) % 7;
+    d.setDate(d.getDate() + delta);
+    return d;
+  }
+
   /**
    * Temporary in-memory data source.
    * Later: replace `fetchPage` with an HttpClient call to your backend.
@@ -96,7 +120,7 @@ export class SiteService {
       name: 'Central Sports Center',
       openingHours: '08:00',
       closingHours: '22:00',
-      closedDays: ['Sunday'],
+      closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 128450,
       bookings: []
@@ -106,7 +130,7 @@ export class SiteService {
       name: 'Riverside Club',
       openingHours: '07:30',
       closingHours: '21:30',
-      closedDays: ['Monday'],
+      closedDays: [SiteService.weekdayToDate('Monday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 84200,
       bookings: []
@@ -126,7 +150,7 @@ export class SiteService {
       name: 'East Park Courts',
       openingHours: '10:00',
       closingHours: '19:00',
-      closedDays: ['Saturday'],
+      closedDays: [SiteService.weekdayToDate('Saturday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }],
       revenue: 45500,
       bookings: []
@@ -146,7 +170,7 @@ export class SiteService {
       name: 'Lakeside Tennis',
       openingHours: '08:30',
       closingHours: '21:00',
-      closedDays: ['Tuesday'],
+      closedDays: [SiteService.weekdayToDate('Tuesday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 98750,
       bookings: []
@@ -166,7 +190,7 @@ export class SiteService {
       name: 'Hilltop Courts',
       openingHours: '09:30',
       closingHours: '18:30',
-      closedDays: ['Sunday'],
+      closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 33700,
       bookings: []
@@ -176,7 +200,7 @@ export class SiteService {
       name: 'University Sports Complex',
       openingHours: '08:00',
       closingHours: '20:30',
-      closedDays: ['Sunday'],
+      closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }],
       revenue: 110500,
       bookings: []
@@ -186,7 +210,7 @@ export class SiteService {
       name: 'Community Courts',
       openingHours: '11:00',
       closingHours: '17:00',
-      closedDays: ['Wednesday'],
+      closedDays: [SiteService.weekdayToDate('Wednesday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 21400,
       bookings: []
@@ -206,7 +230,7 @@ export class SiteService {
       name: 'Downtown Courts',
       openingHours: '07:00',
       closingHours: '21:00',
-      closedDays: ['Monday'],
+      closedDays: [SiteService.weekdayToDate('Monday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 76500,
       bookings: []
@@ -216,7 +240,7 @@ export class SiteService {
       name: 'Harbor Sports Club',
       openingHours: '08:00',
       closingHours: '20:00',
-      closedDays: ['Sunday'],
+      closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }],
       revenue: 40900,
       bookings: []
@@ -226,7 +250,7 @@ export class SiteService {
       name: 'Meadow Courts',
       openingHours: '09:00',
       closingHours: '18:00',
-      closedDays: ['Thursday'],
+      closedDays: [SiteService.weekdayToDate('Thursday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 37250,
       bookings: []
@@ -242,6 +266,7 @@ export class SiteService {
       bookings: []
     }
   ];
+
   /**
    * Replace with real HttpClient call in a service.
    * Current version pages/filters the in-memory `sites` array.

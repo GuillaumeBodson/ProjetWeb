@@ -15,8 +15,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { SiteService } from '../../../sites-list/services/site-service';
-import { Site as SiteDetailsModel } from '../types/site';
 import { Court } from '../types/court';
+import {SiteDto} from '../../../sites-list/types/site';
 
 @Component({
   selector: 'app-site-details',
@@ -63,7 +63,7 @@ export class SiteDetails {
     tap(() => this.loading.set(true)),
     switchMap(id => {
       if (!Number.isFinite(id)) {
-        return of<SiteDetailsModel | null>(null);
+        return of<SiteDto | null>(null);
       }
       // Reuse SiteService demo data and adapt to the richer SiteDetails model.
       return this.siteService.getById(id).pipe(
@@ -71,18 +71,7 @@ export class SiteDetails {
           if (!site) {
             return null;
           }
-          return {
-            id: site.id,
-            name: site.name,
-            openingHours: site.openingHours,
-            closingHours: site.closingHours,
-            // Demo service uses string[]; details model expects Date[].
-            // For now we keep dates at local midnight for the given labels.
-            closedDays: (site.closedDays ?? []).map(() => new Date()),
-            revenue: site.revenue,
-            courts: site.courts ?? [],
-            bookings: site.bookings ?? [],
-          } satisfies SiteDetailsModel;
+          return site as SiteDto;
         })
       );
     }),
@@ -105,7 +94,7 @@ export class SiteDetails {
     catchError(err => {
       console.error('Failed to load site details', err);
       this.loading.set(false);
-      return of<SiteDetailsModel | null>(null);
+      return of<SiteDto | null>(null);
     }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
@@ -154,7 +143,7 @@ export class SiteDetails {
     await this.router.navigate(['/sites']);
   }
 
-  save(site: SiteDetailsModel): void {
+  save(site: SiteDto): void {
     if (!this.form.valid) {
       this.form.markAllAsTouched();
       return;
@@ -165,7 +154,7 @@ export class SiteDetails {
       .filter(d => !Number.isNaN(d.getTime()));
 
     // Keep revenue and courts unchanged.
-    const updated: SiteDetailsModel = {
+    const updated: SiteDto = {
       ...site,
       name: this.form.controls.name.value.trim(),
       openingHours: this.form.controls.openingHours.value.trim(),
@@ -181,7 +170,7 @@ export class SiteDetails {
       openingHours: updated.openingHours,
       closingHours: updated.closingHours,
       revenue: site.revenue,
-      closedDays: updated.closedDays.map(d => d.toISOString().slice(0, 10)),
+      closedDays: updated.closedDays,
       courts: site.courts ?? [],
       bookings: site.bookings ?? [],
     }).pipe(
