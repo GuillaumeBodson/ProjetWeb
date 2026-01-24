@@ -123,7 +123,13 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 128450,
-      bookings: []
+      bookings: [
+        { id: 1, courtId: 1, siteId: 1, startTime: new Date('2026-01-25T09:00:00'), endTime: new Date('2026-01-25T10:30:00') },
+        { id: 2, courtId: 1, siteId: 1, startTime: new Date('2026-01-25T14:00:00'), endTime: new Date('2026-01-25T16:00:00') },
+        { id: 3, courtId: 2, siteId: 1, startTime: new Date('2026-01-25T10:00:00'), endTime: new Date('2026-01-25T11:30:00') },
+        { id: 4, courtId: 3, siteId: 1, startTime: new Date('2026-01-26T08:00:00'), endTime: new Date('2026-01-26T09:00:00') },
+        { id: 5, courtId: 1, siteId: 1, startTime: new Date('2026-01-27T18:00:00'), endTime: new Date('2026-01-27T20:00:00') }
+      ]
     },
     {
       id: 2,
@@ -133,7 +139,11 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Monday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 84200,
-      bookings: []
+      bookings: [
+        { id: 6, courtId: 1, siteId: 2, startTime: new Date('2026-01-25T08:00:00'), endTime: new Date('2026-01-25T09:30:00') },
+        { id: 7, courtId: 2, siteId: 2, startTime: new Date('2026-01-25T15:00:00'), endTime: new Date('2026-01-25T17:00:00') },
+        { id: 8, courtId: 1, siteId: 2, startTime: new Date('2026-01-28T19:00:00'), endTime: new Date('2026-01-28T21:00:00') }
+      ]
     },
     {
       id: 3,
@@ -143,7 +153,11 @@ export class SiteService {
       closedDays: [],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 61350,
-      bookings: []
+      bookings: [
+        { id: 9, courtId: 1, siteId: 3, startTime: new Date('2026-01-24T10:00:00'), endTime: new Date('2026-01-24T12:00:00') },
+        { id: 10, courtId: 2, siteId: 3, startTime: new Date('2026-01-24T13:00:00'), endTime: new Date('2026-01-24T14:30:00') },
+        { id: 11, courtId: 3, siteId: 3, startTime: new Date('2026-01-25T11:00:00'), endTime: new Date('2026-01-25T12:00:00') }
+      ]
     },
     {
       id: 4,
@@ -153,7 +167,12 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Saturday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }],
       revenue: 45500,
-      bookings: []
+      bookings: [
+        { id: 12, courtId: 1, siteId: 4, startTime: new Date('2026-01-27T11:00:00'), endTime: new Date('2026-01-27T12:30:00') },
+        { id: 13, courtId: 2, siteId: 4, startTime: new Date('2026-01-27T14:00:00'), endTime: new Date('2026-01-27T15:00:00') },
+        { id: 14, courtId: 3, siteId: 4, startTime: new Date('2026-01-28T10:30:00'), endTime: new Date('2026-01-28T12:00:00') },
+        { id: 15, courtId: 4, siteId: 4, startTime: new Date('2026-01-29T16:00:00'), endTime: new Date('2026-01-29T18:00:00') }
+      ]
     },
     {
       id: 5,
@@ -163,7 +182,12 @@ export class SiteService {
       closedDays: [],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 173900,
-      bookings: []
+      bookings: [
+        { id: 16, courtId: 1, siteId: 5, startTime: new Date('2026-01-24T06:30:00'), endTime: new Date('2026-01-24T08:00:00') },
+        { id: 17, courtId: 1, siteId: 5, startTime: new Date('2026-01-24T20:00:00'), endTime: new Date('2026-01-24T22:00:00') },
+        { id: 18, courtId: 2, siteId: 5, startTime: new Date('2026-01-25T07:00:00'), endTime: new Date('2026-01-25T08:30:00') },
+        { id: 19, courtId: 2, siteId: 5, startTime: new Date('2026-01-25T19:00:00'), endTime: new Date('2026-01-25T21:00:00') }
+      ]
     },
     {
       id: 6,
@@ -173,7 +197,11 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Tuesday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 98750,
-      bookings: []
+      bookings: [
+        { id: 20, courtId: 1, siteId: 6, startTime: new Date('2026-01-26T09:00:00'), endTime: new Date('2026-01-26T10:30:00') },
+        { id: 21, courtId: 2, siteId: 6, startTime: new Date('2026-01-26T15:00:00'), endTime: new Date('2026-01-26T16:30:00') },
+        { id: 22, courtId: 3, siteId: 6, startTime: new Date('2026-01-28T17:00:00'), endTime: new Date('2026-01-28T18:30:00') }
+      ]
     },
     {
       id: 7,
@@ -183,7 +211,11 @@ export class SiteService {
       closedDays: [],
       courts: [{ id: 1, number: 1 }],
       revenue: 52100,
-      bookings: []
+      bookings: [
+        { id: 23, courtId: 1, siteId: 7, startTime: new Date('2026-01-24T07:30:00'), endTime: new Date('2026-01-24T09:00:00') },
+        { id: 24, courtId: 1, siteId: 7, startTime: new Date('2026-01-24T18:00:00'), endTime: new Date('2026-01-24T19:30:00') },
+        { id: 25, courtId: 1, siteId: 7, startTime: new Date('2026-01-25T12:00:00'), endTime: new Date('2026-01-25T13:30:00') }
+      ]
     },
     {
       id: 8,
@@ -193,7 +225,10 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 33700,
-      bookings: []
+      bookings: [
+        { id: 26, courtId: 1, siteId: 8, startTime: new Date('2026-01-27T10:00:00'), endTime: new Date('2026-01-27T11:30:00') },
+        { id: 27, courtId: 2, siteId: 8, startTime: new Date('2026-01-28T14:00:00'), endTime: new Date('2026-01-28T15:30:00') }
+      ]
     },
     {
       id: 9,
@@ -203,7 +238,12 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }],
       revenue: 110500,
-      bookings: []
+      bookings: [
+        { id: 28, courtId: 1, siteId: 9, startTime: new Date('2026-01-24T08:30:00'), endTime: new Date('2026-01-24T10:00:00') },
+        { id: 29, courtId: 2, siteId: 9, startTime: new Date('2026-01-24T11:00:00'), endTime: new Date('2026-01-24T12:30:00') },
+        { id: 30, courtId: 3, siteId: 9, startTime: new Date('2026-01-25T16:00:00'), endTime: new Date('2026-01-25T17:30:00') },
+        { id: 31, courtId: 4, siteId: 9, startTime: new Date('2026-01-26T09:00:00'), endTime: new Date('2026-01-26T10:30:00') }
+      ]
     },
     {
       id: 10,
@@ -213,7 +253,10 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Wednesday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 21400,
-      bookings: []
+      bookings: [
+        { id: 32, courtId: 1, siteId: 10, startTime: new Date('2026-01-24T12:00:00'), endTime: new Date('2026-01-24T13:30:00') },
+        { id: 33, courtId: 2, siteId: 10, startTime: new Date('2026-01-27T14:00:00'), endTime: new Date('2026-01-27T15:30:00') }
+      ]
     },
     {
       id: 11,
@@ -223,7 +266,11 @@ export class SiteService {
       closedDays: [],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 58700,
-      bookings: []
+      bookings: [
+        { id: 34, courtId: 1, siteId: 11, startTime: new Date('2026-01-24T09:00:00'), endTime: new Date('2026-01-24T10:30:00') },
+        { id: 35, courtId: 2, siteId: 11, startTime: new Date('2026-01-25T13:00:00'), endTime: new Date('2026-01-25T14:30:00') },
+        { id: 36, courtId: 3, siteId: 11, startTime: new Date('2026-01-26T16:00:00'), endTime: new Date('2026-01-26T17:30:00') }
+      ]
     },
     {
       id: 12,
@@ -233,7 +280,11 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Monday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }],
       revenue: 76500,
-      bookings: []
+      bookings: [
+        { id: 37, courtId: 1, siteId: 12, startTime: new Date('2026-01-24T08:00:00'), endTime: new Date('2026-01-24T09:30:00') },
+        { id: 38, courtId: 2, siteId: 12, startTime: new Date('2026-01-25T17:00:00'), endTime: new Date('2026-01-25T18:30:00') },
+        { id: 39, courtId: 1, siteId: 12, startTime: new Date('2026-01-27T19:00:00'), endTime: new Date('2026-01-27T20:30:00') }
+      ]
     },
     {
       id: 13,
@@ -243,7 +294,10 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Sunday')],
       courts: [{ id: 1, number: 1 }],
       revenue: 40900,
-      bookings: []
+      bookings: [
+        { id: 40, courtId: 1, siteId: 13, startTime: new Date('2026-01-24T10:00:00'), endTime: new Date('2026-01-24T11:30:00') },
+        { id: 41, courtId: 1, siteId: 13, startTime: new Date('2026-01-28T15:00:00'), endTime: new Date('2026-01-28T16:30:00') }
+      ]
     },
     {
       id: 14,
@@ -253,7 +307,11 @@ export class SiteService {
       closedDays: [SiteService.weekdayToDate('Thursday')],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }],
       revenue: 37250,
-      bookings: []
+      bookings: [
+        { id: 42, courtId: 1, siteId: 14, startTime: new Date('2026-01-24T10:00:00'), endTime: new Date('2026-01-24T11:30:00') },
+        { id: 43, courtId: 2, siteId: 14, startTime: new Date('2026-01-25T13:00:00'), endTime: new Date('2026-01-25T14:30:00') },
+        { id: 44, courtId: 3, siteId: 14, startTime: new Date('2026-01-27T15:00:00'), endTime: new Date('2026-01-27T16:30:00') }
+      ]
     },
     {
       id: 15,
@@ -263,7 +321,13 @@ export class SiteService {
       closedDays: [],
       courts: [{ id: 1, number: 1 }, { id: 2, number: 2 }, { id: 3, number: 3 }, { id: 4, number: 4 }, { id: 5, number: 5 }],
       revenue: 225000,
-      bookings: []
+      bookings: [
+        { id: 45, courtId: 1, siteId: 15, startTime: new Date('2026-01-24T07:00:00'), endTime: new Date('2026-01-24T09:00:00') },
+        { id: 46, courtId: 2, siteId: 15, startTime: new Date('2026-01-24T10:00:00'), endTime: new Date('2026-01-24T12:00:00') },
+        { id: 47, courtId: 3, siteId: 15, startTime: new Date('2026-01-25T14:00:00'), endTime: new Date('2026-01-25T16:00:00') },
+        { id: 48, courtId: 4, siteId: 15, startTime: new Date('2026-01-26T18:00:00'), endTime: new Date('2026-01-26T20:00:00') },
+        { id: 49, courtId: 5, siteId: 15, startTime: new Date('2026-01-27T20:00:00'), endTime: new Date('2026-01-27T22:00:00') }
+      ]
     }
   ];
 

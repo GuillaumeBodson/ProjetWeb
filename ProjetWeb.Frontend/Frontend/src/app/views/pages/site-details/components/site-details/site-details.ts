@@ -13,9 +13,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { SiteService } from '../../../sites-list/services/site-service';
-import { Court } from '../types/court';
+import { Court, Booking } from '../types/court';
 import {SiteDto} from '../../../sites-list/types/site';
 
 @Component({
@@ -30,6 +31,7 @@ import {SiteDto} from '../../../sites-list/types/site';
     ReactiveFormsModule,
 
     MatToolbarModule,
+    MatTabsModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
@@ -97,6 +99,10 @@ export class SiteDetails {
       return of<SiteDto | null>(null);
     }),
     shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  readonly futureBookings$ = this.site$.pipe(
+    map(site => site?.bookings?.filter(b => new Date(b.startTime) > new Date()) ?? [])
   );
 
   readonly form = this.fb.nonNullable.group({
@@ -191,5 +197,9 @@ export class SiteDetails {
       .split(',')
       .map(s => s.trim())
 
+  }
+
+  getCourtNumber(courtId: number, courts: Court[]): number | undefined {
+    return courts.find(c => c.id === courtId)?.number;
   }
 }
