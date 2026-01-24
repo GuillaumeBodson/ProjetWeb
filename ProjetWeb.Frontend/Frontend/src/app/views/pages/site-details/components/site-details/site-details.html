@@ -125,8 +125,8 @@
               </mat-card-header>
               <mat-card-content>
                 <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Closed days (comma separated)</mat-label>
-                  <input matInput formControlName="closedDays" placeholder="Sunday, Monday" />
+                  <mat-label>Closed dates (YYYY-MM-DD, comma separated)</mat-label>
+                  <input matInput formControlName="closedDays" placeholder="2026-01-24, 2026-01-31" />
                 </mat-form-field>
               </mat-card-content>
             </mat-card>
@@ -136,10 +136,12 @@
                 <mat-card-title class="text-base">Courts</mat-card-title>
               </mat-card-header>
               <mat-card-content>
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Courts (comma separated)</mat-label>
-                  <input matInput formControlName="courts" placeholder="Court A, Court B" />
-                </mat-form-field>
+                <div class="w-full">
+                  <div class="text-xs text-gray-600 mb-1">Courts</div>
+                  <p class="text-sm text-gray-800 break-words">
+                    {{ form.get('courts')?.value || '—' }}
+                  </p>
+                </div>
               </mat-card-content>
             </mat-card>
 
