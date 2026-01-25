@@ -4,7 +4,7 @@ services:
   # Frontend service - Angular 21 application
   frontend:
     build:
-      context: ./ProjetWeb.Frontend/Frontend
+      context: ./ProjetWeb.Frontend
       dockerfile: Dockerfile
     ports:
       - "4200:80"
