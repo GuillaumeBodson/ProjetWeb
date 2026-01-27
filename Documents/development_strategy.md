@@ -74,15 +74,7 @@ All code must adhere to SOLID principles to ensure maintainability and scalabili
 - Comment only when necessary to explain "why", not "what"
 - Refactor regularly to improve code quality
 
-## Test Driven Development (TDD)
-
-### Backend Development
-All backend development **must** follow Test Driven Development:
-
-1. **Write the test first** - Define expected behavior before implementation
-2. **Run the test** - Verify it fails (Red phase)
-3. **Write minimal code** - Implement just enough to pass the test (Green phase)
-4. **Refactor** - Improve code while keeping tests green (Refactor phase)
+## Test Strategy
 
 ### Testing Guidelines
 - Aim for high test coverage (minimum 80% for backend)
@@ -136,9 +128,9 @@ Follow this format for all branches:
    - Link the branch to the issue
    - Use the naming convention above
 
-3. **Develop with TDD** (for backend)
-   - Write tests first
+3. **Develop** 
    - Implement features
+   - Write tests
    - Ensure all tests pass
 
 4. **Commit Regularly**
