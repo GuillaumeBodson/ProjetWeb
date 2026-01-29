@@ -1,36 +1,52 @@
-version: '5.0'
-
 services:
-  # Frontend service - Angular 21 application
-  frontend:
-    build:
-      context: ./ProjetWeb.Frontend
-      dockerfile: Dockerfile
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend
-    networks:
-      - projetweb-network
-    container_name: projetweb-frontend
-    environment:
-      - API_URL=http://backend:5000
-
-  # Backend service - .NET 10 API
-  backend:
+  # AppHost service - Orchestrates API and Frontend
+  # WARNING: This configuration mounts the Docker socket which grants full Docker daemon access.
+  # This is ONLY suitable for development environments. NEVER use this in production.
+  # Security risks include: container breakout, access to all host containers, ability to mount any host directory.
+  apphost:
     build:
       context: .
-      dockerfile: ProjetWeb.Api/Dockerfile
+      dockerfile: ProjetWeb.AppHost/Dockerfile
     ports:
-      - "5000:5000"
+      - "15888:15888"  # Aspire Dashboard HTTP
+      - "18889:18889"  # Aspire Dashboard HTTPS/OTLP
+      - "5000:5000"    # API Backend
+      - "4200:4200"    # Angular Frontend
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
-    networks:
-      - projetweb-network
-    container_name: projetweb-backend
+      - DOTNET_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:15888
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DOTNET_ASPIRE_CONTAINER_RUNTIME=docker
+    volumes:
+      # Mount Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount source code for hot reload (with named volumes for build outputs)
+      - ./ProjetWeb.AppHost:/app/ProjetWeb.AppHost:rw
+      - ./ProjetWeb.Api:/app/ProjetWeb.Api:rw
+      - ./ProjetWeb.Frontend:/app/ProjetWeb.Frontend:rw
+      - ./ProjetWeb.ServiceDefaults:/app/ProjetWeb.ServiceDefaults:rw
+      - ./ProjetWeb.slnx:/app/ProjetWeb.slnx:ro
+      # Use named volumes for NuGet packages and build outputs to prevent overwriting during mount
+      - nuget-packages:/root/.nuget/packages:rw
+      - apphost-bin:/app/ProjetWeb.AppHost/bin:rw
+      - apphost-obj:/app/ProjetWeb.AppHost/obj:rw
+      - api-bin:/app/ProjetWeb.Api/bin:rw
+      - api-obj:/app/ProjetWeb.Api/obj:rw
+      - servicedefaults-bin:/app/ProjetWeb.ServiceDefaults/bin:rw
+      - servicedefaults-obj:/app/ProjetWeb.ServiceDefaults/obj:rw
+    network_mode: bridge
+    container_name: projetweb-apphost
 
-# Define network
-networks:
-  projetweb-network:
-    driver: bridge
+# Define named volumes for build outputs and NuGet cache
+volumes:
+  nuget-packages:
+  apphost-bin:
+  apphost-obj:
+  api-bin:
+  api-obj:
+  servicedefaults-bin:
+  servicedefaults-obj:
+
+# Note: API and Frontend containers will be managed by the AppHost
+# The AppHost will orchestrate these services using Aspire
