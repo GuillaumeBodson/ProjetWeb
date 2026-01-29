@@ -41,6 +41,3 @@ packages/
 # OS files
 .DS_Store
 Thumbs.db
-
-# mkcert certificate (copied into Dockerfile context for CI environment)
-mkcert-ca.crt
