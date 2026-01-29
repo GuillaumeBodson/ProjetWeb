@@ -23,9 +23,10 @@ RUN dotnet publish "ProjetWeb.Api.csproj" -c Release -o /app/publish /p:UseAppHo
 # Stage 3: Final runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5000
 
 COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:5000
 
 ENTRYPOINT ["dotnet", "ProjetWeb.Api.dll"]
