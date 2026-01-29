@@ -1,5 +1,3 @@
-version: '5.0'
-
 services:
   # AppHost service - Orchestrates API and Frontend
   apphost:
