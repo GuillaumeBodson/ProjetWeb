@@ -2,13 +2,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy solution and project files
-COPY ProjetWeb.slnx .
+# Copy project files
 COPY ProjetWeb.Api/ProjetWeb.Api.csproj ProjetWeb.Api/
 COPY ProjetWeb.ServiceDefaults/ProjetWeb.ServiceDefaults.csproj ProjetWeb.ServiceDefaults/
 
 # Restore dependencies
-RUN dotnet restore ProjetWeb.slnx
+RUN dotnet restore ProjetWeb.Api/ProjetWeb.Api.csproj
 
 # Copy source files
 COPY ProjetWeb.Api/ ProjetWeb.Api/
