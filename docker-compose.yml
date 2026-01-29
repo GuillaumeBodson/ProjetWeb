@@ -13,12 +13,14 @@ services:
     networks:
       - projetweb-network
     container_name: projetweb-frontend
+    environment:
+      - API_URL=http://backend:5000
 
-  # Backend service - .NET 9 API (placeholder)
+  # Backend service - .NET 10 API
   backend:
     build:
-      context: ./ProjetWeb.Backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ProjetWeb.Backend/Dockerfile
     ports:
       - "5000:5000"
     environment:
