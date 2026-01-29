@@ -50,13 +50,25 @@ The Docker setup uses .NET Aspire AppHost to orchestrate services:
 
 - **AppHost Container**:
   - Uses .NET 10 SDK with Docker CLI support
-  - Includes Node.js 24.x for Angular frontend
+  - Includes Node.js 20.x LTS for Angular frontend
   - Mounts Docker socket for container management (Docker-in-Docker)
   - Provides hot reload for development
   - Orchestrates API and Frontend containers
   - Exposes Aspire Dashboard for observability
 
-**Security Note**: The Docker socket is mounted to allow the AppHost to manage containers. This is intended for development environments only and grants full Docker access.
+**⚠️ Security Warning**: This setup mounts the Docker socket (`/var/run/docker.sock`), which grants the container full access to the Docker daemon. This poses significant security risks including:
+- Potential container breakout to the host system
+- Access to all containers on the host
+- Ability to mount any host directory
+- Full Docker daemon privileges
+
+**This configuration is ONLY intended for development environments. NEVER use this in production.**
+
+For production deployments, consider:
+- Using rootless Docker
+- Implementing proper container isolation
+- Using Kubernetes or other orchestration platforms with proper security boundaries
+- Review [Docker security best practices](https://docs.docker.com/engine/security/)
 
 ### Development Features
 

@@ -1,5 +1,8 @@
 services:
   # AppHost service - Orchestrates API and Frontend
+  # WARNING: This configuration mounts the Docker socket which grants full Docker daemon access.
+  # This is ONLY suitable for development environments. NEVER use this in production.
+  # Security risks include: container breakout, access to all host containers, ability to mount any host directory.
   apphost:
     build:
       context: .

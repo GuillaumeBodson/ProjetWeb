@@ -13,8 +13,8 @@ RUN apt-get update && \
     apt-get install -y docker-ce-cli && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 24.x for Angular frontend support
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+# Install Node.js 20.x LTS for Angular frontend support
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
@@ -27,12 +27,16 @@ COPY ProjetWeb.ServiceDefaults/ProjetWeb.ServiceDefaults.csproj ./ProjetWeb.Serv
 # Restore dependencies for the AppHost project
 RUN dotnet restore ProjetWeb.AppHost/ProjetWeb.AppHost.csproj
 
+# Copy frontend package files and install npm dependencies
+COPY ProjetWeb.Frontend/package*.json ./ProjetWeb.Frontend/
+RUN npm install --prefix ./ProjetWeb.Frontend
+
 # Copy all source code
 COPY . .
 
 # Expose ports for Aspire Dashboard and services
 # 15888: Aspire Dashboard HTTP
-# 18889: Aspire Dashboard HTTPS/OTLP
+# 18889: Aspire Dashboard OTLP (OpenTelemetry Protocol)
 EXPOSE 15888 18889
 
 # Set working directory to AppHost
