@@ -1,13 +1,13 @@
 # Stage 1: Build the Angular application
-FROM dhi.io/node:24-alpine3.22-dev AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install the required npm version and dependencies
-RUN --mount=type=cache,target=/root/.npm npm ci
+# Install dependencies (using npm install for better compatibility)
+RUN npm install
 
 # Copy application source
 COPY . .
@@ -18,8 +18,8 @@ RUN npm run build
 
 
 
-# # Stage 2: Serve the application with Nginx
-FROM dhi.io/nginx:1.28.0-alpine3.21-dev AS runner
+# Stage 2: Serve the application with Nginx
+FROM nginx:alpine AS runner
 
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf

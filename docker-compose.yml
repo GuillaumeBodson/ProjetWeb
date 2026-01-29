@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Frontend service - Angular 21 application
   frontend:
