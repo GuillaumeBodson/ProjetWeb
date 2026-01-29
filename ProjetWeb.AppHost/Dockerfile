@@ -2,21 +2,20 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS base
 WORKDIR /app
 
-# Install Docker CLI for container management
+# Install Docker CLI and Node.js from Ubuntu repository
+# Using docker.io and nodejs packages for simplicity
 RUN apt-get update && \
-    apt-get install -y ca-certificates curl gnupg && \
-    install -m 0755 -d /etc/apt/keyrings && \
-    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
-    chmod a+r /etc/apt/keyrings/docker.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli && \
+    apt-get install -y docker.io nodejs npm ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 20.x LTS for Angular frontend support
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
+# Copy and trust the mkcert development CA certificate
+# This is needed in CI/CD environments that use mkcert for local HTTPS interception
+COPY mkcert-ca.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
+# Set environment variables
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0 \
+    DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # Copy solution and project files for dependency restoration
 COPY ProjetWeb.slnx ./
@@ -27,7 +26,7 @@ COPY ProjetWeb.ServiceDefaults/ProjetWeb.ServiceDefaults.csproj ./ProjetWeb.Serv
 # Restore dependencies for the AppHost project
 RUN dotnet restore ProjetWeb.AppHost/ProjetWeb.AppHost.csproj
 
-# Copy frontend package files and install npm dependencies
+# Copy frontend package files and install npm dependencies  
 COPY ProjetWeb.Frontend/package*.json ./ProjetWeb.Frontend/
 RUN npm install --prefix ./ProjetWeb.Frontend
 
