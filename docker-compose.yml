@@ -1,36 +1,33 @@
 version: '5.0'
 
 services:
-  # Frontend service - Angular 21 application
-  frontend:
-    build:
-      context: ./ProjetWeb.Frontend
-      dockerfile: Dockerfile
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend
-    networks:
-      - projetweb-network
-    container_name: projetweb-frontend
-    environment:
-      - API_URL=http://backend:5000
-
-  # Backend service - .NET 10 API
-  backend:
+  # AppHost service - Orchestrates API and Frontend
+  apphost:
     build:
       context: .
-      dockerfile: ProjetWeb.Api/Dockerfile
+      dockerfile: ProjetWeb.AppHost/Dockerfile
     ports:
-      - "5000:5000"
+      - "15888:15888"  # Aspire Dashboard HTTP
+      - "18889:18889"  # Aspire Dashboard HTTPS/OTLP
+      - "5000:5000"    # API Backend
+      - "4200:4200"    # Angular Frontend
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
-    networks:
-      - projetweb-network
-    container_name: projetweb-backend
+      - DOTNET_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:15888
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DOTNET_ASPIRE_CONTAINER_RUNTIME=docker
+    volumes:
+      # Mount Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount source code for hot reload (exclude build artifacts)
+      - ./ProjetWeb.AppHost:/app/ProjetWeb.AppHost:rw
+      - ./ProjetWeb.Api:/app/ProjetWeb.Api:rw
+      - ./ProjetWeb.Frontend:/app/ProjetWeb.Frontend:rw
+      - ./ProjetWeb.ServiceDefaults:/app/ProjetWeb.ServiceDefaults:rw
+      - ./ProjetWeb.slnx:/app/ProjetWeb.slnx:ro
+    network_mode: bridge
+    container_name: projetweb-apphost
 
-# Define network
-networks:
-  projetweb-network:
-    driver: bridge
+# Note: API and Frontend containers will be managed by the AppHost
+# The AppHost will orchestrate these services using Aspire

@@ -1,15 +1,17 @@
 # ProjetWeb
 
-A web application project with an Angular 21 frontend and .NET backend (coming soon).
+A web application project with an Angular 21 frontend and .NET 10 backend, orchestrated using .NET Aspire.
 
 ## Project Structure
 
-- **ProjetWeb.Frontend/Frontend/** - Angular 21 frontend application
-- **ProjetWeb.Backend/** - .NET 9 backend API (placeholder)
+- **ProjetWeb.AppHost/** - .NET Aspire AppHost for orchestration
+- **ProjetWeb.Api/** - .NET 10 backend API
+- **ProjetWeb.Frontend/** - Angular 21 frontend application
+- **ProjetWeb.ServiceDefaults/** - Shared service defaults
 
-## Docker Development
+## Running with Docker (Recommended)
 
-This project includes Docker support for containerized development and deployment.
+This project uses .NET Aspire AppHost to orchestrate all services from a single Docker container. The AppHost manages both the API and Frontend services, providing an integrated development experience with the Aspire Dashboard for observability.
 
 ### Prerequisites
 
@@ -18,16 +20,16 @@ This project includes Docker support for containerized development and deploymen
 
 ### Quick Start
 
-Build and start all services:
+Build and start the AppHost with all services:
 
 ```bash
 docker-compose up --build
 ```
 
-Run in detached mode (background):
+View logs from the AppHost:
 
 ```bash
-docker-compose up -d --build
+docker-compose logs -f apphost
 ```
 
 Stop all services:
@@ -38,54 +40,36 @@ docker-compose down
 
 ### Accessing the Application
 
-- **Frontend**: http://localhost:4200
-- **Backend API**: http://localhost:5000 (placeholder - to be implemented)
+- **Aspire Dashboard**: http://localhost:15888 - Monitor all services, view logs, traces, and metrics
+- **API Backend**: http://localhost:5000 - .NET 10 REST API
+- **Angular Frontend**: http://localhost:4200 - Angular 21 web application
 
 ### Docker Architecture
 
-The Docker setup includes:
+The Docker setup uses .NET Aspire AppHost to orchestrate services:
 
-- **Frontend Container**: 
-  - Multi-stage build using Node.js 22 Alpine for building
-  - Nginx Alpine for serving the production build
-  - Configured with API proxy to backend
-  - Optimized with gzip compression and asset caching
+- **AppHost Container**:
+  - Uses .NET 10 SDK with Docker CLI support
+  - Includes Node.js 24.x for Angular frontend
+  - Mounts Docker socket for container management (Docker-in-Docker)
+  - Provides hot reload for development
+  - Orchestrates API and Frontend containers
+  - Exposes Aspire Dashboard for observability
 
-- **Backend Container**: 
-  - Placeholder .NET 9 container
-  - Configured to run on port 5000
-  - Ready for backend implementation
+**Security Note**: The Docker socket is mounted to allow the AppHost to manage containers. This is intended for development environments only and grants full Docker access.
 
-- **Network**: 
-  - Custom bridge network (`projetweb-network`) for inter-container communication
+### Development Features
 
-### Development Notes
-
-- The frontend Dockerfile uses a multi-stage build to keep the final image small
-- Nginx is configured to handle Angular routing and proxy API requests
-- The backend is currently a placeholder and will be implemented with .NET 9
-- Both services communicate over a shared Docker network
-
-### Rebuilding After Changes
-
-After making changes to the code, rebuild the containers:
-
-```bash
-docker-compose up --build
-```
-
-Or rebuild a specific service:
-
-```bash
-docker-compose build frontend
-docker-compose build backend
-```
+- **Hot Reload**: Code changes are automatically detected and applied
+- **Aspire Dashboard**: Real-time monitoring of services, traces, and logs
+- **Integrated Orchestration**: All services managed by a single AppHost
+- **Docker-in-Docker**: AppHost creates and manages service containers dynamically
 
 ## Local Development (without Docker)
 
 For local development without Docker, refer to:
-- Frontend: [ProjetWeb.Frontend/Frontend/README.md](ProjetWeb.Frontend/Frontend/README.md)
-- Backend: Coming soon
+- Frontend: [ProjetWeb.Frontend/README.md](ProjetWeb.Frontend/README.md)
+- Backend: Run the AppHost directly with `dotnet run` in ProjetWeb.AppHost directory
 
 ## Additional Documentation
 

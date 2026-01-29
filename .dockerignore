@@ -1,0 +1,43 @@
+# Build outputs
+**/bin/
+**/obj/
+**/out/
+
+# Node modules and build artifacts
+**/node_modules/
+**/dist/
+
+# IDE folders
+**/.vs/
+**/.vscode/
+**/.idea/
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+Documents/
+
+# Docker files (avoid copying Docker files into the image)
+**/Dockerfile
+**/docker-compose*.yml
+**/.dockerignore
+
+# Aspire
+.aspire/
+
+# Test results
+TestResults/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# OS files
+.DS_Store
+Thumbs.db
