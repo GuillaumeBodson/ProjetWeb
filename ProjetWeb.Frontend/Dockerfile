@@ -1,3 +1,6 @@
+## from https://docs.docker.com/guides/angular/containerize/
+
+
 # Stage 1: Build the Angular application
 FROM dhi.io/node:24-alpine3.22-dev AS builder
 
@@ -33,4 +36,5 @@ COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/nginx/htm
 EXPOSE 80
 
 # Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-c", "/etc/nginx/nginx.conf"]
+CMD ["-g", "daemon off;"]
