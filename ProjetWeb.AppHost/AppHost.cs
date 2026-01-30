@@ -10,6 +10,4 @@ var frontend = builder.AddJavaScriptApp("frontend", "../ProjetWeb.Frontend", "st
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
 
-builder.AddProject<Projects.AuthService>("authservice");
-
 builder.Build().Run();

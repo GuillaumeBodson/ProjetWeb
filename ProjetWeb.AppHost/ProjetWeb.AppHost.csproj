@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
 
   <ItemGroup>
-    <ProjectReference Include="..\AuthService\AuthService.csproj" />
     <ProjectReference Include="..\ProjetWeb.Api\ProjetWeb.Api.csproj" />
   </ItemGroup>
 

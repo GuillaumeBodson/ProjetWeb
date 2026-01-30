@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="AuthService/AuthService.csproj" />
   <Project Path="ProjetWeb.Api/ProjetWeb.Api.csproj" />
   <Project Path="ProjetWeb.AppHost/ProjetWeb.AppHost.csproj" />
   <Project Path="ProjetWeb.ServiceDefaults/ProjetWeb.ServiceDefaults.csproj" />
