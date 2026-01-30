@@ -1,8 +1,18 @@
+using AuthService.BL.Options;
+using AuthService.BL.Services;
+using AuthService.BL.Services.Abstractions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+builder.Services.AddOptions<JwtOptions>()
+    .BindConfiguration(JwtOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 // Add services to the container.
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
