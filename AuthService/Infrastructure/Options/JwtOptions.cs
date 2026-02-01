@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AuthService.BL.Options;
+namespace AuthService.Infrastructure.Options;
 
 public class JwtOptions
 {
@@ -17,4 +17,5 @@ public class JwtOptions
     public required string Audience { get; init; }
 
     public int AccessTokenExpirationHours { get; init; } = 1;
+    public int RefreshTokenExpirationDays { get; init; } = 7;
 }

@@ -1,8 +1,10 @@
-using AuthService.BL.Options;
 using AuthService.BL.Services;
 using AuthService.BL.Services.Abstractions;
 using AuthService.DAL;
+using AuthService.Infrastructure;
+using AuthService.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -25,7 +27,11 @@ builder.Services.AddOptions<JwtOptions>()
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthenticationService>();
 
-builder.Services.AddControllers();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddControllers(options => 
+    options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails))));
 
 
 // JWT Authentication
@@ -63,6 +69,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
