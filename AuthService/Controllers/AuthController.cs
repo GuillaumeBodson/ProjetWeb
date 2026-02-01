@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Conflict(new ProblemDetails
+            return BadRequest(new ProblemDetails
             {
                 Title = "Registration Failed",
                 Detail = ex.Message,

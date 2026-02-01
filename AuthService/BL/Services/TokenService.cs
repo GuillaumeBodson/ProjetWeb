@@ -61,8 +61,9 @@ public class TokenService : ITokenService
                 ValidIssuer = _jwtOptions.Issuer,
                 ValidateAudience = true,
                 ValidAudience = _jwtOptions.Audience,
-                ValidateLifetime = false,
-                ClockSkew = TimeSpan.Zero
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromMinutes(5)
+
             }, out SecurityToken validatedToken);
 
             return principal;
