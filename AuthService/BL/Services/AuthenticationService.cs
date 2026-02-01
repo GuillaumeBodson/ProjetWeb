@@ -1,8 +1,8 @@
 ﻿using AuthService.BL.Models;
-using AuthService.BL.Options;
 using AuthService.BL.Services.Abstractions;
 using AuthService.DAL;
 using AuthService.DAL.Entities;
+using AuthService.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static BCrypt.Net.BCrypt;

@@ -17,66 +17,26 @@ public class AuthController : ControllerBase
 
     [HttpPost("register")]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        try
-        {
-            var response = await _authService.RegisterAsync(request);
-            return CreatedAtAction(
-                actionName: nameof(Register),
-                value: response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new ProblemDetails
-            {
-                Title = "Registration Failed",
-                Detail = ex.Message,
-                Status = StatusCodes.Status409Conflict
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Registration Failed",
-                Detail = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
+        var response = await _authService.RegisterAsync(request);
+        return CreatedAtAction(nameof(Register), value: response);
     }
 
     [HttpPost("login")]
-    [Produces<AuthResponse>]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        try
-        {
-            var response = await _authService.LoginAsync(request);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred during login" });
-        }
+        var response = await _authService.LoginAsync(request);
+        return Ok(response);
     }
 
-    [HttpPost("logout")]
-    [Produces<AuthResponse>]
-    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest refreshTokenRequest)
+    [HttpPost("refresh")]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-        var response = await _authService.RefreshTokenAsync(refreshTokenRequest.RefreshToken);
-
-        if(response == null)
-        {
-            return Unauthorized(new { message = "Invalid refresh token" });
-        }
+        var response = await _authService.RefreshTokenAsync(refreshTokenRequest.RefreshToken)
+            ?? throw new UnauthorizedAccessException("The provided refresh token is invalid or has expired.");
 
         return Ok(response);
     }

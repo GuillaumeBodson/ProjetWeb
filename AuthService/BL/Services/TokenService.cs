@@ -5,8 +5,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using AuthService.BL.Services.Abstractions;
-using AuthService.BL.Options;
 using System.Security.Cryptography;
+using AuthService.Infrastructure.Options;
 
 namespace AuthService.BL.Services;
 
