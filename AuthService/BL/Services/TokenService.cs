@@ -75,7 +75,7 @@ public class TokenService : ITokenService
         }
     }
     
-    public string GenerateRefreshToken(string token)
+    public string GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();

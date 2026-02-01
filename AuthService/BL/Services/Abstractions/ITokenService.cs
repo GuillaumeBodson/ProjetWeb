@@ -6,6 +6,6 @@ namespace AuthService.BL.Services.Abstractions;
 public interface ITokenService
 {
     string GenerateAccessToken(User user);
-    string GenerateRefreshToken(string token);
+    string GenerateRefreshToken();
     ClaimsPrincipal? ValidateToken(string token);
 }

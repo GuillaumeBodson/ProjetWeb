@@ -59,8 +59,6 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-app.UseExceptionHandler();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -71,6 +69,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

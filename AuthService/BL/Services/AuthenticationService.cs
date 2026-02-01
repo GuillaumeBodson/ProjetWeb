@@ -44,7 +44,7 @@ public class AuthenticationService : IAuthService
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation("New user registered: {Email}", user.Email);
-        return await GetAuthResponseAsync(user);
+        return await GenerateAuthResponseAsync(user);
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -60,14 +60,14 @@ public class AuthenticationService : IAuthService
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation("User logged in: {Email}", user.Email);
-        return await GetAuthResponseAsync(user);
+        return await GenerateAuthResponseAsync(user);
     }
 
     public async Task<AuthResponse?> RefreshTokenAsync(string refreshToken)
     {
         var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
 
-        if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt >= DateTime.UtcNow)
+        if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt <= DateTime.UtcNow)
         {
             return null;
         }
@@ -81,12 +81,26 @@ public class AuthenticationService : IAuthService
         storedToken.IsRevoked = true;
         await _dbContext.SaveChangesAsync();
 
-        return await GetAuthResponseAsync(user);
+        return await GenerateAuthResponseAsync(user);
     }
 
-    private async Task<AuthResponse> GetAuthResponseAsync(User user)
+    private async Task<AuthResponse> GenerateAuthResponseAsync(User user)
     {
         var accessToken = _tokenService.GenerateAccessToken(user);
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        var refreshTokenEntity = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = refreshToken,
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays),
+            CreatedAt = DateTime.UtcNow,
+            IsRevoked = false
+        };
+
+        _dbContext.RefreshTokens.Add(refreshTokenEntity);
+        await _dbContext.SaveChangesAsync();
 
         return new AuthResponse
         {
