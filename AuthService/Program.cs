@@ -16,6 +16,7 @@ builder.Services.AddOptions<JwtOptions>()
 
 // Add services to the container.
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthenticationService>();
 
 builder.Services.AddControllers();
 
