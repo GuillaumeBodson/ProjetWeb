@@ -4,6 +4,7 @@ using AuthService.BL.Services.Abstractions;
 using AuthService.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -29,21 +30,11 @@ builder.Services.AddControllers();
 
 
 // JWT Authentication
-var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtOptions.Issuer,
-            ValidAudience = jwtOptions.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
-        };
-    });
+    .AddJwtBearer();
+
+// Configure JWT Bearer options using ConfigureOptions to resolve JwtOptions from DI
+builder.Services.ConfigureOptions<ConfigureJwtBearerOptions>();
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
