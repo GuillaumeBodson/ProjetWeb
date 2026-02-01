@@ -63,6 +63,27 @@ public class AuthenticationService : IAuthService
         return await GetAuthResponseAsync(user);
     }
 
+    public async Task<AuthResponse?> RefreshTokenAsync(string refreshToken)
+    {
+        var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt >= DateTime.UtcNow)
+        {
+            return null;
+        }
+
+        var user = await _dbContext.Users.FindAsync(storedToken.UserId);
+        if (user == null || !user.IsActive)
+        {
+            return null;
+        }
+
+        storedToken.IsRevoked = true;
+        await _dbContext.SaveChangesAsync();
+
+        return await GetAuthResponseAsync(user);
+    }
+
     private async Task<AuthResponse> GetAuthResponseAsync(User user)
     {
         var accessToken = _tokenService.GenerateAccessToken(user);

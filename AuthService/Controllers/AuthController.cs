@@ -1,6 +1,5 @@
 ﻿using AuthService.BL.Models;
 using AuthService.BL.Services.Abstractions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers;
@@ -66,5 +65,19 @@ public class AuthController : ControllerBase
         {
             return StatusCode(500, new { message = "An error occurred during login" });
         }
+    }
+
+    [HttpPost("logout")]
+    [Produces<AuthResponse>]
+    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest refreshTokenRequest)
+    {
+        var response = await _authService.RefreshTokenAsync(refreshTokenRequest.RefreshToken);
+
+        if(response == null)
+        {
+            return Unauthorized(new { message = "Invalid refresh token" });
+        }
+
+        return Ok(response);
     }
 }
