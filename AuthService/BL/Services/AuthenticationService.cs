@@ -84,6 +84,19 @@ public class AuthenticationService : IAuthService
         return await GenerateAuthResponseAsync(user);
     }
 
+    public async Task RevokeTokenAsnc(string refreshToken)
+    {
+        var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+        if (storedToken == null || storedToken.IsRevoked)
+        {
+            _logger.LogWarning("Attempt to revoke invalid or already revoked token: {Token}", refreshToken);
+            throw new InvalidOperationException("The provided refresh token is invalid or already revoked.");
+        }
+        storedToken.IsRevoked = true;
+        await _dbContext.SaveChangesAsync();
+        _logger.LogInformation("Refresh token revoked: {Token}", refreshToken);
+    }
+
     private async Task<AuthResponse> GenerateAuthResponseAsync(User user)
     {
         var accessToken = _tokenService.GenerateAccessToken(user);
