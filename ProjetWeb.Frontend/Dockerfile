@@ -1,40 +1,14 @@
-## from https://docs.docker.com/guides/angular/containerize/
-
-
-# Stage 1: Build the Angular application
-FROM dhi.io/node:24-alpine3.22-dev AS builder
-
+# Build stage
+FROM node:22-alpine AS build
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
-
-# Install the required npm version and dependencies
-RUN --mount=type=cache,target=/root/.npm npm ci
-
-# Copy application source
+RUN npm ci
 COPY . .
+RUN npm run build -- --configuration=production
 
-# Build the Angular app
-RUN npm run build
-
-
-
-
-# # Stage 2: Serve the application with Nginx
-FROM dhi.io/nginx:1.28.0-alpine3.21-dev AS runner
-
-# Copy custom Nginx config
+# Production stage
+FROM nginx:alpine AS final
 COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy the static build output from the build stage to Nginx's default HTML serving directory
-COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/nginx/html
-
-
-
-# Expose port 80
-EXPOSE 80
-
-# Start nginx
-ENTRYPOINT ["nginx", "-c", "/etc/nginx/nginx.conf"]
-CMD ["-g", "daemon off;"]
+COPY --from=build /app/dist/*/browser /usr/share/nginx/html
+EXPOSE 8000
+CMD ["nginx", "-g", "daemon off;"]

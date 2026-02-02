@@ -1,0 +1,73 @@
+services:
+  aspire-dashboard:
+    container_name: "aspire-dashboard"
+    image: "mcr.microsoft.com/dotnet/aspire-dashboard:9.0"
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+    - target: 18888
+      published: 18888
+    restart: unless-stopped
+
+  authservice:
+    container_name: "authservice"
+    build:
+      context: ../../
+      dockerfile: AuthService/Dockerfile
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "authservice"
+    ports:
+    - target: 8080
+      published: 10000
+    restart: unless-stopped
+
+  apigateway:
+    container_name: "apigateway"
+    build:
+      context: ../../
+      dockerfile: ApiGateway/Dockerfile
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      AUTHSERVICE_HTTP: "http://authservice:8080"
+      services__authservice__http__0: "http://authservice:8080"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "apigateway"
+    ports:
+    - target: 8080
+      published: 10002
+    depends_on:
+      - authservice
+    restart: unless-stopped
+
+  frontend:
+    container_name: "frontend"
+    build:
+      context: ../../ProjetWeb.Frontend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: "development"
+      APIGATEWAY_HTTP: "http://apigateway:8080"
+      services__apigateway__http__0: "http://apigateway:8080"
+      PORT: "8000"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "frontend"
+    ports:
+    - target: 8000
+      published: 8000
+    depends_on:
+      - apigateway
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
