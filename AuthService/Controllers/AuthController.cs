@@ -1,9 +1,9 @@
-﻿using AuthService.BL.Models;
-using AuthService.BL.Services.Abstractions;
+﻿using Authentication.API.BL.Models;
+using Authentication.API.BL.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AuthService.Controllers;
+namespace Authentication.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

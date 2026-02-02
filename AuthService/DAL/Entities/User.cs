@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AuthService.DAL.Entities;
+namespace Authentication.API.DAL.Entities;
 
 public class User
 {

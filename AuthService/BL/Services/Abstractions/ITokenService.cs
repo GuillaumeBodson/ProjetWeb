@@ -1,7 +1,7 @@
-﻿using AuthService.DAL.Entities;
+﻿using Authentication.API.DAL.Entities;
 using System.Security.Claims;
 
-namespace AuthService.BL.Services.Abstractions;
+namespace Authentication.API.BL.Services.Abstractions;
 
 public interface ITokenService
 {

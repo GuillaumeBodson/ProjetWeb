@@ -1,4 +1,4 @@
-﻿using AuthService.Infrastructure.Options;
+﻿using Authentication.API.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.RateLimiting;
 
-namespace AuthService.Infrastructure;
+namespace Authentication.API.Infrastructure;
 
 public static class ServicesRegistrationHelper
 {

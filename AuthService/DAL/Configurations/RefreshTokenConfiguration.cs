@@ -1,8 +1,8 @@
-using AuthService.DAL.Entities;
+using Authentication.API.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AuthService.DAL.Configurations;
+namespace Authentication.API.DAL.Configurations;
 
 public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {

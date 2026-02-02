@@ -1,12 +1,11 @@
-using AuthService.BL.Services;
-using AuthService.BL.Services.Abstractions;
-using AuthService.DAL;
-using AuthService.Infrastructure;
-using AuthService.Infrastructure.Options;
+using Authentication.API.BL.Services;
+using Authentication.API.BL.Services.Abstractions;
+using Authentication.API.DAL;
+using Authentication.API.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static AuthService.Infrastructure.ServicesRegistrationHelper;
+using static Authentication.API.Infrastructure.ServicesRegistrationHelper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +20,7 @@ builder.Services.RegisterOptions();
 
 // Add services to the container.
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IAuthService, AuthenticationService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

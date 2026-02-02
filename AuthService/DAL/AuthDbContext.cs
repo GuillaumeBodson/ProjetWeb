@@ -1,7 +1,7 @@
-﻿using AuthService.DAL.Entities;
+﻿using Authentication.API.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AuthService.DAL;
+namespace Authentication.API.DAL;
 
 public class AuthDbContext : DbContext
 {

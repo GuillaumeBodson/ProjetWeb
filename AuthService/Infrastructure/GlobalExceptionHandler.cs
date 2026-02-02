@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AuthService.Infrastructure;
+namespace Authentication.API.Infrastructure;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
