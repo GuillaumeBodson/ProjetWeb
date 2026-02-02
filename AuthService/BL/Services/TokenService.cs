@@ -13,10 +13,12 @@ namespace AuthService.BL.Services;
 public class TokenService : ITokenService
 {
     private readonly JwtOptions _jwtOptions;
+    private readonly ILogger<TokenService> _logger;
 
-    public TokenService(IOptions<JwtOptions> jwtOptions)
+    public TokenService(IOptions<JwtOptions> jwtOptions, ILogger<TokenService> logger)
     {
         _jwtOptions = jwtOptions.Value;
+        _logger = logger;
     }
 
     public string GenerateAccessToken(User user)
@@ -44,6 +46,8 @@ public class TokenService : ITokenService
             signingCredentials: credentials
         );
 
+        _logger.LogInformation("Generated access token for user {UserId}", user.Id);
+
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
@@ -69,9 +73,10 @@ public class TokenService : ITokenService
 
             return principal;
         }
-        catch
+        catch (Exception ex)
         {
-            return null;
+            _logger.LogWarning("Token validation failed: {Message}", ex.Message);
+            throw;
         }
     }
     
@@ -81,5 +86,14 @@ public class TokenService : ITokenService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public string MaskToken(string token)
+    {
+        if (string.IsNullOrEmpty(token) || token.Length < 8)
+        {
+            return "********";
+        }
+        return string.Concat(token.AsSpan(0, 8), "...");
     }
 }

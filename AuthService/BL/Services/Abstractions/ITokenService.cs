@@ -7,5 +7,6 @@ public interface ITokenService
 {
     string GenerateAccessToken(User user);
     string GenerateRefreshToken();
+    string MaskToken(string token);
     ClaimsPrincipal? ValidateToken(string token);
 }

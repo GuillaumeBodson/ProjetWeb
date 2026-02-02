@@ -63,19 +63,23 @@ public class AuthenticationService : IAuthService
         return await GenerateAuthResponseAsync(user);
     }
 
-    public async Task<AuthResponse?> RefreshTokenAsync(string refreshToken)
+    public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
     {
         var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+        var maskedToken = _tokenService.MaskToken(refreshToken);
 
         if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt <= DateTime.UtcNow)
         {
-            return null;
+            _logger.LogWarning("Invalid, revoked, or expired refresh token received for refresh: {Token}", maskedToken);
+            
+            throw new InvalidOperationException("The provided refresh token is invalid, revoked, or expired.");
         }
 
         var user = await _dbContext.Users.FindAsync(storedToken.UserId);
         if (user == null || !user.IsActive)
         {
-            return null;
+            _logger.LogWarning($"Refresh token refresh failed for non-existent or inactive user. Token: {maskedToken}, UserId: {storedToken.UserId}");
+            throw new InvalidOperationException("The user associated with the refresh token does not exist or is inactive.");
         }
 
         storedToken.IsRevoked = true;
@@ -87,7 +91,7 @@ public class AuthenticationService : IAuthService
     public async Task RevokeTokenAsync(string refreshToken)
     {
         var storedToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
-        var maskedToken = string.Concat(refreshToken.AsSpan(0, Math.Min(8, refreshToken.Length)), "...");
+        var maskedToken = _tokenService.MaskToken(refreshToken);
         if (storedToken == null || storedToken.IsRevoked)
         {
             _logger.LogWarning("Attempt to revoke invalid or already revoked token: {Token}", maskedToken);
@@ -120,6 +124,7 @@ public class AuthenticationService : IAuthService
         {
             Token = accessToken,
             ExpiresAt = DateTime.UtcNow.AddHours(_jwtOptions.AccessTokenExpirationHours),
+            RefreshToken = refreshToken,
             User = new UserDto
             {
                 Id = user.Id,

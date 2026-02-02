@@ -36,13 +36,11 @@ public class AuthController : ControllerBase
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-        var response = await _authService.RefreshTokenAsync(refreshTokenRequest.RefreshToken)
-            ?? throw new UnauthorizedAccessException("The provided refresh token is invalid or has expired.");
+        var response = await _authService.RefreshTokenAsync(refreshTokenRequest.RefreshToken);
 
         return Ok(response);
     }
 
-    [Authorize]
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest refreshTokenRequest)
