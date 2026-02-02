@@ -3,6 +3,7 @@ using AuthService.BL.Services.Abstractions;
 using AuthService.DAL;
 using AuthService.Infrastructure;
 using AuthService.Infrastructure.Options;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static AuthService.Infrastructure.ServicesRegistrationHelper;
@@ -16,10 +17,7 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddOptions<JwtOptions>()
-    .BindConfiguration(JwtOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+builder.Services.RegisterOptions();
 
 // Add services to the container.
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -27,6 +25,14 @@ builder.Services.AddScoped<IAuthService, AuthenticationService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 
 // Rate Limiting Configuration
 builder.Services.AddRateLimiterPolicies();
@@ -56,9 +62,9 @@ app.UseForwardedHeaders();
 
 app.UseExceptionHandler();
 
-app.UseHttpsRedirection();
-
 app.UseRateLimiter();
+
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

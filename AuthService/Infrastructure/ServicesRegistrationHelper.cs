@@ -1,6 +1,7 @@
 ﻿using AuthService.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -12,50 +13,57 @@ public static class ServicesRegistrationHelper
 {
     public static IServiceCollection AddRateLimiterPolicies(this IServiceCollection services)
     {
-        return services.AddRateLimiter(options =>
+        services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-            // Global policy for general endpoints
-            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-                RateLimitPartition.GetTokenBucketLimiter(
-                    partitionKey: GetClientIpAddress(context),
-                    factory: _ => new TokenBucketRateLimiterOptions
-                    {
-                        TokenLimit = 100,
-                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-                        TokensPerPeriod = 100,
-                        AutoReplenishment = true,
-                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        QueueLimit = 0
-                    }));
-
-            // Strict policy for authentication endpoints (login, register)
-            options.AddPolicy("auth", context =>
-                RateLimitPartition.GetTokenBucketLimiter(
-                    partitionKey: GetClientIpAddress(context),
-                    factory: _ => new TokenBucketRateLimiterOptions
-                    {
-                        TokenLimit = 10,
-                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-                        TokensPerPeriod = 10,
-                        AutoReplenishment = true,
-                        QueueLimit = 0
-                    }));
-
-
-            options.OnRejected = async (context, cancellationToken) =>
-            {
-                context.HttpContext.Response.Headers.RetryAfter = "60";
-
-                await context.HttpContext.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Status = StatusCodes.Status429TooManyRequests,
-                    Title = "Too Many Requests",
-                    Detail = "Rate limit exceeded. Please try again later."
-                }, cancellationToken);
-            };
         });
+
+        services.AddOptions<RateLimiterOptions>()
+            .Configure<IOptions<RateLimitOptions>>((rateLimiterOptions, rateLimitOptions) =>
+            {
+                var config = rateLimitOptions.Value;
+
+                // Global policy for general endpoints
+                rateLimiterOptions.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetTokenBucketLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new TokenBucketRateLimiterOptions
+                        {
+                            TokenLimit = config.Global.TokenLimit,
+                            ReplenishmentPeriod = TimeSpan.FromMinutes(config.Global.ReplenishmentPeriodMinutes),
+                            TokensPerPeriod = config.Global.TokensPerPeriod,
+                            AutoReplenishment = true,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = config.Global.QueueLimit
+                        }));
+
+                // Strict policy for authentication endpoints (login, register)
+                rateLimiterOptions.AddPolicy("auth", context =>
+                    RateLimitPartition.GetTokenBucketLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress,
+                        factory: _ => new TokenBucketRateLimiterOptions
+                        {
+                            TokenLimit = config.Auth.TokenLimit,
+                            ReplenishmentPeriod = TimeSpan.FromMinutes(config.Auth.ReplenishmentPeriodMinutes),
+                            TokensPerPeriod = config.Auth.TokensPerPeriod,
+                            AutoReplenishment = true,
+                            QueueLimit = config.Auth.QueueLimit
+                        }));
+
+                rateLimiterOptions.OnRejected = async (context, cancellationToken) =>
+                {
+                    context.HttpContext.Response.Headers.RetryAfter = config.RetryAfterSeconds.ToString();
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(new ProblemDetails
+                    {
+                        Status = StatusCodes.Status429TooManyRequests,
+                        Title = "Too Many Requests",
+                        Detail = "Rate limit exceeded. Please try again later."
+                    }, cancellationToken);
+                };
+            });
+
+        return services;
     }
 
     public static IServiceCollection AddJWTAuthentication(this IServiceCollection services)
@@ -83,18 +91,18 @@ public static class ServicesRegistrationHelper
     }
 
 
-    // Helper to extract real client IP
-    private static string GetClientIpAddress(HttpContext context)
+    public static IServiceCollection RegisterOptions(this IServiceCollection services)
     {
-        // X-Forwarded-For is parsed by UseForwardedHeaders() into Connection.RemoteIpAddress
-        // But we can also check the header directly as fallback
-        var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(forwardedFor))
-        {
-            // Take the first IP (original client)
-            return forwardedFor.Split(',')[0].Trim();
-        }
+        services.AddOptions<JwtOptions>()
+            .BindConfiguration(JwtOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        services.AddOptions<RateLimitOptions>()
+            .BindConfiguration(RateLimitOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        return services;
     }
 }
