@@ -1,5 +1,6 @@
 ﻿using AuthService.BL.Models;
 using AuthService.BL.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers;
@@ -39,5 +40,14 @@ public class AuthController : ControllerBase
             ?? throw new UnauthorizedAccessException("The provided refresh token is invalid or has expired.");
 
         return Ok(response);
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest refreshTokenRequest)
+    {
+        await _authService.RevokeTokenAsync(refreshTokenRequest.RefreshToken);
+        return NoContent();
     }
 }
