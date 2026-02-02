@@ -47,7 +47,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-        await _authService.RevokeTokenAsnc(refreshTokenRequest.RefreshToken);
+        await _authService.RevokeTokenAsync(refreshTokenRequest.RefreshToken);
         return NoContent();
     }
 }
