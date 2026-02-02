@@ -42,7 +42,6 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest refreshTokenRequest)
