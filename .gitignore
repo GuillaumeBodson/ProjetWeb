@@ -40,6 +40,8 @@ packages/
 
 # Aspire
 .aspire/
+aspirate-state.json
+**/aspirate-output/
 
 # Test results
 TestResults/
