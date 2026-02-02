@@ -1,6 +1,0 @@
-@ProjetWeb.Api_HostAddress = http://localhost:5128
-
-GET {{ProjetWeb.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
 
   <ItemGroup>
+    <ProjectReference Include="..\ApiGateway\ApiGateway.csproj" />
     <ProjectReference Include="..\AuthService\Authentication.API.csproj" />
   </ItemGroup>
 

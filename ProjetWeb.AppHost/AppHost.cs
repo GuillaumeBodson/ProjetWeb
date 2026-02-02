@@ -1,15 +1,16 @@
-using Google.Protobuf.WellKnownTypes;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
+var authApi = builder.AddProject<Projects.Authentication_API>("authservice");
 
-
-var authApi =  builder.AddProject<Projects.Authentication_API>("authservice");
-
-// Add the Angular frontend and reference the API
-var frontend = builder.AddJavaScriptApp("frontend", "../ProjetWeb.Frontend", "start")
+// Add API Gateway with reference to backend services
+var apiGateway = builder.AddProject<Projects.ApiGateway>("apigateway")
     .WithReference(authApi)
-    .WaitFor(authApi)
+    .WaitFor(authApi);
+
+// Add the Angular frontend and reference the API Gateway
+var frontend = builder.AddJavaScriptApp("frontend", "../ProjetWeb.Frontend", "start")
+    .WithReference(apiGateway)
+    .WaitFor(apiGateway)
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
 
