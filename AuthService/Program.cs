@@ -12,8 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Database
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.AddSqlServerDbContext<AuthDbContext>("authdb");
 
 
 builder.Services.RegisterOptions();
