@@ -21,5 +21,5 @@ public class User
 
     public bool IsActive { get; set; } = true;
 
-    public string Role { get; set; } = "User";
+    public Role Role { get; set; } = null!;
 }
