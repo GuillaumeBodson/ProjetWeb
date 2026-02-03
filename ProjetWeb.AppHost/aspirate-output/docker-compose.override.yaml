@@ -1,0 +1,23 @@
+services:
+  sql:
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  auth-migrations:
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: "no"  # Run once and exit
+
+  authservice:
+    depends_on:
+      auth-migrations:
+        condition: service_completed_successfully
+  frontend:    
+    build:
+      context: ../../ProjetWeb.Frontend
+      dockerfile: Dockerfile
