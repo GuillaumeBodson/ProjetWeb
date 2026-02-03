@@ -61,8 +61,11 @@ app.UseForwardedHeaders();
 app.UseExceptionHandler();
 
 app.UseRateLimiter();
-
-app.UseHttpsRedirection();
+// Only use HTTPS redirect in production and when not behind a proxy
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
