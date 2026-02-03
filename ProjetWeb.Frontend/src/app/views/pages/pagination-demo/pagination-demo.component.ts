@@ -1,5 +1,5 @@
 import { CommonModule} from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 import { PageRequest, PageResponse } from '../../shared/types/paging';
 import {
@@ -13,6 +13,7 @@ import {
   switchMap,
   tap
 } from 'rxjs';
+import {AuthService, LoginRequestDto} from '../../../core/api/auth';
 type Item = { id: number; name: string };
 
 @Component({
@@ -23,6 +24,17 @@ type Item = { id: number; name: string };
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaginationDemoComponent {
+  private authService = inject(AuthService);
+
+  login() {
+    const request: LoginRequestDto = { email: 'test@example.com', password: 'Password123!' };
+    console.log('Logging in with', request);
+    this.authService.apiAuthLoginPost(request).subscribe(response => {
+      console.log('Token:', response.token);
+    });
+  }
+
+
   loading = signal(false);
 
   all: Item[] = Array.from({ length: 137 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` }));
