@@ -1,6 +1,6 @@
-﻿using AuthService.BL.Models;
+﻿using Authentication.API.BL.Models;
 
-namespace AuthService.BL.Services.Abstractions;
+namespace Authentication.API.BL.Services.Abstractions;
 
 public interface IAuthService
 {

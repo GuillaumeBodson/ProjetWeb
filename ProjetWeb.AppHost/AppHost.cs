@@ -1,15 +1,17 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Add the .NET API backend
-var api = builder.AddProject<Projects.ProjetWeb_Api>("api");
+var authApi = builder.AddProject<Projects.Authentication_API>("authservice");
 
-// Add the Angular frontend and reference the API
+// Add API Gateway with reference to backend services
+var apiGateway = builder.AddProject<Projects.ApiGateway>("apigateway")
+    .WithReference(authApi)
+    .WaitFor(authApi);
+
+// Add the Angular frontend and reference the API Gateway
 var frontend = builder.AddJavaScriptApp("frontend", "../ProjetWeb.Frontend", "start")
-    .WithReference(api)
-    .WaitFor(api)
+    .WithReference(apiGateway)
+    .WaitFor(apiGateway)
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
-
-builder.AddProject<Projects.AuthService>("authservice");
 
 builder.Build().Run();

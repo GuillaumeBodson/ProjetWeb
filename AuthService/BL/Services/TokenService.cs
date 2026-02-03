@@ -1,14 +1,14 @@
-﻿using AuthService.DAL.Entities;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
-using AuthService.BL.Services.Abstractions;
 using System.Security.Cryptography;
-using AuthService.Infrastructure.Options;
+using Authentication.API.DAL.Entities;
+using Authentication.API.BL.Services.Abstractions;
+using Authentication.API.Infrastructure.Options;
 
-namespace AuthService.BL.Services;
+namespace Authentication.API.BL.Services;
 
 public class TokenService : ITokenService
 {

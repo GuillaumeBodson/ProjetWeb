@@ -1,4 +1,4 @@
-﻿namespace AuthService.BL.Models;
+﻿namespace Authentication.API.BL.Models;
 
 public class AuthResponse
 {

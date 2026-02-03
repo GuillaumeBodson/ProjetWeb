@@ -1,22 +1,22 @@
-﻿using AuthService.BL.Models;
-using AuthService.BL.Services.Abstractions;
-using AuthService.DAL;
-using AuthService.DAL.Entities;
-using AuthService.Infrastructure.Options;
+﻿using Authentication.API.BL.Models;
+using Authentication.API.BL.Services.Abstractions;
+using Authentication.API.DAL;
+using Authentication.API.DAL.Entities;
+using Authentication.API.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static BCrypt.Net.BCrypt;
 
-namespace AuthService.BL.Services;
+namespace Authentication.API.BL.Services;
 
-public class AuthenticationService : IAuthService
+public class AuthService : IAuthService
 {
     private readonly AuthDbContext _dbContext;
     private readonly ITokenService _tokenService;
     private readonly JwtOptions _jwtOptions;
-    private readonly ILogger<AuthenticationService> _logger;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthenticationService(AuthDbContext dbContext, ITokenService tokenService, IOptions<JwtOptions> jwtOptions, ILogger<AuthenticationService> logger)
+    public AuthService(AuthDbContext dbContext, ITokenService tokenService, IOptions<JwtOptions> jwtOptions, ILogger<AuthService> logger)
     {
         _dbContext = dbContext;
         _tokenService = tokenService;

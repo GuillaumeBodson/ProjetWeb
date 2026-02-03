@@ -1,4 +1,4 @@
-﻿namespace AuthService.DAL.Entities;
+﻿namespace Authentication.API.DAL.Entities;
 
 public class RefreshToken
 {
