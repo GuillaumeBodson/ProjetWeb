@@ -68,10 +68,19 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS when not running in a container (to allow HTTP-only container traffic)
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
+{
+    app.UseHttpsRedirection();
+}
 
+app.UseCors();
+
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapReverseProxy();
 
 app.Run();
