@@ -82,7 +82,7 @@ public class AuthService : IAuthService
         }
 
         var user = await _dbContext.Users
-             .Include(u => u.Role)
+            .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Id == storedToken.UserId);
 
         if (user == null || !user.IsActive)
