@@ -3,6 +3,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Authentication.API.DAL;
 
+/*
+# 1. Make entity/configuration changes
+# 2. Create migration
+dotnet ef migrations add Initial --project Authentication.API --startup-project Authentication.API
+
+# 3. Run AppHost to test (migrations apply automatically)
+# 4. Commit migration files with your feature
+ */
 public class AuthDbContext : DbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options)
