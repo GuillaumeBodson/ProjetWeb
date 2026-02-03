@@ -37,7 +37,11 @@ public class MigrationWorker(
             var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
 
             // Ensure database is created and can connect
-            await dbContext.Database.CanConnectAsync(token);
+            var canConnect = await dbContext.Database.CanConnectAsync(token);
+            if (!canConnect)
+            {
+                throw new InvalidOperationException("Unable to connect to the authentication database.");
+            }
 
             var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
 
