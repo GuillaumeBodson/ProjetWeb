@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApiGateway\ApiGateway.csproj" />
+    <ProjectReference Include="..\Authentication.MigrationService\Authentication.MigrationService.csproj" />
     <ProjectReference Include="..\AuthService\Authentication.API.csproj" />
   </ItemGroup>
 

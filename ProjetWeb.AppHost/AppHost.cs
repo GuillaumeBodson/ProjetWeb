@@ -7,9 +7,15 @@ var sqlServer = builder.AddSqlServer("sql")
 
 var authDb = sqlServer.AddDatabase("authdb");
 
+// Migration service runs first
+var migrationService = builder.AddProject<Projects.Authentication_MigrationService>("auth-migrations")
+    .WithReference(authDb)
+    .WaitFor(authDb);
+
 var authApi = builder.AddProject<Projects.Authentication_API>("authservice")
     .WithReference(authDb) // Inject connection string automatically
-    .WaitFor(authDb);
+    .WaitFor(authDb)
+    .WaitForCompletion(migrationService);
 
 // Add API Gateway with reference to backend services
 var apiGateway = builder.AddProject<Projects.ApiGateway>("apigateway")
