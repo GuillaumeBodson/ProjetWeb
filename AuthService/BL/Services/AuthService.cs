@@ -37,7 +37,11 @@ public class AuthService : IAuthService
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Role = "User",
+            Role = new Role
+            {
+                Id = Guid.NewGuid(),
+                RoleType = RoleType.User
+            },
             PasswordHash = HashPassword(request.Password)
         };
         _dbContext.Users.Add(user);
@@ -49,7 +53,9 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var user = await _dbContext.Users
+            .Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == request.Email);
+
         if (user == null || !Verify(request.Password, user.PasswordHash))
         {
             _logger.LogWarning("Failed login attempt for email: {Email}", request.Email);
@@ -71,11 +77,14 @@ public class AuthService : IAuthService
         if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt <= DateTime.UtcNow)
         {
             _logger.LogWarning("Invalid, revoked, or expired refresh token received for refresh: {Token}", maskedToken);
-            
+
             throw new InvalidOperationException("The provided refresh token is invalid, revoked, or expired.");
         }
 
-        var user = await _dbContext.Users.FindAsync(storedToken.UserId);
+        var user = await _dbContext.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == storedToken.UserId);
+
         if (user == null || !user.IsActive)
         {
             _logger.LogWarning($"Refresh token refresh failed for non-existent or inactive user. Token: {maskedToken}, UserId: {storedToken.UserId}");
@@ -131,7 +140,11 @@ public class AuthService : IAuthService
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Role = user.Role
+                Role = new RoleDto
+                {                    
+                    RoleType = user.Role.RoleType.ToString(),
+                    SiteId = user.Role.SiteId
+                }
             }
         };
     }
