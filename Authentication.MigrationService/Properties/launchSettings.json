@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Authentication.MigrationService": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

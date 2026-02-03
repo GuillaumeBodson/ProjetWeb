@@ -11,7 +11,23 @@
   "secrets": {
     "salt": "T2racerPclpCmIbZ",
     "hash": "DQ8ca8T2TRWg3hEmunAYYLEXc9S/s2\u002B7Rdo0cF7jaBI=",
-    "secrets": {}
+    "secrets": {
+      "sql-password": {
+        "value": "T2racerPclpCmIbZpC0wZHbOtfR2eBkE8anQ62vhU9rqZ3V/omOb5CgXLrG75TyBI9I="
+      },
+      "sql": {
+        "MSSQL_SA_PASSWORD": "T2racerPclpCmIbZpC0wZHbOtfR2eBkE8anQ62vhU9rqZ3V/omOb5CgXLrG75TyBI9I="
+      },
+      "authdb": {},
+      "auth-migrations": {
+        "ConnectionStrings__authdb": "T2racerPclpCmIbZ8wJIIBpiDd4XWoPPlMpPlmLqT8u4f3tDgV/jo3tsXOKIpmmeNf5BerV7LO8g9KbAG1rYsmNFKIlxnNtCUicJP9CpupuKtc\u002B8OL\u002BrfsBVA/XCsGze0xSTFk2yjzJlq5AZWmV97\u002BLUdz/cFyFWS6QSc9KhKUlkMFQqS7KFi9Y="
+      },
+      "authservice": {
+        "ConnectionStrings__authdb": "T2racerPclpCmIbZ8wJIIBpiDd4XWoPPlMpPlmLqT8u4f3tDgV/jo3tsXOKIpmmeNf5BerV7LO8g9KbAG1rYsmNFKIlxnNtCUicJP9CpupuKtc\u002B8OL\u002BrfsBVA/XCsGze0xSTFk2yjzJlq5AZWmV97\u002BLUdz/cFyFWS6QSc9KhKUlkMFQqS7KFi9Y="
+      },
+      "apigateway": {},
+      "frontend": {}
+    }
   },
   "processAllComponents": true
 }
