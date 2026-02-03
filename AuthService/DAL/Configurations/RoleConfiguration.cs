@@ -1,7 +1,6 @@
 ﻿using Authentication.API.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace Authentication.API.DAL.Configurations;
 
@@ -19,8 +18,5 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .WithOne(u => u.Role)
             .HasForeignKey<Role>(r => r.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasIndex(r => new { r.UserId, r.SiteId })
-              .IsUnique();
     }
 }
