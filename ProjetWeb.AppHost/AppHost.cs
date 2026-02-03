@@ -3,7 +3,12 @@ var builder = DistributedApplication.CreateBuilder(args);
 // Add SQL Server with a dedicated database for auth
 var sqlServer = builder.AddSqlServer("sql")
     .WithImageTag("2025-latest") 
-    .WithDataVolume("authservice-sqldata"); // Persist data across restarts
+    .WithDataVolume("authservice-sqldata") // Persist data across restarts
+    .WithEndpoint("tcp", endpoint =>
+    {
+        endpoint.Port = 14330;  // Fixed external port
+        endpoint.TargetPort = 1433;
+    });
 
 var authDb = sqlServer.AddDatabase("authdb");
 
