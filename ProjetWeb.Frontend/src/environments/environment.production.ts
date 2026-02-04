@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://api.projetweb.com'
+  apiBaseUrl: 'https://your-production-api-domain.com'
 };
