@@ -55,6 +55,6 @@ export class AuthStateService {
 
   logout(): void {
     this.clearUser();
-    this.router.navigate(['/sign-in']);
+    this.router.navigate(['/sign']);
   }
 }
