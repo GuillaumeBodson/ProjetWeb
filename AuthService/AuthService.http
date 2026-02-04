@@ -1,1 +1,35 @@
-@AuthService_HostAddress = http://localhost:5151
+@gateway = http://localhost:5134
+@authservice = http://localhost:10000
+
+### Register via Gateway
+POST {{gateway}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "Password123!",
+    "confirmPassword": "Password123!",
+    "firstName": "John",
+    "lastName": "Doe"
+}
+
+### Register directly to AuthService
+POST {{authservice}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "test2@example.com",
+    "password": "Password123!",
+    "confirmPassword": "Password123!",
+    "firstName": "Jane",
+    "lastName": "Doe"
+}
+
+### Login
+POST {{gateway}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "Password123!"
+}

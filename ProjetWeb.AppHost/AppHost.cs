@@ -31,7 +31,7 @@ var apiGateway = builder.AddProject<Projects.ApiGateway>("apigateway")
 var frontend = builder.AddJavaScriptApp("frontend", "../ProjetWeb.Frontend", "start")
     .WithReference(apiGateway)
     .WaitFor(apiGateway)
-    .WithHttpEndpoint(env: "PORT")
+    .WithHttpEndpoint(port: 4200, targetPort: 4200, env: "PORT", isProxied: false)
     .WithExternalHttpEndpoints();
 
 builder.Build().Run();
