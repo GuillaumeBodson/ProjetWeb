@@ -36,6 +36,23 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Docker Build
+
+To build the Docker image, run the following command from the **repository root**:
+
+```bash
+docker build -f ProjetWeb.Frontend/Dockerfile -t frontend:latest .
+```
+
+**Important**: The Docker build context must be the repository root (`.`) because the build process requires access to `AuthService/Authentication.API.json` for generating the authentication API client.
+
+Alternatively, you can use Docker Compose from the `ProjetWeb.AppHost/aspirate-output` directory:
+
+```bash
+cd ProjetWeb.AppHost/aspirate-output
+docker-compose build frontend
+```
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
