@@ -1,7 +1,18 @@
-<mat-toolbar class="sticky" color="secondary">
+<mat-toolbar class="flex justify-between items-center px-4 md:px-6" color="secondary">
   <button mat-icon-button aria-label="Toggle menu" (click)="layoutService.toggleMenu()" [hidden]="layoutService.sideNavOpened()">
     <mat-icon>menu</mat-icon>
   </button>
-  <span>{{ title() }}</span>
+  <h1 class="text-lg md:text-xl font-semibold">{{ title() }}</h1>
 
+  @if (isAuthenticated()) {
+    <div class="flex items-center gap-2">
+      <span>{{ user()?.firstName ?? user()?.email }}</span>
+      <button mat-button (click)="logout()">Logout</button>
+    </div>
+  } @else {
+    <a mat-button routerLink="/sign">
+      <mat-icon>account_circle</mat-icon>
+      <span class="hidden md:inline">Sign In</span>
+    </a>
+  }
 </mat-toolbar>
