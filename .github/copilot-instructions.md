@@ -1,7 +1,11 @@
 # Copilot Instructions for ProjetWeb
 
 ## Project Overview
-This is an Angular 21 project using TypeScript, Tailwind CSS, and Angular Material components. Follow these guidelines when generating code.
+This is a full-stack application with:
+- **Frontend**: Angular 21 with TypeScript, Tailwind CSS, and Angular Material
+- **Backend**: .NET 10 Aspire microservices with Entity Framework Core
+
+Follow these guidelines when generating code.
 
 ## Core Principles
 
@@ -407,8 +411,82 @@ function hasPermission(user: User, resource: Resource): boolean {
 }
 ```
 
+---
+
+## .NET 10 Aspire Microservices
+
+### Project Structure
+```
+ServiceName/
+├── Controllers/           # API endpoints
+├── BL/
+│   ├── Models/            # DTOs, requests, responses
+│   └── Services/
+│       └── Abstractions/  # Service interfaces
+├── DAL/
+│   ├── Entities/          # EF Core entities
+│   └── Configurations/    # IEntityTypeConfiguration<T>
+└── Infrastructure/
+    └── Options/           # Strongly-typed config
+```
+
+### Aspire Integration
+- Call `builder.AddServiceDefaults()` first in `Program.cs`
+- Use `builder.Add<Provider>DbContext<T>("resource-name")` for databases
+- Use `WaitFor()` and `WaitForCompletion()` for service dependencies in AppHost
+
+### Controllers
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class ExampleController(IExampleService service) : ControllerBase
+{
+    [HttpPost]
+    [ProducesResponseType<ResponseDto>(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] RequestDto request)
+    {
+        var result = await service.CreateAsync(request);
+        return CreatedAtAction(nameof(Create), value: result);
+    }
+}
+```
+
+### Services
+- Define interfaces in `Abstractions/`, register as `Scoped`
+- Use primary constructors and `ILogger<T>` for structured logging
+- Throw domain exceptions; handle via `GlobalExceptionHandler`
+
+### Options Pattern
+```csharp
+public class MyOptions
+{
+    public const string SectionName = "MySection";
+
+    [Required]
+    public required string Value { get; init; }
+
+    public int Timeout { get; init; } = 30;
+}
+```
+
+### Code Standards
+- File-scoped namespaces
+- Primary constructors for DI
+- `async/await` for all I/O
+- `DateTime.UtcNow` for timestamps
+- Return `ProblemDetails` for errors
+- Lowercase URLs via `RouteOptions`
+
+### EF Core
+- One `IEntityTypeConfiguration<T>` per entity in `DAL/Configurations/`
+- Use migrations via dedicated migration service project
+
+---
+
 ## Summary
 When generating code for this project:
+
+**Frontend (Angular):**
 1. Follow SOLID principles strictly
 2. Use Angular 21 features (standalone, signals, new control flow)
 3. Design mobile-first with Tailwind CSS
@@ -416,3 +494,11 @@ When generating code for this project:
 5. Ensure type safety with TypeScript
 6. Write testable, maintainable code
 7. Prioritize performance and accessibility
+
+**Backend (.NET):**
+1. Follow layered architecture (Controllers → BL → DAL)
+2. Use Aspire service defaults and integrations
+3. Define service interfaces in Abstractions/
+4. Use Options pattern for configuration
+5. Return ProblemDetails for all errors
+6. Use primary constructors and structured logging
