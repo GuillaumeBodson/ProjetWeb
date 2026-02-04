@@ -1,4 +1,4 @@
 export const environment = {
-  production: true,
-  apiBaseUrl: 'https://api.projetweb.com'
+  production: false,
+  apiBaseUrl: 'http://localhost:5134'
 };
