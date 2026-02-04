@@ -2,7 +2,7 @@
 FROM node:22-alpine AS build
 WORKDIR /app/ProjetWeb.Frontend
 
-# Copy package files and install dependencies
+# Copy package files and install dependencies (cached layer if package.json unchanged)
 COPY ProjetWeb.Frontend/package*.json ./
 RUN npm ci
 
