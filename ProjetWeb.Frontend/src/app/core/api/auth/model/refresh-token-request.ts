@@ -9,7 +9,7 @@
  */
 
 
-export interface RefreshTokenRequestDto { 
+export interface RefreshTokenRequest { 
     refreshToken: string;
 }
 

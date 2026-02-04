@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+RUN npm run gen:auth
 RUN npm run build -- --configuration=production
 
 # Production stage

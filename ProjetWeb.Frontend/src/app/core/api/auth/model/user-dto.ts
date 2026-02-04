@@ -7,14 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { RoleDtoDto } from './role-dto';
+import { RoleDto } from './role-dto';
 
 
-export interface UserDtoDto { 
+export interface UserDto { 
     id?: string;
     email?: string;
     firstName?: string | null;
     lastName?: string | null;
-    role?: RoleDtoDto;
+    role?: RoleDto;
 }
 
