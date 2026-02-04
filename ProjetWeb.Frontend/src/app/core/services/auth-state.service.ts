@@ -1,44 +1,44 @@
 import {Injectable, signal, computed, effect, inject} from '@angular/core';
 import { Router } from '@angular/router';
-import {UserDto} from '../api/auth';
+import {AuthResponse, UserDto} from '../api/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthStateService {
   private readonly router = inject(Router);
-
-  // Private writable signal
   private readonly userSignal = signal<UserDto | null>(null);
 
-  // Public readonly signals
   readonly user = this.userSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.user() !== null);
   readonly userRole = computed(() => this.user()?.role);
 
   constructor() {
-    // Load user from localStorage on service initialization
     this.loadUserFromStorage();
-
-    // Optional: Auto-save to localStorage when user changes
-    effect(() => {
-      const currentUser = this.user();
-      if (currentUser) {
-        localStorage.setItem('auth_user', JSON.stringify(currentUser));
-      } else {
-        localStorage.removeItem('auth_user');
-      }
-    });
   }
 
-  setUser(user: UserDto): void {
-    this.userSignal.set(user);
+  setAuthData(response: AuthResponse): void {
+    if (response.token) {
+      localStorage.setItem('auth_token', response.token);
+    }
+    if (response.refreshToken) {
+      localStorage.setItem('refresh_token', response.refreshToken);
+    }
+    if (response.user) {
+      this.userSignal.set(response.user);
+      localStorage.setItem('auth_user', JSON.stringify(response.user));
+    }
   }
 
   clearUser(): void {
     this.userSignal.set(null);
     localStorage.removeItem('auth_user');
-    localStorage.removeItem('auth_token'); // If you store token separately
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
   }
 
   private loadUserFromStorage(): void {
@@ -51,10 +51,5 @@ export class AuthStateService {
         localStorage.removeItem('auth_user');
       }
     }
-  }
-
-  logout(): void {
-    this.clearUser();
-    this.router.navigate(['/sign']);
   }
 }

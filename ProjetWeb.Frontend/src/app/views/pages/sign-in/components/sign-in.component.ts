@@ -1,5 +1,5 @@
-import {Component, inject, signal, ChangeDetectionStrategy} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, inject, signal, ChangeDetectionStrategy, DestroyRef} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -7,8 +7,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
-import {AuthService} from '../../../../core/api/auth';
 import {AuthFacadeService} from '../../../../core/services/auth-facade.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sign-in',
@@ -23,16 +23,18 @@ import {AuthFacadeService} from '../../../../core/services/auth-facade.service';
     MatIconModule,
     RouterLink
   ],
-  templateUrl: './sign-in.html',
-  styleUrl: './sign-in.css',
+  templateUrl: './sign-in.component.html',
+  styleUrl: './sign-in.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SignIn {
+export class SignInComponent {
   private readonly authFacade = inject(AuthFacadeService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly signInForm: FormGroup = this.fb.group({
+
+  readonly signInForm: FormGroup<{email: FormControl , password: FormControl}> = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
@@ -52,19 +54,20 @@ export class SignIn {
 
     const {email, password} = this.signInForm.value;
 
-    this.authFacade.login({email, password}).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: (error) => {
-        this.errorMessage.set(error.message || 'Authentication failed. Please try again.');
-        this.isLoading.set(false);
-      },
-      complete: () => {
-        this.isLoading.set(false);
-      }
-    });
+    this.authFacade.login({email, password})
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isLoading.set(false);
+          this.router.navigate(['/dashboard']);
+        },
+        error: (error) => {
+          this.errorMessage.set(error.message || 'Authentication failed. Please try again.');
+          this.isLoading.set(false);
+        }
+      });
   }
+
 
   getErrorMessage(field: string): string {
     const control = this.signInForm.get(field);

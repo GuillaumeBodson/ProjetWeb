@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import {AuthResponse, AuthService, LoginRequest, RegisterRequest} from '../api/auth';
+import { tap, map, catchError } from 'rxjs/operators';
+import { AuthService, LoginRequest, RegisterRequest } from '../api/auth';
 import { AuthStateService } from './auth-state.service';
 
 @Injectable({
@@ -13,93 +14,66 @@ export class AuthFacadeService {
   private readonly router = inject(Router);
 
   login(credentials: LoginRequest): Observable<void> {
-    return new Observable(observer => {
-      this.apiAuthService.apiAuthLoginPost(credentials).subscribe({
-        next: (response) => {
-          this.persistUserInfo(response);
-
-          observer.next();
-          observer.complete();
-        },
-        error: (error) => {
-          observer.error(error);
-        }
-      });
-    });
+    return this.apiAuthService.apiAuthLoginPost(credentials).pipe(
+      tap(response => this.authState.setAuthData(response)),
+      map(() => void 0),
+      catchError(error => throwError(() => error))
+    );
   }
 
   register(data: RegisterRequest): Observable<void> {
-    return new Observable(observer => {
-      this.apiAuthService.apiAuthRegisterPost(data).subscribe({
-        next: (response) => {
-          this.persistUserInfo(response);
-
-          observer.next();
-          observer.complete();
-        },
-        error: (error) => {
-          observer.error(error);
-        }
-      });
-    });
+    return this.apiAuthService.apiAuthRegisterPost(data).pipe(
+      tap(response => this.authState.setAuthData(response)),
+      map(() => void 0),
+      catchError(error => throwError(() => error))
+    );
   }
 
   logout(): void {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = this.authState.getRefreshToken();
 
     if (refreshToken) {
-      this.apiAuthService.apiAuthLogoutPost({ refreshToken }).subscribe({
-        complete: () => {
-          this.authState.clearUser();
-          this.router.navigate(['/sign-in']);
-        },
-        error: () => {
-          // Even if API call fails, clear local state
-          this.authState.clearUser();
-          this.router.navigate(['/sign-in']);
-        }
+      this.apiAuthService.apiAuthLogoutPost({ refreshToken }).pipe(
+        catchError(() => {
+          // Even if API call fails, continue with cleanup
+          return throwError(() => new Error('Logout API failed'));
+        })
+      ).subscribe({
+        next: () => this.performLogoutCleanup(),
+        error: () => this.performLogoutCleanup()
       });
     } else {
-      this.authState.clearUser();
-      this.router.navigate(['/sign-in']);
+      this.performLogoutCleanup();
     }
   }
 
   refreshToken(): Observable<boolean> {
-    return new Observable(observer => {
-      const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = this.authState.getRefreshToken();
 
-      if (!refreshToken) {
-        observer.next(false);
-        observer.complete();
-        return;
-      }
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available')).pipe(
+        catchError(() => this.handleRefreshFailure())
+      );
+    }
 
-      this.apiAuthService.apiAuthRefreshPost({ refreshToken }).subscribe({
-        next: (response) => {
-          this.persistUserInfo(response);
-          observer.next(true);
-          observer.complete();
-        },
-        error: () => {
-          this.authState.clearUser();
-          observer.next(false);
-          observer.complete();
-        }
-      });
-    });
+    return this.apiAuthService.apiAuthRefreshPost({ refreshToken }).pipe(
+      tap(response => this.authState.setAuthData(response)),
+      map(() => true),
+      catchError(() => this.handleRefreshFailure())
+    );
   }
 
-  private persistUserInfo(response: AuthResponse){
-    // Store tokens
-    if (response.token) {
-      localStorage.setItem('auth_token', response.token);
-    }
-    if (response.refreshToken) {
-      localStorage.setItem('refresh_token', response.refreshToken);
-    }
-    if (response.user) {
-      this.authState.setUser(response.user);
-    }
+  private performLogoutCleanup(): void {
+    this.authState.clearUser();
+    this.router.navigate(['/sign-in']);
+  }
+
+  private handleRefreshFailure(): Observable<boolean> {
+    this.authState.clearUser();
+    return throwError(() => false).pipe(
+      catchError(() => {
+        return [false];
+      })
+    );
   }
 }
