@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prestart": "npm run gen:auth",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run gen:auth && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "gen:auth": "openapi-generator-cli generate -i ../AuthService/Authentication.API.json -g typescript-angular -o src/app/core/api/auth --additional-properties=fileNaming=kebab-case,serviceSuffix=Service,useHttpClient=true,standalone=true"

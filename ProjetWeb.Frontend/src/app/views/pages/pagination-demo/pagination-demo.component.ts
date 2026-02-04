@@ -13,7 +13,7 @@ import {
   switchMap,
   tap
 } from 'rxjs';
-import {AuthService, LoginRequestDto} from '../../../core/api/auth';
+import {AuthService, LoginRequest} from '../../../core/api/auth';
 type Item = { id: number; name: string };
 
 @Component({
@@ -27,7 +27,7 @@ export class PaginationDemoComponent {
   private authService = inject(AuthService);
 
   login() {
-    const request: LoginRequestDto = { email: 'test@example.com', password: 'Password123!' };
+    const request: LoginRequest = { email: 'test@example.com', password: 'Password123!' };
     console.log('Logging in with', request);
     this.authService.apiAuthLoginPost(request).subscribe(response => {
       console.log('Token:', response.token);

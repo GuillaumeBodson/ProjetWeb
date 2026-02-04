@@ -5,7 +5,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Auth/register": {
+    "/api/auth/register": {
       "post": {
         "tags": [
           "Auth"
@@ -74,7 +74,7 @@
         }
       }
     },
-    "/api/Auth/login": {
+    "/api/auth/login": {
       "post": {
         "tags": [
           "Auth"
@@ -143,7 +143,7 @@
         }
       }
     },
-    "/api/Auth/refresh": {
+    "/api/auth/refresh": {
       "post": {
         "tags": [
           "Auth"
@@ -212,7 +212,7 @@
         }
       }
     },
-    "/api/Auth/logout": {
+    "/api/auth/logout": {
       "post": {
         "tags": [
           "Auth"

@@ -9,7 +9,7 @@
  */
 
 
-export interface LoginRequestDto { 
+export interface LoginRequest { 
     email: string;
     password: string;
 }

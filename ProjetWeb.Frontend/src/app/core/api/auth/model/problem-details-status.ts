@@ -9,6 +9,6 @@
  */
 
 
-export interface ProblemDetailsStatusDto { 
+export interface ProblemDetailsStatus { 
 }
 

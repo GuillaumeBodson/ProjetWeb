@@ -7,13 +7,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { UserDtoDto } from './user-dto';
+import { UserDto } from './user-dto';
 
 
-export interface AuthResponseDto { 
+export interface AuthResponse { 
     token?: string;
     refreshToken?: string;
     expiresAt?: string;
-    user?: UserDtoDto;
+    user?: UserDto;
 }
 

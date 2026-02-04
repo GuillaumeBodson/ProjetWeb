@@ -7,13 +7,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ProblemDetailsStatusDto } from './problem-details-status';
+import { ProblemDetailsStatus } from './problem-details-status';
 
 
-export interface ProblemDetailsDto { 
+export interface ProblemDetails { 
     type?: string | null;
     title?: string | null;
-    status?: ProblemDetailsStatusDto | null;
+    status?: ProblemDetailsStatus | null;
     detail?: string | null;
     instance?: string | null;
 }

@@ -9,7 +9,7 @@
  */
 
 
-export interface RoleDtoDto { 
+export interface RoleDto { 
     roleType?: string;
     siteId?: string | null;
 }
