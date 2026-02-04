@@ -9,7 +9,7 @@ COPY AuthService/Authentication.API.json ./AuthService/Authentication.API.json
 COPY ProjetWeb.Frontend/package*.json ./
 RUN npm ci
 
-# Copy the frontend source code (excluding node_modules via .dockerignore)
+# Copy the frontend source code (node_modules excluded via root .dockerignore)
 COPY ProjetWeb.Frontend/ ./
 
 # Generate auth API client and build
