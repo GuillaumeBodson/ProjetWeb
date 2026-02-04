@@ -40,7 +40,7 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ### Using Docker Compose
 
-To build with Docker Compose, navigate to the aspirate-output directory:
+To build with Docker Compose, navigate to the `ProjetWeb.AppHost/aspirate-output` directory:
 
 ```bash
 cd ProjetWeb.AppHost/aspirate-output
