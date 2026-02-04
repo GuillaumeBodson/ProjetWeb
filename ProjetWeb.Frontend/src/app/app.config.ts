@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import {provideHttpClient} from '@angular/common/http';
 import {BASE_PATH, provideApi} from './core/api/auth';
+import { environment } from '../environments/environment.development';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -10,7 +11,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
 
-    provideApi('http://localhost:5134'),
+    provideApi(environment.apiBaseUrl),
     //{ provide: BASE_PATH, useValue: 'https://localhost:7000/auth' }
   ]
 };
