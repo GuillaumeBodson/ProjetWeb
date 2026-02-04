@@ -68,30 +68,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// Handle CORS preflight requests BEFORE any redirects
-// This middleware short-circuits OPTIONS requests with proper CORS headers
-app.Use(async (context, next) =>
-{
-    if (context.Request.Method == HttpMethods.Options)
-    {
-        var origin = context.Request.Headers.Origin.ToString();
-        if (origin is "http://localhost:4200" or "https://localhost:4200")
-        {
-            context.Response.Headers.AccessControlAllowOrigin = origin;
-            context.Response.Headers.AccessControlAllowMethods = "GET, POST, PUT, DELETE, OPTIONS";
-            context.Response.Headers.AccessControlAllowHeaders = "Content-Type, Authorization";
-            context.Response.Headers.AccessControlAllowCredentials = "true";
-            context.Response.StatusCode = StatusCodes.Status204NoContent;
-            return; // Short-circuit - don't continue to HTTPS redirect
-        }
-    }
-    await next();
-});
-
-
 app.UseCors();
-
-
 // Only redirect to HTTPS when not running in a container (to allow HTTP-only container traffic)
 if (!app.Environment.IsDevelopment() && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
 {
