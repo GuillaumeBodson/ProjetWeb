@@ -251,13 +251,19 @@ import { MatPaginatorModule } from '@angular/material/paginator';
   standalone: true,
   imports: [MatTableModule, MatSortModule, MatPaginatorModule],
   template: `
-    <table mat-table [dataSource]="dataSource" matSort class="w-full">
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <table mat-table class="w-full" matSort>
+      <thead>
+        <tr mat-header-row>
+          <th mat-header-cell mat-sort-header>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (element of dataSource(); track element.id) {
+          <tr mat-row>
+            <td mat-cell>{{ element.name }}</td>
+          </tr>
+        }
+      </tbody>
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
   `
