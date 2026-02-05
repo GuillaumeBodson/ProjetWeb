@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjetWeb.ServiceDefaults\ProjetWeb.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\ProjetWeb.Shared\ProjetWeb.Shared.csproj" />
   </ItemGroup>
 
 </Project>

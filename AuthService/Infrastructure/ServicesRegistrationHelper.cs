@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ProjetWeb.Shared.Options;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -66,38 +67,8 @@ public static class ServicesRegistrationHelper
         return services;
     }
 
-    public static IServiceCollection AddJWTAuthentication(this IServiceCollection services)
-    {
-        // JWT Authentication
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer();
-
-        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-            .Configure<IOptions<JwtOptions>>((jwtBearerOptions, jwtOptions) =>
-            {
-                var jwt = jwtOptions.Value;
-                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwt.Issuer,
-                    ValidAudience = jwt.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key))
-                };
-            });
-        return services;
-    }
-
-
     public static IServiceCollection RegisterOptions(this IServiceCollection services)
     {
-        services.AddOptions<JwtOptions>()
-            .BindConfiguration(JwtOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         services.AddOptions<RateLimitOptions>()
             .BindConfiguration(RateLimitOptions.SectionName)
             .ValidateDataAnnotations()

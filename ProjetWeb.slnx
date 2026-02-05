@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Backend/">
     <Project Path="ApiGateway/ApiGateway.csproj" />
+    <Project Path="ProjetWeb.Shared/ProjetWeb.Shared.csproj" Id="5a4c7d58-7b66-4776-acbb-b11de058b35d" />
   </Folder>
   <Folder Name="/Backend/AuthenticationService/">
     <Project Path="Authentication.MigrationService/Authentication.MigrationService.csproj" Id="e68ed6ec-a162-47d4-9856-448599e09d34" />

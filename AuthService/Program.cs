@@ -4,7 +4,8 @@ using Authentication.API.DAL;
 using Authentication.API.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using ProjetWeb.Shared.Exceptions;
+using ProjetWeb.Shared.Extensions;
 using static Authentication.API.Infrastructure.ServicesRegistrationHelper;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,7 +49,7 @@ builder.Services.AddControllers(options =>
 
 
 // JWT Authentication
-builder.Services.AddJWTAuthentication();
+builder.Services.AddJwtAuthentication();
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

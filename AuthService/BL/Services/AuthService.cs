@@ -2,9 +2,9 @@
 using Authentication.API.BL.Services.Abstractions;
 using Authentication.API.DAL;
 using Authentication.API.DAL.Entities;
-using Authentication.API.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ProjetWeb.Shared.Options;
 using static BCrypt.Net.BCrypt;
 
 namespace Authentication.API.BL.Services;
