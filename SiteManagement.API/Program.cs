@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Database
-builder.AddSqlServerDbContext<SiteManagementDbContext>("sitedb");
+builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
 
 // Register services
 builder.Services.AddScoped<ISiteService, SiteService>();

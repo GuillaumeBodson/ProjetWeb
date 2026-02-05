@@ -17,7 +17,7 @@ public class PlannedDayConfiguration : IEntityTypeConfiguration<PlannedDay>
             .IsRequired()
             .HasConversion<string>();
 
-        builder.Property(pd => pd.NumberOfTimeSplots)
+        builder.Property(pd => pd.NumberOfTimeSlots)
             .IsRequired()
             .HasMaxLength(2);
 

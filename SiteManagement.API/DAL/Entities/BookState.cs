@@ -4,6 +4,6 @@ public enum BookState
 {
     BookInProgress,
     Booked,
-    Payed,
+    Paid,
     Plaid,
 }

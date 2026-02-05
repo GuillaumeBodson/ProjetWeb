@@ -7,6 +7,6 @@ public record CreatePlannedDayRequest(
     DayOfWeek DayOfWeek,
     
     [Required]
-    [Range(1, 8)] // Max 8 time slots
+    [Range(0, 8)] // Max 8 time slots
     int NumberOfTimeSlots
 );

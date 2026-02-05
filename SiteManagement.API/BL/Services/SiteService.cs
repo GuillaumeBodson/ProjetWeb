@@ -73,7 +73,7 @@ public class SiteService(
             {
                 Id = Guid.NewGuid(),
                 DayOfWeek = scheduleRequest.DayOfWeek,
-                NumberOfTimeSplots = scheduleRequest.NumberOfTimeSlots
+                NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots
             });
         }
 
@@ -152,7 +152,7 @@ public class SiteService(
             if (plannedDaysByDayOfWeek.TryGetValue(scheduleRequest.DayOfWeek, out var existingPlannedDay))
             {
                 // Update existing planned day (only NumberOfTimeSplots can change)
-                existingPlannedDay.NumberOfTimeSplots = scheduleRequest.NumberOfTimeSlots;
+                existingPlannedDay.NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots;
 
                 logger.LogDebug(
                     "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",
@@ -165,7 +165,7 @@ public class SiteService(
                 {
                     Id = Guid.NewGuid(),
                     DayOfWeek = scheduleRequest.DayOfWeek,
-                    NumberOfTimeSplots = scheduleRequest.NumberOfTimeSlots
+                    NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots
                 });
 
                 logger.LogWarning(
@@ -220,11 +220,11 @@ public class SiteService(
         }
 
         // Validate time slot number is within range
-        if (request.TimeSlotNumber < 1 || request.TimeSlotNumber > plannedDay.NumberOfTimeSplots)
+        if (request.TimeSlotNumber < 1 || request.TimeSlotNumber > plannedDay.NumberOfTimeSlots)
         {
             logger.LogWarning(
                 "TimeSlotNumber {TimeSlotNumber} is out of range for PlannedDay {PlannedDayId} (max: {Max})",
-                request.TimeSlotNumber, request.PlannedDayId, plannedDay.NumberOfTimeSplots);
+                request.TimeSlotNumber, request.PlannedDayId, plannedDay.NumberOfTimeSlots);
             return null;
         }
 
@@ -301,7 +301,7 @@ public class SiteService(
                 return new PlannedDayResponse(
                     pd.Id,
                     pd.DayOfWeek,
-                    pd.NumberOfTimeSplots,
+                    pd.NumberOfTimeSlots,
                     timeSlotResponses
                 );
             }).ToList();
