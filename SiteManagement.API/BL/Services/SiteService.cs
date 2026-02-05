@@ -201,11 +201,19 @@ public class SiteService(
         return true;
     }
 
-    public async Task<TimeSlotResponse?> BookTimeSlotAsync(BookTimeSlotRequest request, CancellationToken cancellationToken = default)
+    public async Task<TimeSlotResponse?> BookTimeSlotAsync(Guid siteId, BookTimeSlotRequest request, CancellationToken cancellationToken = default)
     {
+        // Validate that the site exists
+        var site = await context.Sites.FindAsync([siteId], cancellationToken);
+        if (site is null)
+        {
+            logger.LogWarning("Site {SiteId} not found", siteId);
+            return null;
+        }
+
         // Validate that the planned day exists
         var plannedDay = await context.PlannedDays.FindAsync([request.PlannedDayId], cancellationToken);
-        if (plannedDay is null)
+        if (plannedDay is null || plannedDay.SiteId != siteId)
         {
             logger.LogWarning("PlannedDay {PlannedDayId} not found", request.PlannedDayId);
             return null;
@@ -213,7 +221,7 @@ public class SiteService(
 
         // Validate that the court exists
         var court = await context.Courts.FindAsync([request.CourtId], cancellationToken);
-        if (court is null)
+        if (court is null || court.SiteId != siteId)
         {
             logger.LogWarning("Court {CourtId} not found", request.CourtId);
             return null;

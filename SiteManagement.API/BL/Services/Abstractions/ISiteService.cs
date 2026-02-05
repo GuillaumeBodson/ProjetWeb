@@ -9,5 +9,5 @@ public interface ISiteService
     Task<SiteResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default);
     Task<SiteResponse?> UpdateAsync(Guid id, UpdateSiteRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<TimeSlotResponse?> BookTimeSlotAsync(BookTimeSlotRequest request, CancellationToken cancellationToken = default);
+    Task<TimeSlotResponse?> BookTimeSlotAsync(Guid siteId, BookTimeSlotRequest request, CancellationToken cancellationToken = default);
 }

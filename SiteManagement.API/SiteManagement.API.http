@@ -2,7 +2,7 @@
 # Site Management Service API Tests
 # ===================================
 
-@gateway = http://localhost:5000
+@gateway = http://localhost:5134
 @siteservice = http://localhost:5003
 
 # Get token from auth first (replace with actual token)
@@ -24,7 +24,6 @@ Authorization: Bearer {{token}}
 ### Create site via Gateway
 POST {{gateway}}/api/sites
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
     "name": "Main Campus",
@@ -50,19 +49,19 @@ Authorization: Bearer {{token}}
         },
         {
             "dayOfWeek": 1,
-            "numberOfTimeSlots": 10
+            "numberOfTimeSlots": 8
         },
         {
             "dayOfWeek": 2,
-            "numberOfTimeSlots": 10
+            "numberOfTimeSlots": 8
         },
         {
             "dayOfWeek": 3,
-            "numberOfTimeSlots": 10
+            "numberOfTimeSlots": 8
         },
         {
             "dayOfWeek": 4,
-            "numberOfTimeSlots": 10
+            "numberOfTimeSlots": 8
         },
         {
             "dayOfWeek": 5,
@@ -138,9 +137,10 @@ Authorization: Bearer {{token}}
 ### ===================================
 
 ### Book a time slot
+@bookingSiteId = 00000000-0000-0000-0000-000000000000
 @plannedDayId = 00000000-0000-0000-0000-000000000000
 @courtId = 00000000-0000-0000-0000-000000000000
-POST {{gateway}}/api/sites/timeslots/book
+POST {{gateway}}/api/sites/{{bookingSiteId}}/timeslots/book
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -153,7 +153,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Update booking to Booked state
-POST {{gateway}}/api/sites/timeslots/book
+POST {{gateway}}/api/sites/{{bookingSiteId}}/timeslots/book
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -166,7 +166,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Update booking to Payed state
-POST {{gateway}}/api/sites/timeslots/book
+POST {{gateway}}/api/sites/{{bookingSiteId}}/timeslots/book
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
