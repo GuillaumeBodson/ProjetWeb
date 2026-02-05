@@ -213,7 +213,7 @@ public class SiteService(
 
         // Validate that the planned day exists
         var plannedDay = await context.PlannedDays.FindAsync([request.PlannedDayId], cancellationToken);
-        if (plannedDay is null)
+        if (plannedDay is null || plannedDay.SiteId != siteId)
         {
             logger.LogWarning("PlannedDay {PlannedDayId} not found", request.PlannedDayId);
             return null;
@@ -221,7 +221,7 @@ public class SiteService(
 
         // Validate that the court exists
         var court = await context.Courts.FindAsync([request.CourtId], cancellationToken);
-        if (court is null)
+        if (court is null || court.SiteId != siteId)
         {
             logger.LogWarning("Court {CourtId} not found", request.CourtId);
             return null;
