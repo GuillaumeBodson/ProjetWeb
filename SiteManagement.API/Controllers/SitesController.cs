@@ -6,7 +6,6 @@ using SiteManagement.API.BL.Services.Abstractions;
 namespace SiteManagement.API.Controllers;
 
 [ApiController]
-[AllowAnonymous]
 [Route("api/[controller]")]
 public class SitesController(ISiteService siteService) : ControllerBase
 {
@@ -32,7 +31,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
         return Ok(site);
     }
-    [AllowAnonymous]
+    
     [HttpPost]
     [ProducesResponseType<SiteResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
