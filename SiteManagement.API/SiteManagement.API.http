@@ -1,0 +1,229 @@
+# ===================================
+# Site Management Service API Tests
+# ===================================
+
+@gateway = http://localhost:5000
+@siteservice = http://localhost:5003
+
+# Get token from auth first (replace with actual token)
+@token = YOUR_JWT_TOKEN_HERE
+
+### ===================================
+### Sites Management
+### ===================================
+
+### Get all sites via Gateway
+GET {{gateway}}/api/sites
+Authorization: Bearer {{token}}
+
+### Get site by ID via Gateway
+@siteId = 00000000-0000-0000-0000-000000000000
+GET {{gateway}}/api/sites/{{siteId}}
+Authorization: Bearer {{token}}
+
+### Create site via Gateway
+POST {{gateway}}/api/sites
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Main Campus",
+    "closedDays": [
+        "2024-12-25",
+        "2025-01-01"
+    ],
+    "courts": [
+        {
+            "number": 1
+        },
+        {
+            "number": 2
+        },
+        {
+            "number": 3
+        }
+    ],
+    "schedule": [
+        {
+            "dayOfWeek": 0,
+            "numberOfTimeSlots": 8
+        },
+        {
+            "dayOfWeek": 1,
+            "numberOfTimeSlots": 10
+        },
+        {
+            "dayOfWeek": 2,
+            "numberOfTimeSlots": 10
+        },
+        {
+            "dayOfWeek": 3,
+            "numberOfTimeSlots": 10
+        },
+        {
+            "dayOfWeek": 4,
+            "numberOfTimeSlots": 10
+        },
+        {
+            "dayOfWeek": 5,
+            "numberOfTimeSlots": 8
+        },
+        {
+            "dayOfWeek": 6,
+            "numberOfTimeSlots": 0
+        }
+    ]
+}
+
+### Update site via Gateway
+@updateSiteId = 00000000-0000-0000-0000-000000000000
+PUT {{gateway}}/api/sites/{{updateSiteId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Updated Main Campus",
+    "closedDays": [
+        "2024-12-25",
+        "2025-01-01",
+        "2025-07-04"
+    ],
+    "courts": [
+        {
+            "number": 1
+        },
+        {
+            "number": 2
+        }
+    ],
+    "schedule": [
+        {
+            "dayOfWeek": 0,
+            "numberOfTimeSlots": 8
+        },
+        {
+            "dayOfWeek": 1,
+            "numberOfTimeSlots": 12
+        },
+        {
+            "dayOfWeek": 2,
+            "numberOfTimeSlots": 12
+        },
+        {
+            "dayOfWeek": 3,
+            "numberOfTimeSlots": 12
+        },
+        {
+            "dayOfWeek": 4,
+            "numberOfTimeSlots": 12
+        },
+        {
+            "dayOfWeek": 5,
+            "numberOfTimeSlots": 10
+        },
+        {
+            "dayOfWeek": 6,
+            "numberOfTimeSlots": 0
+        }
+    ]
+}
+
+### Delete site via Gateway
+@deleteSiteId = 00000000-0000-0000-0000-000000000000
+DELETE {{gateway}}/api/sites/{{deleteSiteId}}
+Authorization: Bearer {{token}}
+
+### ===================================
+### Time Slot Booking
+### ===================================
+
+### Book a time slot
+@plannedDayId = 00000000-0000-0000-0000-000000000000
+@courtId = 00000000-0000-0000-0000-000000000000
+POST {{gateway}}/api/sites/timeslots/book
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "plannedDayId": "{{plannedDayId}}",
+    "courtId": "{{courtId}}",
+    "timeSlotNumber": 1,
+    "weekNumber": 1,
+    "bookState": "BookInProgress"
+}
+
+### Update booking to Booked state
+POST {{gateway}}/api/sites/timeslots/book
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "plannedDayId": "{{plannedDayId}}",
+    "courtId": "{{courtId}}",
+    "timeSlotNumber": 1,
+    "weekNumber": 1,
+    "bookState": "Booked"
+}
+
+### Update booking to Payed state
+POST {{gateway}}/api/sites/timeslots/book
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "plannedDayId": "{{plannedDayId}}",
+    "courtId": "{{courtId}}",
+    "timeSlotNumber": 1,
+    "weekNumber": 1,
+    "bookState": "Payed"
+}
+
+### ===================================
+### Direct to SiteService (bypassing gateway)
+### ===================================
+
+### Get all sites directly
+GET {{siteservice}}/api/sites
+
+### Create site directly (no auth)
+POST {{siteservice}}/api/sites
+Content-Type: application/json
+
+{
+    "name": "Test Site",
+    "courts": [
+        {
+            "number": 1
+        }
+    ],
+    "schedule": [
+        {
+            "dayOfWeek": 0,
+            "numberOfTimeSlots": 4
+        },
+        {
+            "dayOfWeek": 1,
+            "numberOfTimeSlots": 4
+        },
+        {
+            "dayOfWeek": 2,
+            "numberOfTimeSlots": 4
+        },
+        {
+            "dayOfWeek": 3,
+            "numberOfTimeSlots": 4
+        },
+        {
+            "dayOfWeek": 4,
+            "numberOfTimeSlots": 4
+        },
+        {
+            "dayOfWeek": 5,
+            "numberOfTimeSlots": 4
+        },
+        {
+            "dayOfWeek": 6,
+            "numberOfTimeSlots": 0
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+﻿namespace SiteManagement.API.DAL.Entities;
+
+public enum BookState
+{
+    BookInProgress,
+    Booked,
+    Payed,
+    Plaid,
+}
