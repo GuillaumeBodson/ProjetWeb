@@ -6,7 +6,7 @@ using SiteManagement.MigrationService;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddSqlServerDbContext<SiteManagementDbContext>("sitedb");
+builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
 
 builder.Services.AddHostedService<MigrationWorker>();
 

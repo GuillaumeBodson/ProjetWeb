@@ -17,6 +17,17 @@ services:
     depends_on:
       auth-migrations:
         condition: service_completed_successfully
+
+  site-migrations:
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: "no"  # Run once and exit
+  sitemanagementservice:
+    depends_on:
+      site-migrations:
+        condition: service_completed_successfully
+
   frontend:    
     build:
       context: ../../ProjetWeb.Frontend
