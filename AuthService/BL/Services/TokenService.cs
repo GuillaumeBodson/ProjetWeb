@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using Authentication.API.DAL.Entities;
 using Authentication.API.BL.Services.Abstractions;
-using Authentication.API.Infrastructure.Options;
+using ProjetWeb.Shared.Options;
 
 namespace Authentication.API.BL.Services;
 

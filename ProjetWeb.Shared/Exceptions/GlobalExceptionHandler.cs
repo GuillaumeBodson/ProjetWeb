@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace Authentication.API.Infrastructure;
+namespace ProjetWeb.Shared.Exceptions;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {

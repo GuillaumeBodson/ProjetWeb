@@ -1,13 +1,15 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Authentication.API.Infrastructure.Options;
+namespace ProjetWeb.Shared.Options;
 
+/// <summary>
+/// JWT configuration options (use with Options pattern).
+/// </summary>
 public class JwtOptions
 {
     public const string SectionName = "Jwt";
 
     [Required]
-    [MinLength(32)]
     public required string Key { get; init; }
 
     [Required]
@@ -18,4 +20,5 @@ public class JwtOptions
 
     public int AccessTokenExpirationHours { get; init; } = 1;
     public int RefreshTokenExpirationDays { get; init; } = 7;
+
 }
