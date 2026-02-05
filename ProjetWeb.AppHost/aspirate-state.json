@@ -20,13 +20,20 @@
       },
       "authdb": {},
       "auth-migrations": {
-        "ConnectionStrings__authdb": "T2racerPclpCmIbZ8wJIIBpiDd4XWoPPlMpPlmLqT8u4f3tDgV/jo3tsXOKIpmmeNf5BerV7LO8g9KbAG1rYsmNFKIlxnNtCUicJP9CpupuKtc\u002B8OL\u002BrfsBVA/XCsGze0xSTFk2yjzJlq5AZWmV97\u002BLUdz/cFyFWS6QSc9KhKUlkMFQqS7KFi9Y="
+        "ConnectionStrings__authdb": "T2racerPclpCmIbZ08K1cq574mQ/CmCZZCFY3WLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52X7OZh9CC"
       },
       "authservice": {
-        "ConnectionStrings__authdb": "T2racerPclpCmIbZ8wJIIBpiDd4XWoPPlMpPlmLqT8u4f3tDgV/jo3tsXOKIpmmeNf5BerV7LO8g9KbAG1rYsmNFKIlxnNtCUicJP9CpupuKtc\u002B8OL\u002BrfsBVA/XCsGze0xSTFk2yjzJlq5AZWmV97\u002BLUdz/cFyFWS6QSc9KhKUlkMFQqS7KFi9Y="
+        "ConnectionStrings__authdb": "T2racerPclpCmIbZ08K1cq574mQ/CmCZZCFY3WLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52X7OZh9CC"
       },
       "apigateway": {},
-      "frontend": {}
+      "frontend": {},
+      "sitemanagementdb": {},
+      "site-migrations": {
+        "ConnectionStrings__sitemanagementdb": "T2racerPclpCmIbZS43ezKp7sWEcLjn5hXuhRmLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52Ta\u002BZitmBQgUj0t5VeDTSwA=="
+      },
+      "sitemanagement": {
+        "ConnectionStrings__sitemanagementdb": "T2racerPclpCmIbZS43ezKp7sWEcLjn5hXuhRmLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52Ta\u002BZitmBQgUj0t5VeDTSwA=="
+      }
     }
   },
   "processAllComponents": true

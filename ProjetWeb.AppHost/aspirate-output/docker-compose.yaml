@@ -17,10 +17,10 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "sql"
     volumes:
-    - "authservice-sqldata:/var/opt/mssql"
+    - "sqldata:/var/opt/mssql"
     ports:
     - target: 1433
-      published: 1433
+      published: 14330
     restart: unless-stopped
   auth-migrations:
     container_name: "auth-migrations"
@@ -29,16 +29,34 @@ services:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
-      ConnectionStrings__authdb: "Server=sql,1433;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=authdb"
+      ConnectionStrings__authdb: "Server=sql,14330;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=authdb"
       AUTHDB_HOST: "sql"
-      AUTHDB_PORT: "1433"
+      AUTHDB_PORT: "14330"
       AUTHDB_USERNAME: "sa"
       AUTHDB_PASSWORD: "Znng7j3ORPTvgHAhf00m6e"
-      AUTHDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:1433/authdb"
-      AUTHDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:1433;trustServerCertificate=true;databaseName=authdb"
+      AUTHDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:14330/authdb"
+      AUTHDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:14330;trustServerCertificate=true;databaseName=authdb"
       AUTHDB_DATABASENAME: "authdb"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "auth-migrations"
+    restart: unless-stopped
+  site-migrations:
+    container_name: "site-migrations"
+    image: "site-migrations:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ConnectionStrings__sitemanagementdb: "Server=sql,14330;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=sitemanagementdb"
+      SITEMANAGEMENTDB_HOST: "sql"
+      SITEMANAGEMENTDB_PORT: "14330"
+      SITEMANAGEMENTDB_USERNAME: "sa"
+      SITEMANAGEMENTDB_PASSWORD: "Znng7j3ORPTvgHAhf00m6e"
+      SITEMANAGEMENTDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:14330/sitemanagementdb"
+      SITEMANAGEMENTDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:14330;trustServerCertificate=true;databaseName=sitemanagementdb"
+      SITEMANAGEMENTDB_DATABASENAME: "sitemanagementdb"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "site-migrations"
     restart: unless-stopped
   authservice:
     container_name: "authservice"
@@ -49,13 +67,13 @@ services:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
-      ConnectionStrings__authdb: "Server=sql,1433;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=authdb"
+      ConnectionStrings__authdb: "Server=sql,14330;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=authdb"
       AUTHDB_HOST: "sql"
-      AUTHDB_PORT: "1433"
+      AUTHDB_PORT: "14330"
       AUTHDB_USERNAME: "sa"
       AUTHDB_PASSWORD: "Znng7j3ORPTvgHAhf00m6e"
-      AUTHDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:1433/authdb"
-      AUTHDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:1433;trustServerCertificate=true;databaseName=authdb"
+      AUTHDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:14330/authdb"
+      AUTHDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:14330;trustServerCertificate=true;databaseName=authdb"
       AUTHDB_DATABASENAME: "authdb"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "authservice"
@@ -64,6 +82,31 @@ services:
       published: 10000
     - target: 8443
       published: 10001
+    restart: unless-stopped
+  sitemanagement:
+    container_name: "sitemanagement"
+    image: "sitemanagement:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      ConnectionStrings__sitemanagementdb: "Server=sql,14330;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=sitemanagementdb"
+      SITEMANAGEMENTDB_HOST: "sql"
+      SITEMANAGEMENTDB_PORT: "14330"
+      SITEMANAGEMENTDB_USERNAME: "sa"
+      SITEMANAGEMENTDB_PASSWORD: "Znng7j3ORPTvgHAhf00m6e"
+      SITEMANAGEMENTDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:14330/sitemanagementdb"
+      SITEMANAGEMENTDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:14330;trustServerCertificate=true;databaseName=sitemanagementdb"
+      SITEMANAGEMENTDB_DATABASENAME: "sitemanagementdb"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "sitemanagement"
+    ports:
+    - target: 8080
+      published: 10002
+    - target: 8443
+      published: 10003
     restart: unless-stopped
   apigateway:
     container_name: "apigateway"
@@ -76,29 +119,28 @@ services:
       HTTP_PORTS: "8080"
       AUTHSERVICE_HTTP: "http://authservice:8080"
       services__authservice__http__0: "http://authservice:8080"
+      SITEMANAGEMENT_HTTP: "http://sitemanagement:8080"
+      services__sitemanagement__http__0: "http://sitemanagement:8080"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "apigateway"
     ports:
     - target: 8080
-      published: 10002
+      published: 10004
     - target: 8443
-      published: 10003
+      published: 10005
     restart: unless-stopped
   frontend:
     container_name: "frontend"
-    build:
-      context: ../../ProjetWeb.Frontend
-      dockerfile: Dockerfile
     environment:
       NODE_ENV: "development"
       APIGATEWAY_HTTP: "http://apigateway:8080"
       services__apigateway__http__0: "http://apigateway:8080"
-      PORT: "8000"
+      PORT: "4200"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "frontend"
     ports:
-    - target: 8000
-      published: 8000
+    - target: 4200
+      published: 4200
     restart: unless-stopped
 volumes:
-  authservice-sqldata: {}
+  sqldata: {}

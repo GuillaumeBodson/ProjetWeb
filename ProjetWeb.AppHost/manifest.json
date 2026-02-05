@@ -7,7 +7,7 @@
       "image": "mcr.microsoft.com/mssql/server:2025-latest",
       "volumes": [
         {
-          "name": "authservice-sqldata",
+          "name": "sqldata",
           "target": "/var/opt/mssql",
           "readOnly": false
         }
@@ -21,6 +21,7 @@
           "scheme": "tcp",
           "protocol": "tcp",
           "transport": "tcp",
+          "port": 14330,
           "targetPort": 1433
         }
       }
@@ -28,6 +29,10 @@
     "authdb": {
       "type": "value.v0",
       "connectionString": "{sql.connectionString};Initial Catalog=authdb"
+    },
+    "sitemanagementdb": {
+      "type": "value.v0",
+      "connectionString": "{sql.connectionString};Initial Catalog=sitemanagementdb"
     },
     "auth-migrations": {
       "type": "project.v0",
@@ -44,6 +49,23 @@
         "AUTHDB_URI": "mssql://sa:{sql-password.value}@{sql.bindings.tcp.host}:{sql.bindings.tcp.port}/authdb",
         "AUTHDB_JDBCCONNECTIONSTRING": "jdbc:sqlserver://{sql.bindings.tcp.host}:{sql.bindings.tcp.port};trustServerCertificate=true;databaseName=authdb",
         "AUTHDB_DATABASENAME": "authdb"
+      }
+    },
+    "site-migrations": {
+      "type": "project.v0",
+      "path": "../SiteManagement.MigrationService/SiteManagement.MigrationService.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ConnectionStrings__sitemanagementdb": "{sitemanagementdb.connectionString}",
+        "SITEMANAGEMENTDB_HOST": "{sql.bindings.tcp.host}",
+        "SITEMANAGEMENTDB_PORT": "{sql.bindings.tcp.port}",
+        "SITEMANAGEMENTDB_USERNAME": "sa",
+        "SITEMANAGEMENTDB_PASSWORD": "{sql-password.value}",
+        "SITEMANAGEMENTDB_URI": "mssql://sa:{sql-password.value}@{sql.bindings.tcp.host}:{sql.bindings.tcp.port}/sitemanagementdb",
+        "SITEMANAGEMENTDB_JDBCCONNECTIONSTRING": "jdbc:sqlserver://{sql.bindings.tcp.host}:{sql.bindings.tcp.port};trustServerCertificate=true;databaseName=sitemanagementdb",
+        "SITEMANAGEMENTDB_DATABASENAME": "sitemanagementdb"
       }
     },
     "authservice": {
@@ -77,6 +99,37 @@
         }
       }
     },
+    "sitemanagement": {
+      "type": "project.v0",
+      "path": "../SiteManagement.API/SiteManagement.API.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "HTTP_PORTS": "{sitemanagement.bindings.http.targetPort}",
+        "ConnectionStrings__sitemanagementdb": "{sitemanagementdb.connectionString}",
+        "SITEMANAGEMENTDB_HOST": "{sql.bindings.tcp.host}",
+        "SITEMANAGEMENTDB_PORT": "{sql.bindings.tcp.port}",
+        "SITEMANAGEMENTDB_USERNAME": "sa",
+        "SITEMANAGEMENTDB_PASSWORD": "{sql-password.value}",
+        "SITEMANAGEMENTDB_URI": "mssql://sa:{sql-password.value}@{sql.bindings.tcp.host}:{sql.bindings.tcp.port}/sitemanagementdb",
+        "SITEMANAGEMENTDB_JDBCCONNECTIONSTRING": "jdbc:sqlserver://{sql.bindings.tcp.host}:{sql.bindings.tcp.port};trustServerCertificate=true;databaseName=sitemanagementdb",
+        "SITEMANAGEMENTDB_DATABASENAME": "sitemanagementdb"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    },
     "apigateway": {
       "type": "project.v0",
       "path": "../ApiGateway/ApiGateway.csproj",
@@ -89,7 +142,11 @@
         "AUTHSERVICE_HTTP": "{authservice.bindings.http.url}",
         "services__authservice__http__0": "{authservice.bindings.http.url}",
         "AUTHSERVICE_HTTPS": "{authservice.bindings.https.url}",
-        "services__authservice__https__0": "{authservice.bindings.https.url}"
+        "services__authservice__https__0": "{authservice.bindings.https.url}",
+        "SITEMANAGEMENT_HTTP": "{sitemanagement.bindings.http.url}",
+        "services__sitemanagement__http__0": "{sitemanagement.bindings.http.url}",
+        "SITEMANAGEMENT_HTTPS": "{sitemanagement.bindings.https.url}",
+        "services__sitemanagement__https__0": "{sitemanagement.bindings.https.url}"
       },
       "bindings": {
         "http": {
@@ -123,7 +180,7 @@
           "scheme": "http",
           "protocol": "tcp",
           "transport": "http",
-          "targetPort": 8000,
+          "targetPort": 4200,
           "external": true
         }
       }

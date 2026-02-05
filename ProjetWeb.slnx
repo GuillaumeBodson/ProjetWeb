@@ -6,6 +6,10 @@
     <Project Path="Authentication.MigrationService/Authentication.MigrationService.csproj" Id="e68ed6ec-a162-47d4-9856-448599e09d34" />
     <Project Path="AuthService/Authentication.API.csproj" Id="6cdab7b3-de4f-6ff5-06f0-d824f083f1af" />
   </Folder>
+  <Folder Name="/Backend/SiteManagementService/">
+    <Project Path="SiteManagement.API/SiteManagement.API.csproj" />
+    <Project Path="SiteManagement.MigrationService/SiteManagement.MigrationService.csproj" />
+  </Folder>
   <Project Path="ProjetWeb.AppHost/ProjetWeb.AppHost.csproj" />
   <Project Path="ProjetWeb.ServiceDefaults/ProjetWeb.ServiceDefaults.csproj" />
 </Solution>
