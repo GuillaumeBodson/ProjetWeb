@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SiteManagement.API.BL.Services;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
 using SiteManagement.API.Infrastructure;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +23,32 @@ builder.Services.AddScoped<ISiteService, SiteService>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// JWT Authentication (same config as Gateway)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// Authorization with FallbackPolicy (secure by default)
+builder.Services.AddAuthorizationBuilder()
+.SetFallbackPolicy(new AuthorizationPolicyBuilder()
+.RequireAuthenticatedUser()
+.Build());
+
 // Controllers with ProblemDetails response type
-builder.Services.AddControllers(options => 
+builder.Services.AddControllers(options =>
     options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails))));
 
 // OpenAPI/Swagger
@@ -40,6 +68,7 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

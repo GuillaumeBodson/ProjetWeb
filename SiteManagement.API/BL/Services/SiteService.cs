@@ -201,8 +201,16 @@ public class SiteService(
         return true;
     }
 
-    public async Task<TimeSlotResponse?> BookTimeSlotAsync(BookTimeSlotRequest request, CancellationToken cancellationToken = default)
+    public async Task<TimeSlotResponse?> BookTimeSlotAsync(Guid siteId, BookTimeSlotRequest request, CancellationToken cancellationToken = default)
     {
+        // Validate that the site exists
+        var site = await context.Sites.FindAsync([siteId], cancellationToken);
+        if (site is null)
+        {
+            logger.LogWarning("Site {SiteId} not found", siteId);
+            return null;
+        }
+
         // Validate that the planned day exists
         var plannedDay = await context.PlannedDays.FindAsync([request.PlannedDayId], cancellationToken);
         if (plannedDay is null)

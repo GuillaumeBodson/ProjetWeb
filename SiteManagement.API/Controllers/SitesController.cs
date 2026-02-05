@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SiteManagement.API.BL.Models;
 using SiteManagement.API.BL.Services.Abstractions;
@@ -5,6 +6,7 @@ using SiteManagement.API.BL.Services.Abstractions;
 namespace SiteManagement.API.Controllers;
 
 [ApiController]
+[AllowAnonymous]
 [Route("api/[controller]")]
 public class SitesController(ISiteService siteService) : ControllerBase
 {
@@ -30,7 +32,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
         return Ok(site);
     }
-
+    [AllowAnonymous]
     [HttpPost]
     [ProducesResponseType<SiteResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -71,14 +73,14 @@ public class SitesController(ISiteService siteService) : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("timeslots/book")]
+    [HttpPost("{siteId:guid}/timeslots/book")]
     [ProducesResponseType<TimeSlotResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> BookTimeSlot([FromBody] BookTimeSlotRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> BookTimeSlot(Guid siteId, [FromBody] BookTimeSlotRequest request, CancellationToken cancellationToken)
     {
-        var timeSlot = await siteService.BookTimeSlotAsync(request, cancellationToken);
-        
+        var timeSlot = await siteService.BookTimeSlotAsync(siteId, request, cancellationToken);
+
         if (timeSlot is null)
         {
             return NotFound();
