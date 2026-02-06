@@ -9,7 +9,7 @@ builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
 
 builder.Services.AddScoped<DataSeeder>();
 
-// Register workers - they run sequentially by default
+// Register workers - DataSeedWorker checks for pending migrations before seeding
 builder.Services.AddHostedService<SqlServerMigrationWorker<SiteManagementDbContext>>();
 builder.Services.AddHostedService<DataSeedWorker>();
 

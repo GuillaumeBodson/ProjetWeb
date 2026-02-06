@@ -43,6 +43,14 @@ public class DataSeedWorker(
                 throw new InvalidOperationException("Unable to connect to the site management database.");
             }
 
+            // Ensure all migrations are applied before seeding
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
+            if (pendingMigrations.Any())
+            {
+                logger.LogWarning("Pending migrations detected. Waiting for migrations to complete...");
+                throw new InvalidOperationException("Database migrations are not yet complete. Retrying seeding...");
+            }
+
             // Run seeder
             var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
             await seeder.SeedAsync(token);
