@@ -1,7 +1,9 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetWeb.Shared.Exceptions;
 using ProjetWeb.Shared.Extensions;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SiteManagement.API.BL.Services;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
@@ -13,6 +15,10 @@ builder.AddServiceDefaults();
 
 // Database
 builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
+
+// Add FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddFluentValidationAutoValidation();
 
 // Register services
 builder.Services.AddScoped<ISiteService, SiteService>();
@@ -32,7 +38,10 @@ builder.Services.AddAuthorizationBuilder()
 
 // Controllers with ProblemDetails response type
 builder.Services.AddControllers(options =>
-    options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails))));
+{
+    options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails)));
+    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
+});
 
 // OpenAPI/Swagger
 builder.Services.AddOpenApi();
@@ -44,7 +53,7 @@ app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
 app.UseExceptionHandler();

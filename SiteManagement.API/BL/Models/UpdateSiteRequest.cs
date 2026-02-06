@@ -17,12 +17,5 @@ public record UpdateSiteRequest(
     IReadOnlyCollection<CreatePlannedDayRequest> Schedule
 )
 {
-    // Custom validation to ensure all 7 days of week are present
-    public bool HasAllDaysOfWeek()
-    {
-        if (Schedule.Count != 7) return false;
 
-        var distinctDays = Schedule.Select(s => s.DayOfWeek).Distinct().Count();
-        return distinctDays == 7;
-    }
 };

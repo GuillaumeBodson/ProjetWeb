@@ -39,12 +39,6 @@ public class SiteService(
 
     public async Task<SiteResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
     {
-        // Validate that all 7 days of week are present
-        if (!request.HasAllDaysOfWeek())
-        {
-            throw new ArgumentException("Schedule must contain exactly 7 days (one for each day of the week) with no duplicates.");
-        }
-
         var site = new Site
         {
             Id = Guid.NewGuid(),
@@ -98,12 +92,6 @@ public class SiteService(
         if (site is null)
         {
             return null;
-        }
-
-        // Validate that all 7 days of week are present
-        if (!request.HasAllDaysOfWeek())
-        {
-            throw new ArgumentException("Schedule must contain exactly 7 days (one for each day of the week) with no duplicates.");
         }
 
         site.Name = request.Name;
@@ -211,23 +199,25 @@ public class SiteService(
             return null;
         }
 
-        // Validate that the planned day exists
+        // Validate that the planned day exists and belongs to site
         var plannedDay = await context.PlannedDays.FindAsync([request.PlannedDayId], cancellationToken);
         if (plannedDay is null || plannedDay.SiteId != siteId)
         {
-            logger.LogWarning("PlannedDay {PlannedDayId} not found", request.PlannedDayId);
+            logger.LogWarning("PlannedDay {PlannedDayId} not found or does not belong to site {SiteId}", 
+                request.PlannedDayId, siteId);
             return null;
         }
 
-        // Validate that the court exists
+        // Validate that the court exists and belongs to site
         var court = await context.Courts.FindAsync([request.CourtId], cancellationToken);
         if (court is null || court.SiteId != siteId)
         {
-            logger.LogWarning("Court {CourtId} not found", request.CourtId);
+            logger.LogWarning("Court {CourtId} not found or does not belong to site {SiteId}", 
+                request.CourtId, siteId);
             return null;
         }
 
-        // Validate time slot number is within range
+        // Validate time slot number is within range (business rule validation)
         if (request.TimeSlotNumber < 1 || request.TimeSlotNumber > plannedDay.NumberOfTimeSlots)
         {
             logger.LogWarning(
