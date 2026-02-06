@@ -56,7 +56,6 @@ public class SiteService(
         };
     }
 
-
     public async Task<SiteResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
     {
         var site = new Site
