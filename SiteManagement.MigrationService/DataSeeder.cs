@@ -9,10 +9,10 @@ public class DataSeeder(
     SiteManagementDbContext context,
     ILogger<DataSeeder> logger)
 {
-    public async Task SeedAsync()
+    public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
         // Only seed if database is empty
-        if (await context.Sites.AnyAsync())
+        if (await context.Sites.AnyAsync(cancellationToken))
         {
             logger.LogInformation("Database already contains data. Skipping seeding.");
             return;
@@ -20,10 +20,16 @@ public class DataSeeder(
 
         logger.LogInformation("Seeding initial data...");
 
+        // Use a transaction to ensure atomicity
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
         // Define Site IDs
         var centralSportsId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var northCampusId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         var riversideId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+
+        // Get current year for dynamic date generation
+        var currentYear = DateTime.UtcNow.Year;
 
         // Seed Sites
         var sites = new[]
@@ -33,8 +39,8 @@ public class DataSeeder(
                 Id = centralSportsId,
                 Name = "Central Sports Complex",
                 ClosedDays = [
-                    new DateOnly(2026, 1, 1),  // New Year
-                    new DateOnly(2026, 12, 25) // Christmas
+                    new DateOnly(currentYear, 1, 1),  // New Year
+                    new DateOnly(currentYear, 12, 25) // Christmas
                 ]
             },
             new Site
@@ -48,13 +54,13 @@ public class DataSeeder(
                 Id = riversideId,
                 Name = "Riverside Athletic Club",
                 ClosedDays = [
-                    new DateOnly(2026, 7, 21) // National Holiday
+                    new DateOnly(currentYear, 7, 21) // National Holiday
                 ]
             }
         };
 
         context.Sites.AddRange(sites);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} sites.", sites.Length);
 
         // Seed Courts
@@ -94,7 +100,7 @@ public class DataSeeder(
         }
 
         context.Courts.AddRange(courts);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} courts.", courts.Count);
 
         // Seed PlannedDays
@@ -139,7 +145,7 @@ public class DataSeeder(
         }
 
         context.PlannedDays.AddRange(plannedDays);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} planned days.", plannedDays.Count);
 
         // Optionally seed TimeSlots (example: seed for current week)
@@ -168,8 +174,11 @@ public class DataSeeder(
         }
 
         context.TimeSlots.AddRange(timeSlots);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} time slots for week {Week}.", timeSlots.Count, currentWeekNumber);
+
+        // Commit transaction
+        await transaction.CommitAsync(cancellationToken);
 
         logger.LogInformation("Data seeding completed successfully!");
     }
