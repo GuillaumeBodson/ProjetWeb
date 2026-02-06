@@ -48,7 +48,7 @@ public class DataSeedWorker(
             if (pendingMigrations.Any())
             {
                 logger.LogWarning("Pending migrations detected. Waiting for migrations to complete...");
-                throw new InvalidOperationException("Database migrations are not yet complete. Retrying seeding...");
+                throw new InvalidOperationException("Database migrations are not yet complete. Seeding cannot proceed until migrations complete.");
             }
 
             // Run seeder
