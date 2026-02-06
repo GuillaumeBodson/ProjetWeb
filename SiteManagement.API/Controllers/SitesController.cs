@@ -11,6 +11,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType<IEnumerable<SiteResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var sites = await siteService.GetAllAsync(cancellationToken);
@@ -19,7 +20,8 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType<SiteResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var site = await siteService.GetByIdAsync(id, cancellationToken);
@@ -34,7 +36,8 @@ public class SitesController(ISiteService siteService) : ControllerBase
     
     [HttpPost]
     [ProducesResponseType<SiteResponse>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateSiteRequest request, CancellationToken cancellationToken)
     {
         var site = await siteService.CreateAsync(request, cancellationToken);
@@ -43,8 +46,9 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
     [HttpPut("{id:guid}")]
     [ProducesResponseType<SiteResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSiteRequest request, CancellationToken cancellationToken)
     {
         var site = await siteService.UpdateAsync(id, request, cancellationToken);
@@ -59,7 +63,8 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var deleted = await siteService.DeleteAsync(id, cancellationToken);
@@ -74,8 +79,9 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
     [HttpPost("{siteId:guid}/timeslots/book")]
     [ProducesResponseType<TimeSlotResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> BookTimeSlot(Guid siteId, [FromBody] BookTimeSlotRequest request, CancellationToken cancellationToken)
     {
         var timeSlot = await siteService.BookTimeSlotAsync(siteId, request, cancellationToken);
