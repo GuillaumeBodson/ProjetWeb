@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SiteManagement.API.DAL;
 using SiteManagement.API.DAL.Entities;
 
@@ -7,55 +7,83 @@ namespace SiteManagement.MigrationService;
 
 public class DataSeeder(
     SiteManagementDbContext context,
-    ILogger<DataSeeder> logger)
+    ILogger<DataSeeder> logger,
+    IOptions<SeedingOptions> seedingOptions)
 {
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        // Only seed if database is empty
+        var forceRecreate = seedingOptions.Value.ForceRecreate;
+
+        if (forceRecreate)
+        {
+            logger.LogWarning("ForceRecreate is enabled - dropping and recreating database...");
+            await context.Database.EnsureDeletedAsync(cancellationToken);
+            await context.Database.MigrateAsync(cancellationToken);
+        }
+
         if (await context.Sites.AnyAsync(cancellationToken))
         {
             logger.LogInformation("Database already contains data. Skipping seeding.");
             return;
         }
 
-        logger.LogInformation("Seeding initial data...");
+        logger.LogInformation("Seeding initial data with transaction...");
 
-        // Use a transaction to ensure atomicity
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        // Use execution strategy for resilient transaction support
+        var strategy = context.Database.CreateExecutionStrategy();
 
-        // Define Site IDs
-        var centralSportsId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var northCampusId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var riversideId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        await strategy.ExecuteAsync(async () =>
+        {
+            // Set command timeout to 5 minutes for seeding operations
+            context.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 
-        // Get current year for dynamic date generation
+            await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
+            try
+            {
+                var sites = await SeedSitesAsync(cancellationToken);
+                var courts = await SeedCourtsAsync(sites, cancellationToken);
+                var plannedDays = await SeedPlannedDaysAsync(sites, cancellationToken);
+                await SeedTimeSlotsAsync(courts, plannedDays, cancellationToken);
+
+                await transaction.CommitAsync(cancellationToken);
+                logger.LogInformation("Transaction committed. Data seeding completed successfully!");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error during seeding, rolling back transaction...");
+                await transaction.RollbackAsync(CancellationToken.None); // Use None to ensure rollback completes
+                throw;
+            }
+        });
+    }
+
+    private async Task<Site[]> SeedSitesAsync(CancellationToken cancellationToken)
+    {
         var currentYear = DateTime.UtcNow.Year;
 
-        // Seed Sites
         var sites = new[]
         {
             new Site
             {
-                Id = centralSportsId,
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 Name = "Central Sports Complex",
                 ClosedDays = [
-                    new DateOnly(currentYear, 1, 1),  // New Year
-                    new DateOnly(currentYear, 12, 25) // Christmas
+                    new DateOnly(currentYear, 1, 1),
+                    new DateOnly(currentYear, 12, 25)
                 ]
             },
             new Site
             {
-                Id = northCampusId,
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Name = "North Campus Tennis Center",
                 ClosedDays = []
             },
             new Site
             {
-                Id = riversideId,
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 Name = "Riverside Athletic Club",
-                ClosedDays = [
-                    new DateOnly(currentYear, 7, 21) // National Holiday
-                ]
+                ClosedDays = [new DateOnly(currentYear, 7, 21)]
             }
         };
 
@@ -63,104 +91,92 @@ public class DataSeeder(
         await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} sites.", sites.Length);
 
-        // Seed Courts
-        var courts = new List<Court>();
+        return sites;
+    }
 
-        // Central Sports Complex - 5 courts
-        for (int i = 1; i <= 5; i++)
+    private async Task<List<Court>> SeedCourtsAsync(Site[] sites, CancellationToken cancellationToken)
+    {
+        var courtConfigurations = new Dictionary<Guid, int>
         {
-            courts.Add(new Court
-            {
-                Id = Guid.NewGuid(),
-                Number = i,
-                SiteId = centralSportsId
-            });
-        }
+            [sites[0].Id] = 5,  // Central Sports Complex
+            [sites[1].Id] = 3,  // North Campus
+            [sites[2].Id] = 4   // Riverside
+        };
 
-        // North Campus - 3 courts
-        for (int i = 1; i <= 3; i++)
-        {
-            courts.Add(new Court
-            {
-                Id = Guid.NewGuid(),
-                Number = i,
-                SiteId = northCampusId
-            });
-        }
-
-        // Riverside - 4 courts
-        for (int i = 1; i <= 4; i++)
-        {
-            courts.Add(new Court
-            {
-                Id = Guid.NewGuid(),
-                Number = i,
-                SiteId = riversideId
-            });
-        }
+        var courts = courtConfigurations
+            .SelectMany(config => Enumerable.Range(1, config.Value)
+                .Select(number => new Court
+                {
+                    Id = Guid.NewGuid(),
+                    Number = number,
+                    SiteId = config.Key
+                }))
+            .ToList();
 
         context.Courts.AddRange(courts);
         await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} courts.", courts.Count);
 
-        // Seed PlannedDays
+        return courts;
+    }
+
+    private async Task<List<PlannedDay>> SeedPlannedDaysAsync(Site[] sites, CancellationToken cancellationToken)
+    {
         var plannedDays = new List<PlannedDay>();
 
-        // Central Sports Complex - Open Monday to Saturday with 6 time slots per day
-        foreach (var day in new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, 
-                                     DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday })
-        {
-            plannedDays.Add(new PlannedDay
-            {
-                Id = Guid.NewGuid(),
-                SiteId = centralSportsId,
-                DayOfWeek = day,
-                NumberOfTimeSlots = 6
-            });
-        }
+        // Central Sports Complex - Monday to Saturday, 6 slots
+        plannedDays.AddRange(CreatePlannedDaysForSite(
+            sites[0].Id,
+            [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
+             DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday],
+            6));
 
-        // North Campus - Open all week with 8 time slots per day
-        foreach (var day in Enum.GetValues<DayOfWeek>())
-        {
-            plannedDays.Add(new PlannedDay
-            {
-                Id = Guid.NewGuid(),
-                SiteId = northCampusId,
-                DayOfWeek = day,
-                NumberOfTimeSlots = 8
-            });
-        }
+        // North Campus - All week, 8 slots
+        plannedDays.AddRange(CreatePlannedDaysForSite(
+            sites[1].Id,
+            Enum.GetValues<DayOfWeek>(),
+            8));
 
-        // Riverside - Open Tuesday to Sunday with 5 time slots per day
-        foreach (var day in new[] { DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday,
-                                     DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday })
-        {
-            plannedDays.Add(new PlannedDay
-            {
-                Id = Guid.NewGuid(),
-                SiteId = riversideId,
-                DayOfWeek = day,
-                NumberOfTimeSlots = 5
-            });
-        }
+        // Riverside - Tuesday to Sunday, 5 slots
+        plannedDays.AddRange(CreatePlannedDaysForSite(
+            sites[2].Id,
+            [DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday,
+             DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday],
+            5));
 
         context.PlannedDays.AddRange(plannedDays);
         await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} planned days.", plannedDays.Count);
 
-        // Optionally seed TimeSlots (example: seed for current week)
-        var timeSlots = new List<TimeSlot>();
+        return plannedDays;
+    }
+
+    private static IEnumerable<PlannedDay> CreatePlannedDaysForSite(
+        Guid siteId,
+        IEnumerable<DayOfWeek> days,
+        int numberOfTimeSlots)
+    {
+        return days.Select(day => new PlannedDay
+        {
+            Id = Guid.NewGuid(),
+            SiteId = siteId,
+            DayOfWeek = day,
+            NumberOfTimeSlots = numberOfTimeSlots
+        });
+    }
+
+    private async Task SeedTimeSlotsAsync(
+        List<Court> courts,
+        List<PlannedDay> plannedDays,
+        CancellationToken cancellationToken)
+    {
         var currentWeekNumber = GetIso8601WeekOfYear(DateTime.UtcNow);
 
-        foreach (var plannedDay in plannedDays)
-        {
-            var courtsForSite = courts.Where(c => c.SiteId == plannedDay.SiteId).ToList();
-
-            foreach (var court in courtsForSite)
-            {
-                for (int slotNumber = 1; slotNumber <= plannedDay.NumberOfTimeSlots; slotNumber++)
-                {
-                    timeSlots.Add(new TimeSlot
+        var timeSlots = plannedDays
+            .SelectMany(plannedDay => courts
+                .Where(c => c.SiteId == plannedDay.SiteId)
+                .SelectMany(court => Enumerable.Range(1, plannedDay.NumberOfTimeSlots)
+                    .Select(slotNumber => new TimeSlot
                     {
                         Id = Guid.NewGuid(),
                         PlannedDayId = plannedDay.Id,
@@ -168,19 +184,12 @@ public class DataSeeder(
                         TimeSlotNumber = slotNumber,
                         WeekNumber = currentWeekNumber,
                         BookState = BookState.BookInProgress
-                    });
-                }
-            }
-        }
+                    })))
+            .ToList();
 
         context.TimeSlots.AddRange(timeSlots);
         await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded {Count} time slots for week {Week}.", timeSlots.Count, currentWeekNumber);
-
-        // Commit transaction
-        await transaction.CommitAsync(cancellationToken);
-
-        logger.LogInformation("Data seeding completed successfully!");
     }
 
     private static int GetIso8601WeekOfYear(DateTime date)
@@ -192,8 +201,8 @@ public class DataSeeder(
         }
 
         return System.Globalization.CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-            date, 
-            System.Globalization.CalendarWeekRule.FirstFourDayWeek, 
+            date,
+            System.Globalization.CalendarWeekRule.FirstFourDayWeek,
             DayOfWeek.Monday);
     }
 }
