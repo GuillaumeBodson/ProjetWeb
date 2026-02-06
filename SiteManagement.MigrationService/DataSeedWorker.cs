@@ -45,7 +45,7 @@ public class DataSeedWorker(
 
             // Run seeder
             var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
-            await seeder.SeedAsync();
+            await seeder.SeedAsync(token);
 
             logger.LogInformation("Data seeding completed successfully");
 
