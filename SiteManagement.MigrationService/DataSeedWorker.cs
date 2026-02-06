@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using SiteManagement.API.DAL;
@@ -53,7 +50,7 @@ public class DataSeedWorker(
 
             // Run seeder
             var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
-            await seeder.SeedAsync(token);
+            await seeder.SeedAsync();
 
             logger.LogInformation("Data seeding completed successfully");
 
