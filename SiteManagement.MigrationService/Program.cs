@@ -1,14 +1,12 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SiteManagement.API.DAL;
-using SiteManagement.MigrationService;
+using ProjetWeb.Shared.Migration;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
 
-builder.Services.AddHostedService<MigrationWorker>();
+builder.Services.AddHostedService<SqlServerMigrationWorker<SiteManagementDbContext>>();
 
 var app = builder.Build();
 app.Run();

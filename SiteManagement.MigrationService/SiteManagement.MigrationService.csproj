@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProjetWeb.Shared.Migration\ProjetWeb.Shared.Migration.csproj" />
     <ProjectReference Include="..\SiteManagement.API\SiteManagement.API.csproj" />
     <ProjectReference Include="..\ProjetWeb.ServiceDefaults\ProjetWeb.ServiceDefaults.csproj" />
   </ItemGroup>

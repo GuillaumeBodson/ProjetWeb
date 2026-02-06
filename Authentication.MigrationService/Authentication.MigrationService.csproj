@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuthService\Authentication.API.csproj" />
+    <ProjectReference Include="..\SiteManagement.MigrationService\SiteManagement.MigrationService.csproj" />
   </ItemGroup>
 
 </Project>
