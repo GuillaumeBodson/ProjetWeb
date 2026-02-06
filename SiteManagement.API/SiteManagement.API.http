@@ -16,36 +16,6 @@
 GET {{gateway}}/api/sites
 Authorization: Bearer {{token}}
 
-### Get paginated sites - Basic (via Gateway)
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=10
-
-### Get paginated sites - Custom page size
-GET {{gateway}}/api/sites/page?pageNumber=2&pageSize=5
-
-### Get paginated sites - Sorted by Name ascending
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=10&sortBy[0].PropertyName=Name&sortBy[0].Direction=Ascending
-
-### Get paginated sites - Sorted by Name descending
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=10&sortBy[0].PropertyName=Name&sortBy[0].Direction=Descending
-
-### Get paginated sites - Multiple sorts (Name, then Id)
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=10&sortBy[0].PropertyName=Name&sortBy[0].Direction=Ascending&sortBy[1].PropertyName=Id&sortBy[1].Direction=Ascending
-
-### Get paginated sites - With filter by Name
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=10&filters[0].Logic=And&filters[0].Filters[0].PropertyName=Name&filters[0].Filters[0].Operation=Contains&filters[0].Filters[0].Value=Campus
-
-### Get paginated sites - Combined: Filter, Sort, Paginate
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=10&filters[0].Logic=And&filters[0].Filters[0].PropertyName=Name&filters[0].Filters[0].Operation=Contains&filters[0].Filters[0].Value=Main&sortBy[0].PropertyName=Name&sortBy[0].Direction=Ascending
-
-### Get paginated sites - Test validation: Invalid page number (should return 400)
-GET {{gateway}}/api/sites/page?pageNumber=0&pageSize=10
-
-### Get paginated sites - Test validation: Invalid page size (should return 400)
-GET {{gateway}}/api/sites/page?pageNumber=1&pageSize=101
-
-### Get paginated sites - Directly (no auth required)
-GET {{siteservice}}/api/sites/page?pageNumber=1&pageSize=10
-
 ### Get site by ID via Gateway
 @siteId = 00000000-0000-0000-0000-000000000000
 GET {{gateway}}/api/sites/{{siteId}}
@@ -214,9 +184,6 @@ Authorization: Bearer {{token}}
 
 ### Get all sites directly
 GET {{siteservice}}/api/sites
-
-### Get paginated sites directly - With sorting and filtering
-GET {{siteservice}}/api/sites/page?pageNumber=1&pageSize=20&sortBy[0].PropertyName=Name&sortBy[0].Direction=Ascending&filters[0].Logic=And&filters[0].Filters[0].PropertyName=Name&filters[0].Filters[0].Operation=StartsWith&filters[0].Filters[0].Value=Test
 
 ### Create site directly (no auth)
 POST {{siteservice}}/api/sites
