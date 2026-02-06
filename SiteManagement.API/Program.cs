@@ -7,6 +7,7 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SiteManagement.API.BL.Services;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
+using ToolBox.EntityFramework.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.AddServiceDefaults();
 builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
 
 // Add FluentValidation
+builder.Services.AddFilterValidators();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SiteManagement.API.BL.Models;
 using SiteManagement.API.BL.Services.Abstractions;
+using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.Controllers;
 
@@ -33,7 +34,17 @@ public class SitesController(ISiteService siteService) : ControllerBase
 
         return Ok(site);
     }
-    
+
+    [HttpGet("page")]
+    [ProducesResponseType<PageOf<SiteResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetPage([FromQuery] PageRequest request, CancellationToken cancellationToken)
+    {
+        var page = await siteService.GetPageAsync(request, cancellationToken);
+        return Ok(page);
+    }
+
     [HttpPost]
     [ProducesResponseType<SiteResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]

@@ -4,6 +4,7 @@ using SiteManagement.API.BL.Models;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
 using SiteManagement.API.DAL.Entities;
+using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.BL.Services;
 
@@ -36,6 +37,23 @@ public class SiteService(
             .ToListAsync(cancellationToken);
 
         return sites.Select(SiteMapper.ToResponse);
+    }
+
+    public async Task<PageOf<SiteResponse>> GetPageAsync(PageRequest request, CancellationToken cancellationToken = default)
+    {
+        var page = await context.Sites
+            .Include(s => s.Courts)
+            .Include(s => s.PlannedDays)
+                .ThenInclude(pd => pd.TimeSlots)
+            .ToPageAsync(request, cancellationToken: cancellationToken);
+
+        return new PageOf<SiteResponse>
+        {
+            PageNumber = page.PageNumber,
+            PageSize = page.PageSize,
+            TotalItems = page.TotalItems,
+            Items = [.. page.Items.Select(SiteMapper.ToResponse)]
+        };
     }
 
     public async Task<SiteResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
