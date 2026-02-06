@@ -47,7 +47,6 @@ public class SiteService(
                 .ThenInclude(pd => pd.TimeSlots)
             .ToPageAsync(request, cancellationToken: cancellationToken);
 
-
         return new PageOf<SiteResponse>
         {
             PageNumber = page.PageNumber,
