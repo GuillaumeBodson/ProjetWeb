@@ -17,13 +17,21 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
+import { ApiSitesPageGetPageNumberParameter } from '../model/api-sites-page-get-page-number-parameter';
+// @ts-ignore
 import { BookTimeSlotRequest } from '../model/book-time-slot-request';
 // @ts-ignore
 import { CreateSiteRequest } from '../model/create-site-request';
 // @ts-ignore
+import { FilterGroup } from '../model/filter-group';
+// @ts-ignore
+import { PageOfOfSiteResponse } from '../model/page-of-of-site-response';
+// @ts-ignore
 import { ProblemDetails } from '../model/problem-details';
 // @ts-ignore
 import { SiteResponse } from '../model/site-response';
+// @ts-ignore
+import { SortDescriptor } from '../model/sort-descriptor';
 // @ts-ignore
 import { TimeSlotResponse } from '../model/time-slot-response';
 // @ts-ignore
@@ -277,6 +285,102 @@ export class SitesService extends BaseService {
             {
                 context: localVarHttpContext,
                 body: updateSiteRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @endpoint get /api/Sites/page
+     * @param pageNumber 
+     * @param pageSize 
+     * @param filters 
+     * @param sorts 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public apiSitesPageGet(pageNumber?: ApiSitesPageGetPageNumberParameter, pageSize?: ApiSitesPageGetPageNumberParameter, filters?: Array<FilterGroup>, sorts?: Array<SortDescriptor>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<PageOfOfSiteResponse>;
+    public apiSitesPageGet(pageNumber?: ApiSitesPageGetPageNumberParameter, pageSize?: ApiSitesPageGetPageNumberParameter, filters?: Array<FilterGroup>, sorts?: Array<SortDescriptor>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageOfOfSiteResponse>>;
+    public apiSitesPageGet(pageNumber?: ApiSitesPageGetPageNumberParameter, pageSize?: ApiSitesPageGetPageNumberParameter, filters?: Array<FilterGroup>, sorts?: Array<SortDescriptor>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageOfOfSiteResponse>>;
+    public apiSitesPageGet(pageNumber?: ApiSitesPageGetPageNumberParameter, pageSize?: ApiSitesPageGetPageNumberParameter, filters?: Array<FilterGroup>, sorts?: Array<SortDescriptor>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'PageNumber',
+            <any>pageNumber,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'PageSize',
+            <any>pageSize,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'Filters',
+            <any>filters,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'Sorts',
+            <any>sorts,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'text/plain',
+            'application/json',
+            'text/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/Sites/page`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<PageOfOfSiteResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

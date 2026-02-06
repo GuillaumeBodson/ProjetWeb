@@ -7,11 +7,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ApiSitesPageGetPageNumberParameter } from './api-sites-page-get-page-number-parameter';
 
 
-export interface CourtResponse { 
-    id: string;
-    number: ApiSitesPageGetPageNumberParameter;
+export interface ExpressionFilter { 
+    propertyName?: string | null;
+    valueString?: string | null;
+    comparison?: number;
+    filterAssociation?: number;
 }
 

@@ -7,14 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { BookTimeSlotRequestTimeSlotNumber } from './book-time-slot-request-time-slot-number';
+import { ApiSitesPageGetPageNumberParameter } from './api-sites-page-get-page-number-parameter';
 import { TimeSlotResponse } from './time-slot-response';
 
 
 export interface PlannedDayResponse { 
     id: string;
     dayOfWeek: number;
-    numberOfTimeSlots: BookTimeSlotRequestTimeSlotNumber;
+    numberOfTimeSlots: ApiSitesPageGetPageNumberParameter;
     timeSlots: Array<TimeSlotResponse>;
 }
 
