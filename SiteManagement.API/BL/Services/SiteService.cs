@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SiteManagement.API.BL.Mappers;
 using SiteManagement.API.BL.Models;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
@@ -23,7 +24,7 @@ public class SiteService(
             return null;
         }
 
-        return MapToResponse(site);
+        return SiteMapper.ToResponse(site);
     }
 
     public async Task<IEnumerable<SiteResponse>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -34,7 +35,7 @@ public class SiteService(
                 .ThenInclude(pd => pd.TimeSlots)
             .ToListAsync(cancellationToken);
 
-        return sites.Select(MapToResponse);
+        return sites.Select(SiteMapper.ToResponse);
     }
 
     public async Task<SiteResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
@@ -77,7 +78,7 @@ public class SiteService(
             "Created site {SiteId} with name {SiteName}, {CourtCount} courts, and 7 planned days (all days of week). Time slots will be created on-demand during booking.",
             site.Id, site.Name, site.Courts.Count);
 
-        return MapToResponse(site);
+        return SiteMapper.ToResponse(site);
     }
 
     public async Task<SiteResponse?> UpdateAsync(Guid id, UpdateSiteRequest request, CancellationToken cancellationToken = default)
@@ -168,7 +169,7 @@ public class SiteService(
             "Updated site {SiteId}: Name and schedule updated, {CourtCount} courts, all 7 planned days preserved",
             site.Id, site.Courts.Count);
 
-        return MapToResponse(site);
+        return SiteMapper.ToResponse(site);
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -272,44 +273,5 @@ public class SiteService(
             timeSlot.CourtId,
             timeSlot.WeekNumber,
             timeSlot.BookState);
-    }
-
-    private static SiteResponse MapToResponse(Site site)
-    {
-        var courtResponses = site.Courts
-            .OrderBy(c => c.Number)
-            .Select(c => new CourtResponse(c.Id, c.Number))
-            .ToList();
-
-        var schedule = site.PlannedDays
-            .OrderBy(pd => pd.DayOfWeek)
-            .Select(pd =>
-            {
-                var timeSlotResponses = pd.TimeSlots
-                    .OrderBy(ts => ts.TimeSlotNumber)
-                    .ThenBy(ts => ts.WeekNumber)
-                    .Select(ts => new TimeSlotResponse(
-                        ts.Id,
-                        ts.TimeSlotNumber,
-                        ts.CourtId,
-                        ts.WeekNumber,
-                        ts.BookState))
-                    .ToList();
-
-                return new PlannedDayResponse(
-                    pd.Id,
-                    pd.DayOfWeek,
-                    pd.NumberOfTimeSlots,
-                    timeSlotResponses
-                );
-            }).ToList();
-
-        return new SiteResponse(
-            site.Id,
-            site.Name,
-            site.ClosedDays.OrderBy(d => d).ToList(),
-            courtResponses,
-            schedule
-        );
     }
 }

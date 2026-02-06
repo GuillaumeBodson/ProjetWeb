@@ -5,7 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
-/src/app/core/api/auth/git_push.sh
+/src/app/core/api/**/git_push.sh
 
 # Node
 /node_modules
