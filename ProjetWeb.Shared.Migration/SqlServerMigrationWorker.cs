@@ -1,17 +1,14 @@
-﻿using Authentication.API.DAL;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 
-namespace Authentication.MigrationService;
+namespace ProjetWeb.Shared.Migration;
 
-public class MigrationWorker(
-    IServiceProvider serviceProvider,
-    IHostApplicationLifetime lifetime,
-    ILogger<MigrationWorker> logger) : BackgroundService
+public class SqlServerMigrationWorker<TDbContext>(IServiceProvider serviceProvider, IHostApplicationLifetime lifetime, ILogger<SqlServerMigrationWorker<TDbContext>> logger) : BackgroundService
+where TDbContext : DbContext
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -34,7 +31,7 @@ public class MigrationWorker(
             logger.LogInformation("Starting database migration...");
 
             await using var scope = serviceProvider.CreateAsyncScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
             // Ensure database is created and can connect
             var canConnect = await dbContext.Database.CanConnectAsync(token);
