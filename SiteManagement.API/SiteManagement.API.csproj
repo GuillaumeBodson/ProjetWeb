@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -25,7 +25,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="2.0.0" />
-    <PackageReference Include="ToolBox.EntityFramework" Version="1.1.0" />
+    <PackageReference Include="ToolBox.EntityFramework" Version="2.3.0" />
 
 	  <!-- Add this package to enable build-time generation -->
 	  <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.2">

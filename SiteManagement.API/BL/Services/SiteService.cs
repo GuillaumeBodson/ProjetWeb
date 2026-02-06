@@ -41,18 +41,12 @@ public class SiteService(
 
     public async Task<PageOf<SiteResponse>> GetPageAsync(PageRequest request, CancellationToken cancellationToken = default)
     {
-        var query = context.Sites
+        var page = await context.Sites
             .Include(s => s.Courts)
             .Include(s => s.PlannedDays)
                 .ThenInclude(pd => pd.TimeSlots)
-            .AsQueryable();
+            .ToPageAsync(request, cancellationToken: cancellationToken);
 
-        var page = await PageOf<Site>.QueryAsync(
-            query, 
-            request.Filters ?? [], 
-            request.PageSize, 
-            request.PageNumber, 
-            cancellationToken);
 
         return new PageOf<SiteResponse>
         {

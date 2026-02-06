@@ -648,6 +648,16 @@
                 "$ref": "#/components/schemas/FilterGroup"
               }
             }
+          },
+          {
+            "name": "Sorts",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/SortDescriptor"
+              }
+            }
           }
         ],
         "responses": {
@@ -1128,6 +1138,20 @@
             ],
             "format": "int32"
           },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          },
           "items": {
             "type": "array",
             "items": {
@@ -1243,6 +1267,20 @@
             }
           }
         }
+      },
+      "SortDescriptor": {
+        "type": "object",
+        "properties": {
+          "propertyName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/SortDirection"
+          }
+        }
+      },
+      "SortDirection": {
+        "type": "integer"
       },
       "TimeSlotResponse": {
         "required": [
