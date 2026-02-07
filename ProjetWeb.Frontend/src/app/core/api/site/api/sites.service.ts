@@ -27,6 +27,8 @@ import { PageRequest } from '../model/page-request';
 // @ts-ignore
 import { ProblemDetails } from '../model/problem-details';
 // @ts-ignore
+import { SiteDetailsResponse } from '../model/site-details-response';
+// @ts-ignore
 import { SiteResponse } from '../model/site-response';
 // @ts-ignore
 import { TimeSlotResponse } from '../model/time-slot-response';
@@ -168,9 +170,9 @@ export class SitesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiSitesIdGet(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<SiteResponse>;
-    public apiSitesIdGet(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SiteResponse>>;
-    public apiSitesIdGet(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SiteResponse>>;
+    public apiSitesIdGet(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<SiteDetailsResponse>;
+    public apiSitesIdGet(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SiteDetailsResponse>>;
+    public apiSitesIdGet(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SiteDetailsResponse>>;
     public apiSitesIdGet(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling apiSitesIdGet.');
@@ -205,7 +207,7 @@ export class SitesService extends BaseService {
 
         let localVarPath = `/api/Sites/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "uuid"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<SiteResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<SiteDetailsResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -226,9 +228,9 @@ export class SitesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<SiteResponse>;
-    public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SiteResponse>>;
-    public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SiteResponse>>;
+    public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<SiteDetailsResponse>;
+    public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SiteDetailsResponse>>;
+    public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SiteDetailsResponse>>;
     public apiSitesIdPut(id: string, updateSiteRequest: UpdateSiteRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling apiSitesIdPut.');
@@ -277,7 +279,7 @@ export class SitesService extends BaseService {
 
         let localVarPath = `/api/Sites/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "uuid"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<SiteResponse>('put', `${basePath}${localVarPath}`,
+        return this.httpClient.request<SiteDetailsResponse>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: updateSiteRequest,
@@ -298,9 +300,9 @@ export class SitesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiSitesPost(createSiteRequest: CreateSiteRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<SiteResponse>;
-    public apiSitesPost(createSiteRequest: CreateSiteRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SiteResponse>>;
-    public apiSitesPost(createSiteRequest: CreateSiteRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SiteResponse>>;
+    public apiSitesPost(createSiteRequest: CreateSiteRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<SiteDetailsResponse>;
+    public apiSitesPost(createSiteRequest: CreateSiteRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SiteDetailsResponse>>;
+    public apiSitesPost(createSiteRequest: CreateSiteRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SiteDetailsResponse>>;
     public apiSitesPost(createSiteRequest: CreateSiteRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (createSiteRequest === null || createSiteRequest === undefined) {
             throw new Error('Required parameter createSiteRequest was null or undefined when calling apiSitesPost.');
@@ -346,7 +348,7 @@ export class SitesService extends BaseService {
 
         let localVarPath = `/api/Sites`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<SiteResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<SiteDetailsResponse>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: createSiteRequest,
