@@ -12,8 +12,8 @@
 
   <app-pagination
     [totalItems]="(page$ | async)?.totalItems ?? 0"
-    [pageIndex]="(request$ | async)?.pageIndex ?? 0"
-    [pageSize]="(request$ | async)?.pageSize ?? 10"
+    [pageIndex]="((page$ | async)?.pageNumber ?? 1) - 1"
+    [pageSize]="(page$ | async)?.pageSize ?? 10"
     [loading]="loading()"
     (pageChange)="onPageChange($event)"
   />
