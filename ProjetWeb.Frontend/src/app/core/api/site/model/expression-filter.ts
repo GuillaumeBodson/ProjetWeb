@@ -7,12 +7,17 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Comparison } from './comparison';
+import { FilterAssociation } from './filter-association';
 
 
 export interface ExpressionFilter { 
     propertyName?: string | null;
     valueString?: string | null;
-    comparison?: number;
-    filterAssociation?: number;
+    comparison?: Comparison;
+    filterAssociation?: FilterAssociation;
 }
+export namespace ExpressionFilter {
+}
+
 

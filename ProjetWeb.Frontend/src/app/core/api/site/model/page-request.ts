@@ -7,16 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SiteResponse } from './site-response';
+import { SortDescriptor } from './sort-descriptor';
+import { FilterGroup } from './filter-group';
 
 
-export interface PageOfOfSiteResponse { 
+export interface PageRequest { 
     pageNumber?: number;
     pageSize?: number;
-    totalItems?: number;
-    totalPages?: number;
-    hasPreviousPage?: boolean;
-    hasNextPage?: boolean;
-    items?: Array<SiteResponse>;
+    filters?: Array<FilterGroup> | null;
+    sorts?: Array<SortDescriptor> | null;
 }
 

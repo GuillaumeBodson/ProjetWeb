@@ -7,11 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ApiSitesPageGetPageNumberParameter } from './api-sites-page-get-page-number-parameter';
+import { DayOfWeek } from './day-of-week';
 
 
 export interface CreatePlannedDayRequest { 
-    dayOfWeek: number;
-    numberOfTimeSlots: ApiSitesPageGetPageNumberParameter;
+    dayOfWeek: DayOfWeek;
+    numberOfTimeSlots: number;
 }
+export namespace CreatePlannedDayRequest {
+}
+
 

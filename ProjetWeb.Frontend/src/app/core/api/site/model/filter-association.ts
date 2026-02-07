@@ -9,6 +9,9 @@
  */
 
 
-export interface ProblemDetailsStatus { 
-}
+export const FilterAssociation = {
+    And: 'And',
+    Or: 'Or'
+} as const;
+export type FilterAssociation = typeof FilterAssociation[keyof typeof FilterAssociation];
 
