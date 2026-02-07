@@ -12,7 +12,7 @@ public class SiteService(
     SiteManagementDbContext context,
     ILogger<SiteService> logger) : ISiteService
 {
-    public async Task<SiteResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<SiteDetailsResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var site = await context.Sites
             .Include(s => s.Courts)
@@ -20,43 +20,50 @@ public class SiteService(
                 .ThenInclude(pd => pd.TimeSlots)
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
+
         if (site is null)
         {
             return null;
         }
 
-        return SiteMapper.ToResponse(site);
+        return SiteMapper.ToResponseDetails(site);
     }
 
     public async Task<IEnumerable<SiteResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var sites = await context.Sites
-            .Include(s => s.Courts)
-            .Include(s => s.PlannedDays)
-                .ThenInclude(pd => pd.TimeSlots)
-            .ToListAsync(cancellationToken);
+        var sites = await context.Sites.Select(s => new SiteResponse(
+            s.Id,
+            s.Name,
+            s.Revenue,
+            s.ClosedDays.ToList(),
+            s.Courts.Count()
+        ))
+        .ToListAsync(cancellationToken);
 
-        return sites.Select(SiteMapper.ToResponse);
+        return sites;
     }
 
     public async Task<PageOf<SiteResponse>> GetPageAsync(PageRequest request, CancellationToken cancellationToken = default)
     {
-        var page = await context.Sites
-            .Include(s => s.Courts)
-            .Include(s => s.PlannedDays)
-                .ThenInclude(pd => pd.TimeSlots)
-            .ToPageAsync(request, cancellationToken: cancellationToken);
+        var page = await context.Sites.Select(s => new SiteResponse(
+            s.Id,
+            s.Name,
+            s.Revenue,
+            s.ClosedDays.ToList(),
+            s.Courts.Count()
+        ))
+        .ToPageAsync(request, cancellationToken: cancellationToken);
 
         return new PageOf<SiteResponse>
         {
             PageNumber = page.PageNumber,
             PageSize = page.PageSize,
             TotalItems = page.TotalItems,
-            Items = [.. page.Items.Select(SiteMapper.ToResponse)]
+            Items = page.Items
         };
     }
 
-    public async Task<SiteResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
+    public async Task<SiteDetailsResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
     {
         var site = new Site
         {
@@ -96,10 +103,10 @@ public class SiteService(
             "Created site {SiteId} with name {SiteName}, {CourtCount} courts, and 7 planned days (all days of week). Time slots will be created on-demand during booking.",
             site.Id, site.Name, site.Courts.Count);
 
-        return SiteMapper.ToResponse(site);
+        return SiteMapper.ToResponseDetails(site);
     }
 
-    public async Task<SiteResponse?> UpdateAsync(Guid id, UpdateSiteRequest request, CancellationToken cancellationToken = default)
+    public async Task<SiteDetailsResponse?> UpdateAsync(Guid id, UpdateSiteRequest request, CancellationToken cancellationToken = default)
     {
         var site = await context.Sites
             .Include(s => s.Courts)
@@ -187,7 +194,7 @@ public class SiteService(
             "Updated site {SiteId}: Name and schedule updated, {CourtCount} courts, all 7 planned days preserved",
             site.Id, site.Courts.Count);
 
-        return SiteMapper.ToResponse(site);
+        return SiteMapper.ToResponseDetails(site);
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -222,7 +229,7 @@ public class SiteService(
         var plannedDay = await context.PlannedDays.FindAsync([request.PlannedDayId], cancellationToken);
         if (plannedDay is null || plannedDay.SiteId != siteId)
         {
-            logger.LogWarning("PlannedDay {PlannedDayId} not found or does not belong to site {SiteId}", 
+            logger.LogWarning("PlannedDay {PlannedDayId} not found or does not belong to site {SiteId}",
                 request.PlannedDayId, siteId);
             return null;
         }
@@ -231,7 +238,7 @@ public class SiteService(
         var court = await context.Courts.FindAsync([request.CourtId], cancellationToken);
         if (court is null || court.SiteId != siteId)
         {
-            logger.LogWarning("Court {CourtId} not found or does not belong to site {SiteId}", 
+            logger.LogWarning("Court {CourtId} not found or does not belong to site {SiteId}",
                 request.CourtId, siteId);
             return null;
         }

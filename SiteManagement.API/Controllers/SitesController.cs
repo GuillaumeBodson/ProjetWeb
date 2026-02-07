@@ -6,6 +6,7 @@ using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
 public class SitesController(ISiteService siteService) : ControllerBase
@@ -20,7 +21,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [ProducesResponseType<SiteResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<SiteDetailsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
@@ -46,7 +47,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType<SiteResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<SiteDetailsResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateSiteRequest request, CancellationToken cancellationToken)
@@ -56,7 +57,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [ProducesResponseType<SiteResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<SiteDetailsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

@@ -4,6 +4,7 @@ public class Site
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public decimal Revenue { get; set; }
     public HashSet<DateOnly> ClosedDays { get; set; } = [];
 
     // Navigation properties

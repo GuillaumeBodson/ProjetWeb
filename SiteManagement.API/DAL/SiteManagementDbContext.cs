@@ -3,6 +3,7 @@ using SiteManagement.API.DAL.Entities;
 
 namespace SiteManagement.API.DAL;
 
+// dotnet ef migrations add AddRevenueProperty --project SiteManagement.API/SiteManagement.API.csproj --startup-project SiteManagement.API/SiteManagement.API.csproj
 public class SiteManagementDbContext(DbContextOptions<SiteManagementDbContext> options) : DbContext(options)
 {
     public DbSet<Site> Sites { get; set; }

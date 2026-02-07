@@ -2,14 +2,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 
 namespace ProjetWeb.Shared.Migration;
 
-public class SqlServerMigrationWorker<TDbContext>(IServiceProvider serviceProvider, IHostApplicationLifetime lifetime, ILogger<SqlServerMigrationWorker<TDbContext>> logger) : BackgroundService
+public class SqlServerMigrationWorker<TDbContext>(IOptions<MigrationOptions> migrationOptions, IServiceProvider serviceProvider, IHostApplicationLifetime lifetime, ILogger<SqlServerMigrationWorker<TDbContext>> logger) : BackgroundService
 where TDbContext : DbContext
 {
+    private readonly MigrationOptions _migrationOptions = migrationOptions?.Value ?? new MigrationOptions();
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var pipeline = new ResiliencePipelineBuilder()
@@ -54,6 +57,9 @@ where TDbContext : DbContext
             }
         }, stoppingToken);
 
-        lifetime.StopApplication();
+        if (_migrationOptions.StopAfterExecution)
+        {
+            lifetime.StopApplication();
+        }
     }
 }
