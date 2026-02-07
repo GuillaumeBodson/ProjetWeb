@@ -10,7 +10,7 @@ import {
   FilterGroup,
   SortDescriptor,
   BookTimeSlotRequest,
-  TimeSlotResponse
+  TimeSlotResponse, SiteDetailsResponse
 } from '../api/site';
 
 /**
@@ -59,7 +59,7 @@ export class SiteFacadeService {
    * @param id - The UUID of the site
    * @returns Observable of the site response
    */
-  getSiteById(id: string): Observable<SiteResponse> {
+  getSiteById(id: string): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesIdGet(id).pipe(
       catchError(error => this.handleError(`Failed to fetch site with ID: ${id}`, error))
     );
@@ -70,7 +70,7 @@ export class SiteFacadeService {
    * @param siteData - The site creation request data
    * @returns Observable of the created site response
    */
-  createSite(siteData: CreateSiteRequest): Observable<SiteResponse> {
+  createSite(siteData: CreateSiteRequest): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesPost(siteData).pipe(
       catchError(error => this.handleError('Failed to create site', error))
     );
@@ -82,7 +82,7 @@ export class SiteFacadeService {
    * @param siteData - The site update request data
    * @returns Observable of the updated site response
    */
-  updateSite(id: string, siteData: UpdateSiteRequest): Observable<SiteResponse> {
+  updateSite(id: string, siteData: UpdateSiteRequest): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesIdPut(id, siteData).pipe(
       catchError(error => this.handleError(`Failed to update site with ID: ${id}`, error))
     );

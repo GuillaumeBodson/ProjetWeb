@@ -13,6 +13,7 @@ export * from './page-of-of-site-response';
 export * from './page-request';
 export * from './planned-day-response';
 export * from './problem-details';
+export * from './site-details-response';
 export * from './site-response';
 export * from './sort-descriptor';
 export * from './sort-direction';

@@ -18,7 +18,7 @@ import {
   PageRequest,
   SiteResponse,
   UpdateSiteRequest,
-  FilterGroup
+  FilterGroup, SiteDetailsResponse
 } from '../../../../core/api/site';
 
 @Injectable({
@@ -94,7 +94,7 @@ export class SiteService {
     );
   }
 
-  getById(id: string): Observable<SiteResponse | null> {
+  getById(id: string): Observable<SiteDetailsResponse | null> {
     return this.siteFacade.getSiteById(id).pipe(
       catchError(error => {
         console.error(`Failed to fetch site with ID: ${id}`, error);
@@ -103,7 +103,7 @@ export class SiteService {
     );
   }
 
-  update(siteId: string, updateRequest: UpdateSiteRequest): Observable<SiteResponse> {
+  update(siteId: string, updateRequest: UpdateSiteRequest): Observable<SiteDetailsResponse> {
     return this.siteFacade.updateSite(siteId, updateRequest).pipe(
       map(updated => {
         this.refresh();

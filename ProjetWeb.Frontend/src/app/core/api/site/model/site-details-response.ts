@@ -7,13 +7,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { CourtResponse } from './court-response';
+import { PlannedDayResponse } from './planned-day-response';
 
 
-export interface SiteResponse { 
+export interface SiteDetailsResponse { 
     id: string;
     name: string;
     revenue: number;
     closedDays: Array<string>;
-    courtsCount: number;
+    courts: Array<CourtResponse>;
+    schedule: Array<PlannedDayResponse>;
 }
 

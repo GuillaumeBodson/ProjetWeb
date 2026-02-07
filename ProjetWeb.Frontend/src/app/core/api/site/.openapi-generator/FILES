@@ -24,6 +24,7 @@ model/page-of-of-site-response.ts
 model/page-request.ts
 model/planned-day-response.ts
 model/problem-details.ts
+model/site-details-response.ts
 model/site-response.ts
 model/sort-descriptor.ts
 model/sort-direction.ts
