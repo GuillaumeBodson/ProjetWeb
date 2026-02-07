@@ -40,7 +40,7 @@ where TDbContext : DbContext
             var canConnect = await dbContext.Database.CanConnectAsync(token);
             if (!canConnect)
             {
-                throw new InvalidOperationException("Unable to connect to the authentication database.");
+                throw new InvalidOperationException($"Unable to connect to the {typeof(TDbContext).Name} database.");
             }
 
             var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
