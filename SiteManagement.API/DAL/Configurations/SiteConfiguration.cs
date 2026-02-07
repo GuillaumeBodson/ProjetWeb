@@ -14,6 +14,10 @@ public class SiteConfiguration : IEntityTypeConfiguration<Site>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(s => s.Revenue)
+            .IsRequired()
+            .HasColumnType("decimal(18,2)");
+
         builder.Property(s => s.ClosedDays)
             .HasConversion(
                 v => string.Join(',', v.Select(d => d.ToString("O"))),

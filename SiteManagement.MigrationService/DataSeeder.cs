@@ -64,28 +64,31 @@ public class DataSeeder(
 
         var sites = new[]
         {
-            new Site
-            {
-                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Name = "Central Sports Complex",
-                ClosedDays = [
-                    new DateOnly(currentYear, 1, 1),
-                    new DateOnly(currentYear, 12, 25)
-                ]
-            },
-            new Site
-            {
-                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Name = "North Campus Tennis Center",
-                ClosedDays = []
-            },
-            new Site
-            {
-                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Name = "Riverside Athletic Club",
-                ClosedDays = [new DateOnly(currentYear, 7, 21)]
-            }
-        };
+        new Site
+        {
+            Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            Name = "Central Sports Complex",
+            Revenue = 125000m,
+            ClosedDays = [
+                new DateOnly(currentYear, 1, 1),
+                new DateOnly(currentYear, 12, 25)
+            ]
+        },
+        new Site
+        {
+            Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            Name = "North Campus Tennis Center",
+            Revenue = 75000m,
+            ClosedDays = []
+        },
+        new Site
+        {
+            Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            Name = "Riverside Athletic Club",
+            Revenue = 95000m,
+            ClosedDays = [new DateOnly(currentYear, 7, 21)]
+        }
+    };
 
         context.Sites.AddRange(sites);
         await context.SaveChangesAsync(cancellationToken);

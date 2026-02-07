@@ -8,6 +8,7 @@ builder.AddServiceDefaults();
 builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
 
 builder.Services.AddOptions<SeedingOptions>().BindConfiguration(SeedingOptions.Key);
+builder.Services.AddOptions<MigrationOptions>().BindConfiguration(MigrationOptions.Key);
 
 builder.Services.AddScoped<DataSeeder>();
 
