@@ -7,14 +7,17 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ApiSitesPageGetPageNumberParameter } from './api-sites-page-get-page-number-parameter';
+import { BookState } from './book-state';
 
 
 export interface BookTimeSlotRequest { 
     plannedDayId: string;
     courtId: string;
-    timeSlotNumber: ApiSitesPageGetPageNumberParameter;
-    weekNumber: ApiSitesPageGetPageNumberParameter;
-    bookState: number;
+    timeSlotNumber: number;
+    weekNumber: number;
+    bookState: BookState;
 }
+export namespace BookTimeSlotRequest {
+}
+
 

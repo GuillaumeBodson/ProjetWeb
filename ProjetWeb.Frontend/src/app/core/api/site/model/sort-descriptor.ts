@@ -7,10 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { SortDirection } from './sort-direction';
 
 
 export interface SortDescriptor { 
     propertyName?: string;
-    direction?: number;
+    direction?: SortDirection;
 }
+export namespace SortDescriptor {
+}
+
 

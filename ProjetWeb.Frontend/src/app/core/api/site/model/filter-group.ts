@@ -8,10 +8,14 @@
  * Do not edit the class manually.
  */
 import { ExpressionFilter } from './expression-filter';
+import { FilterAssociation } from './filter-association';
 
 
 export interface FilterGroup { 
     filters?: Array<ExpressionFilter>;
-    filterAssociation?: number;
+    filterAssociation?: FilterAssociation;
 }
+export namespace FilterGroup {
+}
+
 
