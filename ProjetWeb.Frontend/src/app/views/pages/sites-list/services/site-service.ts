@@ -94,8 +94,8 @@ export class SiteService {
     );
   }
 
-  getById(id: number): Observable<SiteResponse | null> {
-    return this.siteFacade.getSiteById(id.toString()).pipe(
+  getById(id: string): Observable<SiteResponse | null> {
+    return this.siteFacade.getSiteById(id).pipe(
       catchError(error => {
         console.error(`Failed to fetch site with ID: ${id}`, error);
         return of(null);

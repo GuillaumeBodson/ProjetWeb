@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
-export interface PageRequest {
+export interface PageRequestEvent {
   pageIndex: number;
   pageSize: number;
 }
@@ -24,12 +24,12 @@ export class PaginationComponent {
   @Input({ required: false }) hidePageSize = false;
   @Input({ required: false }) showFirstLastButtons = true;
 
-  @Output() pageChange = new EventEmitter<PageRequest>();
+  @Output() pageChange = new EventEmitter<PageRequestEvent>();
 
   protected onPage(event: PageEvent): void {
     if (this.disabled || this.loading) return;
     const pageSizeChanged = event.pageSize !== this.pageSize;
-    const next: PageRequest = {
+    const next: PageRequestEvent = {
       pageIndex: pageSizeChanged ? 0 : event.pageIndex,
       pageSize: event.pageSize
     };
