@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { SiteService } from "../../services/site-service";
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { AsyncPipe } from '@angular/common';
-import { Site } from '../../types/site';
 import { map } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import {SiteFilter} from '../site-filter/site-filter';
 import { MatButtonModule } from '@angular/material/button';
 import {RouterLink} from '@angular/router';
+import {SiteResponse} from '../../../../../core/api/site';
 
 @Component({
   selector: 'app-site-list',
@@ -27,7 +27,7 @@ import {RouterLink} from '@angular/router';
 export class SiteList {
   loading = signal(false);
   readonly siteService = inject(SiteService);
-  readonly items$ = this.siteService.page$.pipe(map(page => page.items as Site[]));
+  readonly items$ = this.siteService.page$.pipe(map(page => page.items as SiteResponse[]));
 
   readonly displayedColumns = ['name', 'courts', 'revenue', 'actions']
 }

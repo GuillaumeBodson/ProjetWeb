@@ -3,7 +3,7 @@
 # ===================================
 
 @gateway = http://localhost:5134
-@siteservice = http://localhost:5003
+@siteservice = http://localhost:5107
 
 # Get token from auth first (replace with actual token)
 @token = YOUR_JWT_TOKEN_HERE
@@ -11,6 +11,16 @@
 ### ===================================
 ### Sites Management
 ### ===================================
+
+### Search Sites - Minimal Request
+POST {{siteservice}}/api/Sites/search
+Content-Type: application/json
+
+{
+    "pageNumber": 1,
+    "pageSize": 10
+}
+
 
 ### Get all sites via Gateway
 GET {{gateway}}/api/sites

@@ -609,57 +609,31 @@
         }
       }
     },
-    "/api/Sites/page": {
-      "get": {
+    "/api/Sites/search": {
+      "post": {
         "tags": [
           "Sites"
         ],
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          },
-          {
-            "name": "Filters",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/FilterGroup"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageRequest"
               }
             }
           },
-          {
-            "name": "Sorts",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/SortDescriptor"
-              }
-            }
-          }
-        ],
+          "required": true
+        },
         "responses": {
           "default": {
             "description": "",
@@ -928,7 +902,12 @@
   "components": {
     "schemas": {
       "BookState": {
-        "type": "integer"
+        "enum": [
+          "BookInProgress",
+          "Booked",
+          "Paid",
+          "Plaid"
+        ]
       },
       "BookTimeSlotRequest": {
         "required": [
@@ -949,19 +928,11 @@
             "format": "uuid"
           },
           "timeSlotNumber": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "weekNumber": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "bookState": {
@@ -970,7 +941,17 @@
         }
       },
       "Comparison": {
-        "type": "integer"
+        "enum": [
+          "Equal",
+          "LessThan",
+          "LessThanOrEqual",
+          "GreaterThan",
+          "GreaterThanOrEqual",
+          "NotEqual",
+          "Contains",
+          "StartsWith",
+          "EndsWith"
+        ]
       },
       "CourtResponse": {
         "required": [
@@ -984,11 +965,7 @@
             "format": "uuid"
           },
           "number": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         }
@@ -1000,11 +977,7 @@
         "type": "object",
         "properties": {
           "number": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         }
@@ -1020,11 +993,7 @@
             "$ref": "#/components/schemas/DayOfWeek"
           },
           "numberOfTimeSlots": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           }
         }
@@ -1069,7 +1038,15 @@
         }
       },
       "DayOfWeek": {
-        "type": "integer"
+        "enum": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ]
       },
       "ExpressionFilter": {
         "type": "object",
@@ -1095,7 +1072,10 @@
         }
       },
       "FilterAssociation": {
-        "type": "integer"
+        "enum": [
+          "And",
+          "Or"
+        ]
       },
       "FilterGroup": {
         "type": "object",
@@ -1115,35 +1095,19 @@
         "type": "object",
         "properties": {
           "pageNumber": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "pageSize": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "totalItems": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "totalPages": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "hasPreviousPage": {
@@ -1156,6 +1120,37 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SiteResponse"
+            }
+          }
+        }
+      },
+      "PageRequest": {
+        "type": "object",
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "filters": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/FilterGroup"
+            }
+          },
+          "sorts": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SortDescriptor"
             }
           }
         }
@@ -1177,11 +1172,7 @@
             "$ref": "#/components/schemas/DayOfWeek"
           },
           "numberOfTimeSlots": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "timeSlots": {
@@ -1208,11 +1199,9 @@
             ]
           },
           "status": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "null",
-              "integer",
-              "string"
+              "integer"
             ],
             "format": "int32"
           },
@@ -1280,7 +1269,10 @@
         }
       },
       "SortDirection": {
-        "type": "integer"
+        "enum": [
+          "Ascending",
+          "Descending"
+        ]
       },
       "TimeSlotResponse": {
         "required": [
@@ -1297,11 +1289,7 @@
             "format": "uuid"
           },
           "timeSlotNumber": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "courtId": {
@@ -1309,11 +1297,7 @@
             "format": "uuid"
           },
           "weekNumber": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "bookState": {
@@ -1376,11 +1360,9 @@
             ]
           },
           "status": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "null",
-              "integer",
-              "string"
+              "integer"
             ],
             "format": "int32"
           },

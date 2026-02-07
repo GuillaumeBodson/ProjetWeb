@@ -1,11 +1,10 @@
-import {Component, inject, ViewChild} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors, Validators} from '@angular/forms';
-import {SiteService} from '../../services/site-service';
-import {Comparison, Filter, FilterAssociation, FilterGroup} from '../../../../shared/types/filter';
-import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
-import {MatButton} from '@angular/material/button';
-import {MatExpansionModule, MatExpansionPanel} from '@angular/material/expansion';
-
+import { Component, inject, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors, Validators } from '@angular/forms';
+import { SiteService } from '../../services/site-service';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
+import {Comparison, FilterGroup, ExpressionFilter, FilterAssociation} from '../../../../../core/api/site';
 
 function revenueRangeValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -22,6 +21,7 @@ function revenueRangeValidator(): ValidatorFn {
 
 @Component({
   selector: 'app-site-filter',
+  standalone: true,
   imports: [
     ReactiveFormsModule,
     MatFormField,
@@ -38,50 +38,47 @@ export class SiteFilter {
   @ViewChild(MatExpansionPanel) panel?: MatExpansionPanel;
 
   form = new FormGroup({
-    name: new FormControl<string>('',
-      [Validators.maxLength(100)]),
-    revenueMax: new FormControl<number | null>(null,
-      [Validators.min(0)]),
-    revenueMin: new FormControl<number | null>(null,
-      [Validators.min(0)]),
+    name: new FormControl<string>('', [Validators.maxLength(100)]),
+    revenueMax: new FormControl<number | null>(null, [Validators.min(0)]),
+    revenueMin: new FormControl<number | null>(null, [Validators.min(0)]),
   }, { validators: revenueRangeValidator() });
 
-  submit() {
+  submit(): void {
     const v = this.form.value;
-    const filters: FilterGroup = {
-      filters: [],
-      filterAssociation: FilterAssociation.AND
-    };
+    const expressionFilters: ExpressionFilter[] = [];
 
     if (v.name) {
-      const filterName: Filter = {
+      expressionFilters.push({
         propertyName: 'name',
         valueString: v.name,
-        comparison: Comparison.CONTAINS,
-        filterAssociation: FilterAssociation.AND
-      };
-      filters.filters.push(filterName);
-    }
-    if (v.revenueMin !== null && v.revenueMin !== undefined) {
-      const filterRevenueMin: Filter = {
-        propertyName: 'revenue',
-        valueString: v.revenueMin.toString(),
-        comparison: Comparison.GREATER_THAN,
-        filterAssociation: FilterAssociation.AND
-      };
-      filters.filters.push(filterRevenueMin);
-    }
-    if (v.revenueMax !== null && v.revenueMax !== undefined) {
-      const filterRevenueMax: Filter = {
-        propertyName: 'revenue',
-        valueString: v.revenueMax.toString(),
-        comparison: Comparison.LESS_THAN,
-        filterAssociation: FilterAssociation.AND
-      };
-      filters.filters.push(filterRevenueMax);
+        comparison: Comparison.Contains
+      });
     }
 
-    this.siteService.setFilter(filters.filters.length ? filters : null);
+    if (v.revenueMin !== null && v.revenueMin !== undefined) {
+      expressionFilters.push({
+        propertyName: 'revenue',
+        valueString: v.revenueMin.toString(),
+        comparison: Comparison.GreaterThan
+      });
+    }
+
+    if (v.revenueMax !== null && v.revenueMax !== undefined) {
+      expressionFilters.push({
+        propertyName: 'revenue',
+        valueString: v.revenueMax.toString(),
+        comparison: Comparison.LessThan
+      });
+    }
+
+    const filterGroup: FilterGroup | null = expressionFilters.length > 0
+      ? {
+        filterAssociation: FilterAssociation.And,
+        filters: expressionFilters
+      }
+      : null;
+
+    this.siteService.setFilter(filterGroup);
     this.panel?.close();
   }
 

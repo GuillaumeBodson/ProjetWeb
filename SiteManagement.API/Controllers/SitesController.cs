@@ -6,6 +6,7 @@ using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
 public class SitesController(ISiteService siteService) : ControllerBase
@@ -35,11 +36,11 @@ public class SitesController(ISiteService siteService) : ControllerBase
         return Ok(site);
     }
 
-    [HttpGet("page")]
+    [HttpPost("search")]
     [ProducesResponseType<PageOf<SiteResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetPage([FromQuery] PageRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Search([FromBody] PageRequest request, CancellationToken cancellationToken)
     {
         var page = await siteService.GetPageAsync(request, cancellationToken);
         return Ok(page);
