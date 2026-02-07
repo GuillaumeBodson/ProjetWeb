@@ -27,7 +27,7 @@ import {SiteResponse} from '../../../../../core/api/site';
 export class SiteList {
   loading = signal(false);
   readonly siteService = inject(SiteService);
-  readonly items$ = this.siteService.page$.pipe(map(page => page.items as SiteResponse[]));
+  readonly  = this.siteService.page$.pipe(map(page => page.items as SiteResponse[]));
 
   readonly displayedColumns = ['name', 'courts', 'revenue', 'actions']
 }

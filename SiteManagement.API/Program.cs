@@ -52,12 +52,6 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails)));
     options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
-}).AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails)));
-    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
 })
     .AddJsonOptions(options =>
     {
