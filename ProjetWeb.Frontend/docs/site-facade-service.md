@@ -191,10 +191,18 @@ deleteSite(siteId: string): void {
 Book a time slot at a specific site:
 
 ```typescript
-bookSlot(siteId: string, date: string, slotNumber: number): void {
+bookSlot(
+  siteId: string,
+  plannedDayId: string,
+  courtId: string,
+  weekNumber: number,
+  bookState: string
+): void {
   const bookingRequest = {
-    date: date,
-    timeSlotNumber: slotNumber
+    plannedDayId,
+    courtId,
+    weekNumber,
+    bookState
   };
 
   this.siteFacade.bookTimeSlot(siteId, bookingRequest).subscribe({
