@@ -62,7 +62,7 @@ builder.Services.AddControllers(options =>
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 
         // Handle null values gracefully
-        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        // options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
 // OpenAPI/Swagger
