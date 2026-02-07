@@ -7,12 +7,21 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SiteManagement.API.BL.Services;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
+using System.Text.Json.Serialization;
 using ToolBox.EntityFramework.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // IMPORTANT: Call this first
 builder.AddServiceDefaults();
+
+// Configure JSON options to serialize enums as strings
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    // Ensure numbers are serialized as numbers, not strings
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
 
 // Database
 builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
@@ -43,7 +52,18 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new ProducesDefaultResponseTypeAttribute(typeof(ProblemDetails)));
     options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
-});
+})
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+
+        // Allow case-insensitive property matching
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+
+        // Handle null values gracefully
+        // options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
 // OpenAPI/Swagger
 builder.Services.AddOpenApi();

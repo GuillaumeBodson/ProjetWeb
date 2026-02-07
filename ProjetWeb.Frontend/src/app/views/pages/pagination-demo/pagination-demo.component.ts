@@ -6,7 +6,6 @@ import {
   catchError,
   distinctUntilChanged,
   finalize,
-  map,
   Observable,
   of,
   shareReplay,
@@ -14,7 +13,6 @@ import {
   tap
 } from 'rxjs';
 import { AuthService, LoginRequest } from '../../../core/api/auth';
-import { PageOfOfSiteResponse } from '../../../core/api/site';
 
 type Item = { id: number; name: string };
 
