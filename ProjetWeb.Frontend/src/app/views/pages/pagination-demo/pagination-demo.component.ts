@@ -1,20 +1,30 @@
-import { CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
-import { PageRequest, PageResponse } from '../../shared/types/paging';
 import {
   BehaviorSubject,
   catchError,
   distinctUntilChanged,
   finalize,
+  map,
   Observable,
   of,
   shareReplay,
   switchMap,
   tap
 } from 'rxjs';
-import {AuthService, LoginRequest} from '../../../core/api/auth';
+import { AuthService, LoginRequest } from '../../../core/api/auth';
+import { PageOfOfSiteResponse } from '../../../core/api/site';
+
 type Item = { id: number; name: string };
+
+// Custom page response for demo items (not using SiteResponse)
+interface ItemPageResponse {
+  pageNumber: number;
+  pageSize: number;
+  totalItems: number;
+  items: Item[];
+}
 
 @Component({
   selector: 'app-pagination-demo',
@@ -34,49 +44,52 @@ export class PaginationDemoComponent {
     });
   }
 
-
   loading = signal(false);
 
   all: Item[] = Array.from({ length: 137 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` }));
 
-
-  private readonly requestSubject = new BehaviorSubject<PageRequest>({ pageIndex: 0, pageSize: 10 });
+  private readonly requestSubject = new BehaviorSubject<{ pageNumber: number; pageSize: number }>({
+    pageNumber: 1,
+    pageSize: 10
+  });
   readonly request$ = this.requestSubject.asObservable();
 
-  // Replace with real HttpClient call in a service.
-  private fetchPage(req: PageRequest): Observable<PageResponse<Item>> {
-    const start = req.pageIndex * req.pageSize;
+  private fetchPage(req: { pageNumber: number; pageSize: number }): Observable<ItemPageResponse> {
+    const start = (req.pageNumber - 1) * req.pageSize;
     const items = this.all.slice(start, start + req.pageSize);
 
-    // Simulated latency:
     return of({
       items,
-      pageIndex: req.pageIndex,
+      pageNumber: req.pageNumber,
       pageSize: req.pageSize,
       totalItems: this.all.length
     });
   }
 
   readonly page$ = this.request$.pipe(
-    distinctUntilChanged((a, b) => a.pageIndex === b.pageIndex && a.pageSize === b.pageSize),
-    tap(() => (this.loading.set(true))),
+    distinctUntilChanged((a, b) => a.pageNumber === b.pageNumber && a.pageSize === b.pageSize),
+    tap(() => this.loading.set(true)),
     switchMap((req) =>
       this.fetchPage(req).pipe(
         catchError(() =>
           of({
             items: [],
-            pageIndex: req.pageIndex,
+            pageNumber: req.pageNumber,
             pageSize: req.pageSize,
             totalItems: 0
           })
         ),
-        finalize(() => (this.loading.set(false)))
+        finalize(() => this.loading.set(false))
       )
     ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
-  onPageChange(req: PageRequest): void {
-    this.requestSubject.next(req);
+  onPageChange(req: { pageIndex: number; pageSize: number }): void {
+    // Convert 0-based pageIndex to 1-based pageNumber
+    this.requestSubject.next({
+      pageNumber: req.pageIndex + 1,
+      pageSize: req.pageSize
+    });
   }
 }
