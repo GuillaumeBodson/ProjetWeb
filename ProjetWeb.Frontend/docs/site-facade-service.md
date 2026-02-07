@@ -59,12 +59,12 @@ loadSitesPaginated(): void {
   const pageSize = 10;
   const filters = [
     {
-      logic: 'and',
+      logic: 'And',
       filters: [
         {
-          field: 'city',
-          operator: 'eq',
-          value: 'Brussels'
+          propertyName: 'city',
+          comparison: 'Equal',
+          valueString: 'Brussels'
         }
       ]
     }
