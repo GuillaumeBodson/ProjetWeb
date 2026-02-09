@@ -115,7 +115,7 @@ public class SiteService(
         }
 
         site.Name = request.Name;
-        site.ClosedDays = request.ClosedDays?.ToHashSet() ?? [];
+        site.ClosedDays = [.. request.ClosedDays?.Select(DateOnly.FromDateTime) ?? []];
 
         // Update courts using navigation property
         var existingCourtNumbers = site.Courts.Select(c => c.Number).ToHashSet();
@@ -161,6 +161,7 @@ public class SiteService(
             {
                 // Update existing planned day (only NumberOfTimeSplots can change)
                 existingPlannedDay.NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots;
+                existingPlannedDay.StartTime = TimeOnly.Parse(scheduleRequest.StartTime??"00:00"); //todo: change entity to be nullable
 
                 logger.LogDebug(
                     "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",

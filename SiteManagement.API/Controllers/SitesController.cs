@@ -6,6 +6,7 @@ using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
 public class SitesController(ISiteService siteService) : ControllerBase
