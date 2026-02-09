@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "gen:auth": "openapi-generator-cli generate -i ../AuthService/Authentication.API.json -g typescript-angular -o src/app/core/api/auth --additional-properties=fileNaming=kebab-case,serviceSuffix=Service,useHttpClient=true,standalone=true",
-    "gen:site": "openapi-generator-cli generate -i ../SiteManagement.API/SiteManagement.API.json -g typescript-angular -o src/app/core/api/site --additional-properties=fileNaming=kebab-case,serviceSuffix=Service,useHttpClient=true,standalone=true"
+    "gen:site": "openapi-generator-cli generate -i ../SiteManagement.API/SiteManagement.API.json -g typescript-angular -o src/app/core/api/site --additional-properties=fileNaming=kebab-case,serviceSuffix=Service,useHttpClient=true,standalone=true,dateLibrary=date,stringEnums=true,typescriptThreePlus=true,modelPropertyNaming=original,"
   },
   "prettier": {
     "printWidth": 100,

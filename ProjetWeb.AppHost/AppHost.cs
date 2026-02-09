@@ -3,7 +3,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 // Add SQL Server with databases 
 var sqlServer = builder.AddSqlServer("sql")
     .WithImageTag("2025-latest")
-    .WithDataVolume("sqldata") // Persist data across restarts
+    .WithDataVolume("data") // Persist data across restarts
     .WithEndpoint("tcp", endpoint =>
     {
         endpoint.Port = 14330;  // Fixed external port

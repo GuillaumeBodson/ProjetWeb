@@ -16,8 +16,8 @@ export interface TimeSlotResponse {
     courtId: string;
     weekNumber: number;
     bookState: BookState;
+    dateTime: string;
 }
-export namespace TimeSlotResponse {
-}
+
 
 

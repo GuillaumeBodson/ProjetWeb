@@ -14,7 +14,6 @@ export interface CreatePlannedDayRequest {
     dayOfWeek: DayOfWeek;
     numberOfTimeSlots: number;
 }
-export namespace CreatePlannedDayRequest {
-}
+
 
 

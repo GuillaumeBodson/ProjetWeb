@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -11,15 +11,10 @@ import {
   Subject,
   switchMap
 } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { SiteFacadeService } from '../../../../core/services/site-facade.service';
-import {
-  PageOfOfSiteResponse,
-  PageRequest,
-  SiteResponse,
-  UpdateSiteRequest,
-  FilterGroup, SiteDetailsResponse
-} from '../../../../core/api/site';
+import {map} from 'rxjs/operators';
+import {SiteFacadeService} from '../../../../core/services/site-facade.service';
+import {FilterGroup, PageOfOfSiteResponse, PageRequest, UpdateSiteRequest} from '../../../../core/api/site';
+import {SiteDetailsResponse} from '../../../../core/services/model-override';
 
 @Injectable({
   providedIn: 'root'
@@ -105,10 +100,10 @@ export class SiteService {
 
   update(siteId: string, updateRequest: UpdateSiteRequest): Observable<SiteDetailsResponse> {
     return this.siteFacade.updateSite(siteId, updateRequest).pipe(
-      map(updated => {
-        this.refresh();
-        return updated;
-      })
+      map(updated => ({
+        ...updated,
+        closedDays: updated.closedDays?.map(d => new Date(d)) ?? []
+      }))
     );
   }
 }

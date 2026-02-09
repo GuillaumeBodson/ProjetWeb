@@ -14,7 +14,6 @@ export interface SortDescriptor {
     propertyName?: string;
     direction?: SortDirection;
 }
-export namespace SortDescriptor {
-}
+
 
 
