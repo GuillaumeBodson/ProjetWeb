@@ -22,10 +22,9 @@ public class PlannedDayConfiguration : IEntityTypeConfiguration<PlannedDay>
             .HasMaxLength(2);
 
         builder.Property(pd => pd.StartTime)
-            .IsRequired()
             .HasConversion(
-                v => v.ToString("HH:mm"),
-                v => TimeOnly.ParseExact(v, "HH:mm"));
+                v => v == null ? null : v.Value.ToString("HH:mm"),
+                v => string.IsNullOrEmpty(v) ? null : TimeOnly.ParseExact(v, "HH:mm"));
 
         // Configure relationship with Site (defined in SiteConfiguration)
         // Configure relationship with TimeSlots

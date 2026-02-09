@@ -10,22 +10,6 @@ public class UpdateSiteRequestValidator : AbstractValidator<UpdateSiteRequest>
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(x => x.Schedule)
-            .NotEmpty()
-            .Must(schedule => schedule?.Select(s => s.DayOfWeek).Distinct().Count() == 7)
-            .WithMessage("Schedule must contain exactly 7 days (one for each day of the week) with no duplicates.");
-
-        RuleForEach(x => x.Schedule)
-            .ChildRules(schedule =>
-            {
-                schedule.RuleFor(s => s.DayOfWeek)
-                    .IsInEnum();
-                    
-                schedule.RuleFor(s => s.NumberOfTimeSlots)
-                    .GreaterThanOrEqualTo(0)
-                    .LessThanOrEqualTo(8);
-            });
-
         When(x => x.Courts is not null, () =>
         {
             RuleForEach(x => x.Courts)

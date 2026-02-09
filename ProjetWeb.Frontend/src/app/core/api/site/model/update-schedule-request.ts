@@ -7,12 +7,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { CreateCourtRequest } from './create-court-request';
+import { CreatePlannedDayRequest } from './create-planned-day-request';
 
 
-export interface UpdateSiteRequest { 
-    name: string;
-    closedDays: Array<string> | null;
-    courts: Array<CreateCourtRequest> | null;
+export interface UpdateScheduleRequest { 
+    siteId: string;
+    plannedDays: Array<CreatePlannedDayRequest>;
 }
 

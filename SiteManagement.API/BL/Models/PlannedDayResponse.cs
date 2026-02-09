@@ -4,6 +4,6 @@ public record PlannedDayResponse(
     Guid Id,
     DayOfWeek DayOfWeek,
     int NumberOfTimeSlots,
-    TimeOnly StartTime,
+    TimeOnly? StartTime,
     IReadOnlyCollection<TimeSlotResponse> TimeSlots
 );

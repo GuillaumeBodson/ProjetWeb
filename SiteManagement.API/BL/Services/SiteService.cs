@@ -151,42 +151,7 @@ public class SiteService(
                 Id = Guid.NewGuid(),
                 Number = courtNumber
             });
-        }
-
-        // Update planned days using navigation property
-        var plannedDaysByDayOfWeek = site.PlannedDays.ToDictionary(pd => pd.DayOfWeek);
-
-        foreach (var scheduleRequest in request.Schedule)
-        {
-            if (plannedDaysByDayOfWeek.TryGetValue(scheduleRequest.DayOfWeek, out var existingPlannedDay))
-            {
-                // Update existing planned day (only NumberOfTimeSplots can change)
-                existingPlannedDay.NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots;
-                if (TimeOnly.TryParseExact(scheduleRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime))
-                {
-                    existingPlannedDay.StartTime = startTime;
-                }
-
-                logger.LogDebug(
-                    "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",
-                    scheduleRequest.DayOfWeek, site.Id, scheduleRequest.NumberOfTimeSlots);
-            }
-            else
-            {
-                // This should not happen if validation passed, but create missing planned day as failsafe
-                site.PlannedDays.Add(new PlannedDay
-                {
-                    Id = Guid.NewGuid(),
-                    DayOfWeek = scheduleRequest.DayOfWeek,
-                    StartTime = TimeOnly.TryParseExact(scheduleRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime) ? startTime : TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                    NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots
-                });
-
-                logger.LogWarning(
-                    "Created missing PlannedDay for {DayOfWeek} on site {SiteId}",
-                    scheduleRequest.DayOfWeek, site.Id);
-            }
-        }
+        }        
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -194,6 +159,54 @@ public class SiteService(
             "Updated site {SiteId}: Name and schedule updated, {CourtCount} courts, all 7 planned days preserved",
             site.Id, site.Courts.Count);
 
+        return SiteMapper.ToResponseDetails(site);
+    }
+
+    public async Task<SiteDetailsResponse?> UpdateSiteScheduleAsync(Guid siteId, UpdateScheduleRequest request, CancellationToken cancellationToken)
+    {
+        var site = await context.Sites
+            .Include(s => s.Courts)
+            .Include(s => s.PlannedDays)
+            .FirstOrDefaultAsync(s => s.Id == siteId, cancellationToken);
+
+        if (site is null)
+        {
+            return null;
+        }
+        // Update planned days using navigation property
+        var plannedDaysByDayOfWeek = site.PlannedDays.ToDictionary(pd => pd.DayOfWeek);
+
+        foreach (var plannedDayRequest in request.PlannedDays)
+        {
+            if (plannedDaysByDayOfWeek.TryGetValue(plannedDayRequest.DayOfWeek, out var existingPlannedDay))
+            {
+                // Update existing planned day
+                existingPlannedDay.NumberOfTimeSlots = plannedDayRequest.NumberOfTimeSlots;
+                if (TimeOnly.TryParseExact(plannedDayRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime))
+                {
+                    existingPlannedDay.StartTime = startTime;
+                }
+
+                logger.LogDebug(
+                    "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",
+                    plannedDayRequest.DayOfWeek, site.Id, plannedDayRequest.NumberOfTimeSlots);
+            }
+            else
+            {
+                // This should not happen if validation passed, but create missing planned day as failsafe
+                site.PlannedDays.Add(new PlannedDay
+                {
+                    Id = Guid.NewGuid(),
+                    DayOfWeek = plannedDayRequest.DayOfWeek,
+                    StartTime = TimeOnly.TryParseExact(plannedDayRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime) ? startTime : TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
+                    NumberOfTimeSlots = plannedDayRequest.NumberOfTimeSlots
+                });
+
+                logger.LogWarning(
+                    "Created missing PlannedDay for {DayOfWeek} on site {SiteId}",
+                    plannedDayRequest.DayOfWeek, site.Id);
+            }
+        }
         return SiteMapper.ToResponseDetails(site);
     }
 
@@ -231,6 +244,12 @@ public class SiteService(
         {
             logger.LogWarning("PlannedDay {PlannedDayId} not found or does not belong to site {SiteId}",
                 request.PlannedDayId, siteId);
+            return null;
+        }
+
+        if (plannedDay.StartTime is null)
+        {
+            logger.LogWarning("PlannedDay {PlannedDayId} has no StartTime defined", request.PlannedDayId);
             return null;
         }
 
@@ -298,6 +317,6 @@ public class SiteService(
             timeSlot.CourtId,
             timeSlot.WeekNumber,
             timeSlot.BookState,
-            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime, plannedDay.DayOfWeek));
+            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek));
     }
 }

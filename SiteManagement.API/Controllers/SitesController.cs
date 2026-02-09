@@ -72,6 +72,27 @@ public class SitesController(ISiteService siteService) : ControllerBase
         return Ok(site);
     }
 
+    [HttpPut("{id:guid}/schedule")]
+    [ProducesResponseType<SiteDetailsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateSchedule(Guid id, [FromBody] UpdateScheduleRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.SiteId)
+        {
+            ModelState.AddModelError(nameof(request.SiteId), "Site ID in the URL must match Site ID in the request body.");
+            return ValidationProblem(ModelState);
+        }
+        var site = await siteService.UpdateSiteScheduleAsync(id, request, cancellationToken);
+        
+        if (site is null)
+        {
+            return NotFound();
+        }
+        return Ok(site);
+    }
+
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]

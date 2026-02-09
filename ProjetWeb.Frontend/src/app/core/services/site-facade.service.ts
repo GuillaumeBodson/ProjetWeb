@@ -11,7 +11,7 @@ import {
   FilterGroup,
   SortDescriptor,
   BookTimeSlotRequest,
-  TimeSlotResponse, SitesService,
+  TimeSlotResponse, SitesService, UpdateScheduleRequest,
 } from '../api/site';
 
 /**
@@ -92,6 +92,13 @@ export class SiteFacadeService {
       map(site => this.transformSiteDetails(site)),
 
       catchError(error => this.handleError(`Failed to update site with ID: ${id}`, error))
+    );
+  }
+
+  updateSiteSchedule(siteId: string, updateScheduleRequest: UpdateScheduleRequest){
+    return this.sitesService.apiSitesIdSchedulePut(siteId, updateScheduleRequest).pipe(
+      map(site => this.transformSiteDetails(site)),
+      catchError(error => this.handleError(`Failed to update schedule for site with ID: ${siteId}`, error))
     );
   }
 

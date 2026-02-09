@@ -12,8 +12,12 @@ public record TimeSlotResponse(
     DateTime DateTime
 )
 {
-    public static DateTime CalculateDateTime(int weekNumber, int timeSlotNumber, TimeOnly startTime, DayOfWeek dayOfWeek)
+    public static DateTime CalculateDateTime(int weekNumber, int timeSlotNumber, TimeOnly? startTime, DayOfWeek dayOfWeek)
     {
+        if(startTime is null)
+        {
+            return default;
+        }
         var year = ISOWeek.GetWeekOfYear(DateTime.UtcNow);
         
         // Get the first day (Monday) of the specified ISO week
@@ -24,9 +28,9 @@ public record TimeSlotResponse(
         var targetDay = firstDayOfWeek.AddDays(daysFromMonday);
 
         var timeToAdd = (timeSlotNumber - 1) * 105;
-        startTime = startTime.AddMinutes(timeToAdd);
+        startTime = startTime.Value.AddMinutes(timeToAdd);
 
         // Combine date with start time
-        return targetDay.Add(startTime.ToTimeSpan());
+        return targetDay.Add(startTime.Value.ToTimeSpan());
     }
 }

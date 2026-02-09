@@ -18,5 +18,6 @@ export * from './site-response';
 export * from './sort-descriptor';
 export * from './sort-direction';
 export * from './time-slot-response';
+export * from './update-schedule-request';
 export * from './update-site-request';
 export * from './validation-problem-details';

@@ -1,0 +1,96 @@
+<mat-card>
+  <mat-card-header class="pb-4">
+    <mat-card-title class="text-xl">Opening Hours Configuration</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="mb-4 text-sm text-gray-600">
+      <mat-icon class="text-gray-500 text-base align-middle mr-1">info</mat-icon>
+      Configure the number of time slots (0-8) and start time for each day. Each time slot is 105 minutes.
+    </div>
+
+    <!-- Table -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b-2 border-gray-300">
+            <th class="text-left p-3 font-semibold">Day</th>
+            <th class="text-left p-3 font-semibold">Start Time</th>
+            <th class="text-left p-3 font-semibold">Time Slots</th>
+            <th class="text-left p-3 font-semibold">Total Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let day of daysOfWeek; let i = index">
+            <tr class="border-b border-gray-200 hover:bg-gray-50" [formGroup]="scheduleForm.at(i)">
+              <td class="p-3 font-medium">{{ getDayName(day) }}</td>
+              <td class="p-3">
+                <ng-container *ngIf="editMode(); else viewStartTime">
+                  <input
+                    type="time"
+                    formControlName="startTime"
+                    class="border border-gray-300 rounded px-3 py-2 w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </ng-container>
+                <ng-template #viewStartTime>
+                  <span>{{ scheduleForm.at(i).value.startTime }}</span>
+                </ng-template>
+              </td>
+              <td class="p-3">
+                <ng-container *ngIf="editMode(); else viewTimeSlots">
+                  <input
+                    type="number"
+                    formControlName="numberOfTimeSlots"
+                    min="0"
+                    max="8"
+                    class="border border-gray-300 rounded px-3 py-2 w-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div *ngIf="scheduleForm.at(i).get('numberOfTimeSlots')?.touched && scheduleForm.at(i).get('numberOfTimeSlots')?.invalid" class="text-xs text-red-600 mt-1">
+                    Must be between 0 and 8
+                  </div>
+                </ng-container>
+                <ng-template #viewTimeSlots>
+                  <span>{{ scheduleForm.at(i).value.numberOfTimeSlots }}</span>
+                </ng-template>
+              </td>
+              <td class="p-3 text-sm text-gray-600">
+                {{ (scheduleForm.at(i).value?.numberOfTimeSlots ?? 0) * 105 }} minutes
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions class="flex justify-end gap-2 pt-4">
+    <ng-container *ngIf="!editMode(); else scheduleEditActions">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="startEdit()"
+      >
+        <mat-icon class="mr-1">edit</mat-icon>
+        Edit Schedule
+      </button>
+    </ng-container>
+    <ng-template #scheduleEditActions>
+      <button
+        mat-button
+        (click)="cancelEdit()"
+        [disabled]="saving()"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSave()"
+        [disabled]="!scheduleForm.valid || saving()"
+      >
+        <mat-progress-spinner *ngIf="saving()" mode="indeterminate" diameter="20" class="inline-block mr-2"></mat-progress-spinner>
+        Save Schedule
+      </button>
+    </ng-template>
+  </mat-card-actions>
+</mat-card>
+
