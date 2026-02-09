@@ -1,5 +1,5 @@
-import { SiteResponse as GeneratedSiteResponse } from '../api/site/model/site-response';
-import { SiteDetailsResponse as GeneratedSiteDetailsResponse } from '../api/site/model/site-details-response';
+import { SiteResponse as GeneratedSiteResponse } from './site-response';
+import { SiteDetailsResponse as GeneratedSiteDetailsResponse } from './site-details-response';
 
 // Override with proper Date types
 export interface SiteResponse extends Omit<GeneratedSiteResponse, 'closedDays'> {
@@ -11,4 +11,4 @@ export interface SiteDetailsResponse extends Omit<GeneratedSiteDetailsResponse, 
 }
 
 // Re-export other models as-is
-export * from '../api/site/model/models';
+//export * from './models';

@@ -14,7 +14,7 @@ import {
 import {map} from 'rxjs/operators';
 import {SiteFacadeService} from '../../../../core/services/site-facade.service';
 import {FilterGroup, PageOfOfSiteResponse, PageRequest, UpdateSiteRequest} from '../../../../core/api/site';
-import {SiteDetailsResponse} from '../../../../core/services/model-override';
+import {SiteDetailsResponse} from '../../../../core/api/site/model/model-override';
 
 @Injectable({
   providedIn: 'root'

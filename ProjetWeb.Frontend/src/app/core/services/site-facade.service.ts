@@ -3,7 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { SiteResponse as GeneratedSiteResponse} from '../api/site/model/site-response';
 import { SiteDetailsResponse as GeneratedSiteDetailsResponse} from '../api/site/model/site-details-response';
-import { SiteResponse, SiteDetailsResponse} from './model-override';
+import { SiteResponse, SiteDetailsResponse} from '../api/site/model/model-override';
 import {
   CreateSiteRequest,
   UpdateSiteRequest,
@@ -63,7 +63,8 @@ export class SiteFacadeService {
    */
   getSiteById(id: string): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesIdGet(id).pipe(
-      map(site => this.transformSiteDetails(site))
+      map(site => this.transformSiteDetails(site)),
+      catchError(error => this.handleError('Failed to fetch site details', error))
     );
   }
 

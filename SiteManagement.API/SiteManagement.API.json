@@ -985,7 +985,8 @@
       "CreatePlannedDayRequest": {
         "required": [
           "dayOfWeek",
-          "numberOfTimeSlots"
+          "numberOfTimeSlots",
+          "startTime"
         ],
         "type": "object",
         "properties": {
@@ -995,6 +996,9 @@
           "numberOfTimeSlots": {
             "type": "integer",
             "format": "int32"
+          },
+          "startTime": {
+            "type": "string"
           }
         }
       },

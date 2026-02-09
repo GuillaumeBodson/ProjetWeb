@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { AsyncPipe, CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, map, of, shareReplay, switchMap, tap } from 'rxjs';
+import {catchError, map, of, shareReplay, switchMap, take, tap} from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -25,7 +25,7 @@ import {
   TimeSlotResponse,
   CourtResponse
 } from '../../../../../core/api/site';
-import { SiteDetailsResponse } from '../../../../../core/services/model-override';
+import { SiteDetailsResponse } from '../../../../../core/api/site/model/model-override';
 
 @Component({
   selector: 'app-site-details',
@@ -183,7 +183,11 @@ export class SiteDetails {
   cancelEdit(): void {
     this.editMode.set(false);
     // Reset form back to latest loaded site values.
-    this.site$.pipe(tap(site => {
+    this.site$.pipe(
+      //The take(1) operator ensures the subscription completes immediately after receiving the first value,
+      // preventing any memory leaks.
+      take(1),
+      tap(site => {
       if (!site) {
         return;
       }
@@ -232,6 +236,7 @@ export class SiteDetails {
     this.saving.set(true);
 
     this.id$.pipe(
+      take(1),
       switchMap(id => {
         if (!id) {
           this.saving.set(false);
