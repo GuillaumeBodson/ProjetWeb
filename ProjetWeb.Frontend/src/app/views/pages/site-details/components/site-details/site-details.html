@@ -199,9 +199,9 @@
                     <th class="text-left p-3 font-semibold">Total Duration</th>
                   </tr>
                 </thead>
-                <tbody [formArray]="scheduleForm">
+                <tbody>
                   <ng-container *ngFor="let day of daysOfWeek; let i = index">
-                    <tr class="border-b border-gray-200 hover:bg-gray-50" [formGroupName]="i">
+                    <tr class="border-b border-gray-200 hover:bg-gray-50" [formGroup]="scheduleForm.at(i)">
                       <td class="p-3 font-medium">{{ getDayName(day) }}</td>
                       <td class="p-3">
                         <ng-container *ngIf="scheduleEditMode(); else viewStartTime">
