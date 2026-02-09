@@ -108,7 +108,7 @@ export class SiteDetails {
   );
 
   readonly futureBookings$ = this.site$.pipe(
-    map(site => site?.schedule.flatMap(d => d.timeSlots))//.filter(d => d.d).bookings?.filter(b => new Date(b.startTime) > new Date()) ?? [])
+    map(site => site?.schedule?.flatMap(d => d.timeSlots) ?? [])//.filter(d => d.d).bookings?.filter(b => new Date(b.startTime) > new Date()) ?? [])
   );
 
   // Schedule table data
