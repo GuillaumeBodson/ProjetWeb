@@ -9,11 +9,14 @@
  */
 
 
-export const BookState = {
-    BookInProgress: 'BookInProgress',
-    Booked: 'Booked',
-    Paid: 'Paid',
-    Plaid: 'Plaid'
-} as const;
-export type BookState = typeof BookState[keyof typeof BookState];
+export enum BookState {
+
+    BookInProgress = 'BookInProgress',
+
+    Booked = 'Booked',
+
+    Paid = 'Paid',
+
+    Plaid = 'Plaid'
+}
 

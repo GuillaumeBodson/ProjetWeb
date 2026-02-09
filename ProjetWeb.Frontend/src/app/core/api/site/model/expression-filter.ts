@@ -17,7 +17,6 @@ export interface ExpressionFilter {
     comparison?: Comparison;
     filterAssociation?: FilterAssociation;
 }
-export namespace ExpressionFilter {
-}
+
 
 

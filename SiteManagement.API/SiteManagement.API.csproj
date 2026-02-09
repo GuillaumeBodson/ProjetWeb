@@ -40,4 +40,8 @@
     <ProjectReference Include="..\ProjetWeb.Shared\ProjetWeb.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

@@ -1,16 +1,17 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { SiteResponse as GeneratedSiteResponse} from '../api/site/model/site-response';
+import { SiteDetailsResponse as GeneratedSiteDetailsResponse} from '../api/site/model/site-details-response';
+import { SiteResponse, SiteDetailsResponse} from '../api/site/model/model-override';
 import {
-  SitesService,
   CreateSiteRequest,
   UpdateSiteRequest,
-  SiteResponse,
   PageOfOfSiteResponse,
   FilterGroup,
   SortDescriptor,
   BookTimeSlotRequest,
-  TimeSlotResponse, SiteDetailsResponse
+  TimeSlotResponse, SitesService,
 } from '../api/site';
 
 /**
@@ -31,6 +32,7 @@ export class SiteFacadeService {
    */
   getAllSites(): Observable<SiteResponse[]> {
     return this.sitesService.apiSitesGet().pipe(
+      map(sites => sites.map(site => this.transformSite(site))),
       catchError(error => this.handleError('Failed to fetch sites', error))
     );
   }
@@ -61,7 +63,8 @@ export class SiteFacadeService {
    */
   getSiteById(id: string): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesIdGet(id).pipe(
-      catchError(error => this.handleError(`Failed to fetch site with ID: ${id}`, error))
+      map(site => this.transformSiteDetails(site)),
+      catchError(error => this.handleError('Failed to fetch site details', error))
     );
   }
 
@@ -72,6 +75,8 @@ export class SiteFacadeService {
    */
   createSite(siteData: CreateSiteRequest): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesPost(siteData).pipe(
+      map(site => this.transformSiteDetails(site)),
+
       catchError(error => this.handleError('Failed to create site', error))
     );
   }
@@ -84,6 +89,8 @@ export class SiteFacadeService {
    */
   updateSite(id: string, siteData: UpdateSiteRequest): Observable<SiteDetailsResponse> {
     return this.sitesService.apiSitesIdPut(id, siteData).pipe(
+      map(site => this.transformSiteDetails(site)),
+
       catchError(error => this.handleError(`Failed to update site with ID: ${id}`, error))
     );
   }
@@ -122,4 +129,33 @@ export class SiteFacadeService {
     console.error(message, error);
     return throwError(() => new Error(message));
   }
+
+  private transformSiteDetails(site: GeneratedSiteDetailsResponse): SiteDetailsResponse {
+    // Validate required fields
+    if (!site.id) {
+      throw new Error('Site ID is required');
+    }
+
+    return {
+      ...site,
+      closedDays: site.closedDays?.map(d => {
+        return new Date(d);
+      }) ?? []
+    };
+  }
+
+  private transformSite(site: GeneratedSiteResponse): SiteResponse {
+    // Validate required fields
+    if (!site.id) {
+      throw new Error('Site ID is required');
+    }
+
+    return {
+      ...site,
+      closedDays: site.closedDays?.map(d => {
+        return new Date(d);
+      }) ?? []
+    };
+  }
+
 }

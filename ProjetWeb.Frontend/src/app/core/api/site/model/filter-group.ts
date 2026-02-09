@@ -15,7 +15,6 @@ export interface FilterGroup {
     filters?: Array<ExpressionFilter>;
     filterAssociation?: FilterAssociation;
 }
-export namespace FilterGroup {
-}
+
 
 

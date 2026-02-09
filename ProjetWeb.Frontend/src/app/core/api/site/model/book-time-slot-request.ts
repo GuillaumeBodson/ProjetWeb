@@ -17,7 +17,6 @@ export interface BookTimeSlotRequest {
     weekNumber: number;
     bookState: BookState;
 }
-export namespace BookTimeSlotRequest {
-}
+
 
 

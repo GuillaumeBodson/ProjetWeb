@@ -18,6 +18,7 @@ public static class SiteMapper
                 pd.Id,
                 pd.DayOfWeek,
                 pd.NumberOfTimeSlots,
+                pd.StartTime,
                 pd.TimeSlots
                     .OrderBy(ts => ts.TimeSlotNumber)
                     .ThenBy(ts => ts.WeekNumber)
@@ -26,7 +27,8 @@ public static class SiteMapper
                         ts.TimeSlotNumber,
                         ts.CourtId,
                         ts.WeekNumber,
-                        ts.BookState))
+                        ts.BookState,
+                        TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, pd.StartTime, pd.DayOfWeek)))
                     .ToList()
             ))
             .ToList();

@@ -9,9 +9,10 @@
  */
 
 
-export const FilterAssociation = {
-    And: 'And',
-    Or: 'Or'
-} as const;
-export type FilterAssociation = typeof FilterAssociation[keyof typeof FilterAssociation];
+export enum FilterAssociation {
+
+    And = 'And',
+
+    Or = 'Or'
+}
 

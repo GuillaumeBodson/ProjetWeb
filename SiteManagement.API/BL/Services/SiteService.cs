@@ -54,13 +54,7 @@ public class SiteService(
         ))
         .ToPageAsync(request, cancellationToken: cancellationToken);
 
-        return new PageOf<SiteResponse>
-        {
-            PageNumber = page.PageNumber,
-            PageSize = page.PageSize,
-            TotalItems = page.TotalItems,
-            Items = page.Items
-        };
+        return page;
     }
 
     public async Task<SiteDetailsResponse> CreateAsync(CreateSiteRequest request, CancellationToken cancellationToken = default)
@@ -297,6 +291,7 @@ public class SiteService(
             timeSlot.TimeSlotNumber,
             timeSlot.CourtId,
             timeSlot.WeekNumber,
-            timeSlot.BookState);
+            timeSlot.BookState,
+            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime, plannedDay.DayOfWeek));
     }
 }

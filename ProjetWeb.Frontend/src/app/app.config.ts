@@ -7,12 +7,14 @@ import { provideApi as provideSiteApi} from './core/api/site';
 
 import { environment } from '../environments/environment';
 import {authInterceptor} from './core/interceptors/auth.interceptor';
+import { dateInterceptor } from './core/interceptors/date.interceptor';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([dateInterceptor, authInterceptor])),
 
     provideApi(environment.apiBaseUrl),
     provideSiteApi(environment.apiBaseUrl)

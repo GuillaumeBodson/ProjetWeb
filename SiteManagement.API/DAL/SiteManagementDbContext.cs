@@ -16,3 +16,5 @@ public class SiteManagementDbContext(DbContextOptions<SiteManagementDbContext> o
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SiteManagementDbContext).Assembly);
     }
 }
+
+

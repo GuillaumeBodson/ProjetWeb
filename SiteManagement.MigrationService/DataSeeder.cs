@@ -164,7 +164,8 @@ public class DataSeeder(
             Id = Guid.NewGuid(),
             SiteId = siteId,
             DayOfWeek = day,
-            NumberOfTimeSlots = numberOfTimeSlots
+            NumberOfTimeSlots = numberOfTimeSlots,
+            StartTime = new TimeOnly(8, 0) // All sites start at 8 AM
         });
     }
 

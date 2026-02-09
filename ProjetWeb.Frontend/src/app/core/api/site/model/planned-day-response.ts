@@ -15,9 +15,9 @@ export interface PlannedDayResponse {
     id: string;
     dayOfWeek: DayOfWeek;
     numberOfTimeSlots: number;
+    startTime: string;
     timeSlots: Array<TimeSlotResponse>;
 }
-export namespace PlannedDayResponse {
-}
+
 
 

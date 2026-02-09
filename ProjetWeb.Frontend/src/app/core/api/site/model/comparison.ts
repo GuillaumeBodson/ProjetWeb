@@ -9,16 +9,24 @@
  */
 
 
-export const Comparison = {
-    Equal: 'Equal',
-    LessThan: 'LessThan',
-    LessThanOrEqual: 'LessThanOrEqual',
-    GreaterThan: 'GreaterThan',
-    GreaterThanOrEqual: 'GreaterThanOrEqual',
-    NotEqual: 'NotEqual',
-    Contains: 'Contains',
-    StartsWith: 'StartsWith',
-    EndsWith: 'EndsWith'
-} as const;
-export type Comparison = typeof Comparison[keyof typeof Comparison];
+export enum Comparison {
+
+    Equal = 'Equal',
+
+    LessThan = 'LessThan',
+
+    LessThanOrEqual = 'LessThanOrEqual',
+
+    GreaterThan = 'GreaterThan',
+
+    GreaterThanOrEqual = 'GreaterThanOrEqual',
+
+    NotEqual = 'NotEqual',
+
+    Contains = 'Contains',
+
+    StartsWith = 'StartsWith',
+
+    EndsWith = 'EndsWith'
+}
 

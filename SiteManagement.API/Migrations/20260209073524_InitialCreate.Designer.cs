@@ -12,8 +12,8 @@ using SiteManagement.API.DAL;
 namespace SiteManagement.API.Migrations
 {
     [DbContext(typeof(SiteManagementDbContext))]
-    [Migration("20260205093036_UpdateTimeSlotWithBookStateAndWeekNumber")]
-    partial class UpdateTimeSlotWithBookStateAndWeekNumber
+    [Migration("20260209073524_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,19 +55,18 @@ namespace SiteManagement.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("NumberOfTimeSplots")
+                    b.Property<int>("NumberOfTimeSlots")
                         .HasMaxLength(2)
                         .HasColumnType("int");
 
                     b.Property<Guid>("SiteId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("SiteId1")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("StartTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SiteId1");
 
                     b.HasIndex("SiteId", "DayOfWeek")
                         .IsUnique();
@@ -89,6 +88,9 @@ namespace SiteManagement.API.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("Revenue")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -121,6 +123,8 @@ namespace SiteManagement.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourtId");
+
                     b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber")
                         .IsUnique();
 
@@ -129,38 +133,60 @@ namespace SiteManagement.API.Migrations
 
             modelBuilder.Entity("SiteManagement.API.DAL.Entities.Court", b =>
                 {
-                    b.HasOne("SiteManagement.API.DAL.Entities.Site", null)
-                        .WithMany()
+                    b.HasOne("SiteManagement.API.DAL.Entities.Site", "Site")
+                        .WithMany("Courts")
                         .HasForeignKey("SiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Site");
                 });
 
             modelBuilder.Entity("SiteManagement.API.DAL.Entities.PlannedDay", b =>
                 {
-                    b.HasOne("SiteManagement.API.DAL.Entities.Site", null)
-                        .WithMany()
+                    b.HasOne("SiteManagement.API.DAL.Entities.Site", "Site")
+                        .WithMany("PlannedDays")
                         .HasForeignKey("SiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SiteManagement.API.DAL.Entities.Site", null)
-                        .WithMany("Schedule")
-                        .HasForeignKey("SiteId1");
+                    b.Navigation("Site");
                 });
 
             modelBuilder.Entity("SiteManagement.API.DAL.Entities.TimeSlot", b =>
                 {
-                    b.HasOne("SiteManagement.API.DAL.Entities.PlannedDay", null)
-                        .WithMany()
+                    b.HasOne("SiteManagement.API.DAL.Entities.Court", "Court")
+                        .WithMany("TimeSlots")
+                        .HasForeignKey("CourtId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SiteManagement.API.DAL.Entities.PlannedDay", "PlannedDay")
+                        .WithMany("TimeSlots")
                         .HasForeignKey("PlannedDayId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Court");
+
+                    b.Navigation("PlannedDay");
+                });
+
+            modelBuilder.Entity("SiteManagement.API.DAL.Entities.Court", b =>
+                {
+                    b.Navigation("TimeSlots");
+                });
+
+            modelBuilder.Entity("SiteManagement.API.DAL.Entities.PlannedDay", b =>
+                {
+                    b.Navigation("TimeSlots");
                 });
 
             modelBuilder.Entity("SiteManagement.API.DAL.Entities.Site", b =>
                 {
-                    b.Navigation("Schedule");
+                    b.Navigation("Courts");
+
+                    b.Navigation("PlannedDays");
                 });
 #pragma warning restore 612, 618
         }

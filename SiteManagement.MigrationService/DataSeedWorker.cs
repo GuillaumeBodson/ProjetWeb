@@ -42,10 +42,12 @@ public class DataSeedWorker(
 
             // Ensure all migrations are applied before seeding
             var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
-            if (pendingMigrations.Any())
+
+            while (pendingMigrations.Any())
             {
                 logger.LogWarning("Pending migrations detected. Waiting for migrations to complete...");
-                throw new InvalidOperationException("Database migrations are not yet complete. Seeding cannot proceed until migrations complete.");
+                await Task.Delay(TimeSpan.FromSeconds(5), token);
+                pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
             }
 
             // Run seeder

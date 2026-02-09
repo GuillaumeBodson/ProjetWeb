@@ -1,219 +1,294 @@
-<!--<ng-container *ngIf="site$ | async as site; else loadingOrError">-->
-<!--  &lt;!&ndash; Mobile-first top bar &ndash;&gt;-->
-<!--  <mat-toolbar color="primary" class="sticky top-0 z-10">-->
-<!--    <button mat-icon-button (click)="goBack()" aria-label="Back">-->
-<!--      <mat-icon>arrow_back</mat-icon>-->
-<!--    </button>-->
+<ng-container *ngIf="site$ | async as site; else loadingOrError">
+  <!-- Mobile-first top bar -->
+  <mat-toolbar color="primary" class="sticky top-0 z-10">
+    <button mat-icon-button (click)="goBack()" aria-label="Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
 
-<!--    <span class="ml-2 truncate">{{ site.name }}</span>-->
+    <span class="ml-2 truncate">{{ site.name }}</span>
 
-<!--    <span class="flex-1"></span>-->
+    <span class="flex-1"></span>
 
-<!--    <ng-container *ngIf="!editMode(); else editActions">-->
-<!--      <button mat-button (click)="startEdit()">Edit</button>-->
-<!--    </ng-container>-->
+    <ng-container *ngIf="!editMode(); else editActions">
+      <button mat-button (click)="startEdit()">Edit</button>
+    </ng-container>
 
-<!--    <ng-template #editActions>-->
-<!--      <button mat-button (click)="cancelEdit()" [disabled]="saving()">Cancel</button>-->
-<!--      <button mat-flat-button color="accent" (click)="save(site)" [disabled]="!canSave()">Save</button>-->
-<!--    </ng-template>-->
-<!--  </mat-toolbar>-->
+    <ng-template #editActions>
+      <button mat-button (click)="cancelEdit()" [disabled]="saving()">Cancel</button>
+      <button mat-flat-button color="accent" (click)="save(site)" [disabled]="!canSave()">Save</button>
+    </ng-template>
+  </mat-toolbar>
 
-<!--  <mat-tab-group class="w-full" mat-stretch-tabs="false" mat-align-tabs="start">-->
-<!--    &lt;!&ndash; Details Tab &ndash;&gt;-->
-<!--    <mat-tab label="Details">-->
-<!--      <div class="p-4 flex flex-col gap-4 max-w-3xl mx-auto">-->
-<!--        &lt;!&ndash; View mode &ndash;&gt;-->
-<!--        <ng-container *ngIf="!editMode(); else editForm">-->
-<!--          <mat-card>-->
-<!--            <mat-card-header>-->
-<!--              <mat-card-title class="text-base">Opening hours</mat-card-title>-->
-<!--            </mat-card-header>-->
-<!--            <mat-card-content>-->
-<!--              <div class="flex flex-col gap-2 text-sm">-->
-<!--                <div class="flex items-center justify-between">-->
-<!--                  <span class="text-gray-600">Opens</span>-->
-<!--                  <span class="font-medium">{{ site.openingHours }}</span>-->
-<!--                </div>-->
-<!--                <div class="flex items-center justify-between">-->
-<!--                  <span class="text-gray-600">Closes</span>-->
-<!--                  <span class="font-medium">{{ site.closingHours }}</span>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </mat-card-content>-->
-<!--          </mat-card>-->
+  <mat-tab-group class="w-full" mat-stretch-tabs="false" mat-align-tabs="start">
+    <!-- Details Tab -->
+    <mat-tab label="Details">
+      <div class="p-4 flex flex-col gap-4 max-w-3xl mx-auto">
+        <!-- View mode -->
+        <ng-container *ngIf="!editMode(); else editForm">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title class="text-base">Closed days</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="flex flex-wrap gap-2" *ngIf="site.closedDays.length; else noClosedDays">
+                <mat-chip *ngFor="let d of site.closedDays">{{ d | date:'yyyy-MM-dd' }}</mat-chip>
+              </div>
+              <ng-template #noClosedDays>
+                <span class="text-sm text-gray-600">No closed days configured</span>
+              </ng-template>
+            </mat-card-content>
+          </mat-card>
 
-<!--          <mat-card>-->
-<!--            <mat-card-header>-->
-<!--              <mat-card-title class="text-base">Closed days</mat-card-title>-->
-<!--            </mat-card-header>-->
-<!--            <mat-card-content>-->
-<!--              <div class="flex flex-wrap gap-2" *ngIf="site.closedDays?.length; else noClosedDays">-->
-<!--                <mat-chip *ngFor="let d of site.closedDays">{{ d | date:'yyyy-MM-dd' }}</mat-chip>-->
-<!--              </div>-->
-<!--              <ng-template #noClosedDays>-->
-<!--                <span class="text-sm text-gray-600">No closed days configured</span>-->
-<!--              </ng-template>-->
-<!--            </mat-card-content>-->
-<!--          </mat-card>-->
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title class="text-base">Courts</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="flex flex-wrap gap-2" *ngIf="site.courts.length; else noCourts">
+                <mat-chip *ngFor="let c of site.courts">Court {{ c.number }}</mat-chip>
+              </div>
+              <ng-template #noCourts>
+                <span class="text-sm text-gray-600">No courts configured</span>
+              </ng-template>
+            </mat-card-content>
+          </mat-card>
 
-<!--          <mat-card>-->
-<!--            <mat-card-header>-->
-<!--              <mat-card-title class="text-base">Courts</mat-card-title>-->
-<!--            </mat-card-header>-->
-<!--            <mat-card-content>-->
-<!--              <div class="flex flex-wrap gap-2" *ngIf="site.courts.length; else noCourts">-->
-<!--                <mat-chip *ngFor="let c of site.courts">Court {{ c.number }}</mat-chip>-->
-<!--              </div>-->
-<!--              <ng-template #noCourts>-->
-<!--                <span class="text-sm text-gray-600">No courts configured</span>-->
-<!--              </ng-template>-->
-<!--            </mat-card-content>-->
-<!--          </mat-card>-->
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title class="text-base">Revenue</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="flex items-baseline gap-2">
+                <span class="text-xl font-semibold">{{ site.revenue | currency:'EUR':'symbol':'1.0-0' }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </ng-container>
 
-<!--          <mat-card>-->
-<!--            <mat-card-header>-->
-<!--              <mat-card-title class="text-base">Revenue</mat-card-title>-->
-<!--            </mat-card-header>-->
-<!--            <mat-card-content>-->
-<!--              <div class="flex items-baseline gap-2">-->
-<!--                <span class="text-xl font-semibold">{{ site.revenue | currency:'EUR':'symbol':'1.0-0' }}</span>-->
-<!--              </div>-->
-<!--            </mat-card-content>-->
-<!--          </mat-card>-->
-<!--        </ng-container>-->
+        <!-- Edit mode -->
+        <ng-template #editForm>
+          <form [formGroup]="form" class="flex flex-col gap-4">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title class="text-base">General</mat-card-title>
+              </mat-card-header>
+              <mat-card-content class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Name</mat-label>
+                  <input matInput formControlName="name" placeholder="Site name" />
+                  <mat-error *ngIf="form.controls.name.touched && form.controls.name.invalid">
+                    Name is required (min 2 chars)
+                  </mat-error>
+                </mat-form-field>
 
-<!--        &lt;!&ndash; Edit mode &ndash;&gt;-->
-<!--        <ng-template #editForm>-->
-<!--          <form [formGroup]="form" class="flex flex-col gap-4">-->
-<!--            <mat-card>-->
-<!--              <mat-card-header>-->
-<!--                <mat-card-title class="text-base">General</mat-card-title>-->
-<!--              </mat-card-header>-->
-<!--              <mat-card-content class="grid grid-cols-1 sm:grid-cols-2 gap-4">-->
-<!--                <mat-form-field appearance="outline" class="w-full">-->
-<!--                  <mat-label>Name</mat-label>-->
-<!--                  <input matInput formControlName="name" placeholder="Site name" />-->
-<!--                  <mat-error *ngIf="form.controls.name.touched && form.controls.name.invalid">-->
-<!--                    Name is required (min 2 chars)-->
-<!--                  </mat-error>-->
-<!--                </mat-form-field>-->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Revenue</mat-label>
+                  <input matInput type="number" formControlName="revenue" />
+                  <mat-error *ngIf="form.controls.revenue.touched && form.controls.revenue.invalid">
+                    Revenue must be a positive number
+                  </mat-error>
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
 
-<!--                <mat-form-field appearance="outline" class="w-full">-->
-<!--                  <mat-label>Revenue</mat-label>-->
-<!--                  <input matInput type="number" formControlName="revenue" />-->
-<!--                  <mat-error *ngIf="form.controls.revenue.touched && form.controls.revenue.invalid">-->
-<!--                    Revenue must be a positive number-->
-<!--                  </mat-error>-->
-<!--                </mat-form-field>-->
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title class="text-base">Closed days</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Closed dates (YYYY-MM-DD, comma separated)</mat-label>
+                  <input matInput formControlName="closedDays" placeholder="2026-01-24, 2026-01-31" />
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
 
-<!--                <mat-form-field appearance="outline" class="w-full">-->
-<!--                  <mat-label>Opening hours</mat-label>-->
-<!--                  <input matInput formControlName="openingHours" placeholder="HH:mm" />-->
-<!--                </mat-form-field>-->
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title class="text-base">Courts</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="w-full">
+                  <div class="text-xs text-gray-600 mb-1">Courts</div>
+                  <p class="text-sm text-gray-800 break-words">
+                    {{ form.get('courts')?.value || '—' }}
+                  </p>
+                </div>
+              </mat-card-content>
+            </mat-card>
 
-<!--                <mat-form-field appearance="outline" class="w-full">-->
-<!--                  <mat-label>Closing hours</mat-label>-->
-<!--                  <input matInput formControlName="closingHours" placeholder="HH:mm" />-->
-<!--                </mat-form-field>-->
-<!--              </mat-card-content>-->
-<!--            </mat-card>-->
+            <div class="flex items-center gap-3">
+              <mat-progress-spinner *ngIf="saving()" mode="indeterminate" diameter="20"></mat-progress-spinner>
+              <span *ngIf="saving()" class="text-sm text-gray-600">Saving…</span>
+            </div>
+          </form>
+        </ng-template>
+      </div>
+    </mat-tab>
 
-<!--            <mat-card>-->
-<!--              <mat-card-header>-->
-<!--                <mat-card-title class="text-base">Closed days</mat-card-title>-->
-<!--              </mat-card-header>-->
-<!--              <mat-card-content>-->
-<!--                <mat-form-field appearance="outline" class="w-full">-->
-<!--                  <mat-label>Closed dates (YYYY-MM-DD, comma separated)</mat-label>-->
-<!--                  <input matInput formControlName="closedDays" placeholder="2026-01-24, 2026-01-31" />-->
-<!--                </mat-form-field>-->
-<!--              </mat-card-content>-->
-<!--            </mat-card>-->
+    <!-- Bookings Tab -->
+    <mat-tab label="Bookings">
+      <div class="p-4 flex flex-col gap-4 max-w-3xl mx-auto">
+        <ng-container *ngIf="futureBookings$ | async as bookings">
+          <ng-container *ngIf="bookings.length; else noBookings">
+            <mat-card *ngFor="let booking of bookings" class="hover:shadow-md transition-shadow">
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="text-primary">event</mat-icon>
+                <mat-card-title class="text-base">
+                  Court {{ getCourtNumber(booking.courtId, site.courts) ?? 'Unknown' }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                  {{ booking.dateTime | date:'EEEE, MMM d, y' }}
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="flex flex-col gap-2 text-sm mt-2">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-gray-500 text-lg w-5 h-5">schedule</mat-icon>
+                    <span class="text-gray-600">
+                      {{ formatTime(booking.dateTime) }} (Slot {{ booking.timeSlotNumber }})
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="px-2 py-1 rounded text-xs font-medium"
+                      [ngClass]="getBookStateColor(booking.bookState)"
+                    >
+                      {{ booking.bookState }}
+                    </span>
+                    <span class="text-gray-600">Week {{ booking.weekNumber }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </ng-container>
 
-<!--            <mat-card>-->
-<!--              <mat-card-header>-->
-<!--                <mat-card-title class="text-base">Courts</mat-card-title>-->
-<!--              </mat-card-header>-->
-<!--              <mat-card-content>-->
-<!--                <div class="w-full">-->
-<!--                  <div class="text-xs text-gray-600 mb-1">Courts</div>-->
-<!--                  <p class="text-sm text-gray-800 break-words">-->
-<!--                    {{ form.get('courts')?.value || '—' }}-->
-<!--                  </p>-->
-<!--                </div>-->
-<!--              </mat-card-content>-->
-<!--            </mat-card>-->
+          <ng-template #noBookings>
+            <mat-card>
+              <mat-card-content class="text-center py-8">
+                <mat-icon class="text-gray-400 text-5xl w-12 h-12 mx-auto mb-4">event_busy</mat-icon>
+                <p class="text-gray-600 text-sm">No future bookings scheduled</p>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </ng-container>
+      </div>
+    </mat-tab>
 
-<!--            <div class="flex items-center gap-3">-->
-<!--              <mat-progress-spinner *ngIf="saving()" mode="indeterminate" diameter="20"></mat-progress-spinner>-->
-<!--              <span *ngIf="saving()" class="text-sm text-gray-600">Saving…</span>-->
-<!--            </div>-->
-<!--          </form>-->
-<!--        </ng-template>-->
-<!--      </div>-->
-<!--    </mat-tab>-->
+    <!-- Schedule Tab -->
+    <mat-tab label="Schedule">
+      <div class="p-4 flex flex-col gap-4 w-full">
+        <ng-container *ngIf="scheduleData$ | async as scheduleData">
+          <ng-container *ngIf="scheduleData.rows.length; else noSchedule">
+            <!-- Mobile-first: Info card -->
+            <mat-card class="md:hidden">
+              <mat-card-content class="text-sm text-gray-600">
+                <mat-icon class="text-gray-500 text-base align-middle mr-1">info</mat-icon>
+                Scroll horizontally to view all days
+              </mat-card-content>
+            </mat-card>
 
-<!--    &lt;!&ndash; Bookings Tab &ndash;&gt;-->
-<!--    <mat-tab label="Bookings">-->
-<!--      <div class="p-4 flex flex-col gap-4 max-w-3xl mx-auto">-->
-<!--        <ng-container *ngIf="futureBookings$ | async as bookings">-->
-<!--          <ng-container *ngIf="bookings.length; else noBookings">-->
-<!--            <mat-card *ngFor="let booking of bookings" class="hover:shadow-md transition-shadow">-->
-<!--              <mat-card-header>-->
-<!--                <mat-icon mat-card-avatar class="text-primary">event</mat-icon>-->
-<!--                <mat-card-title class="text-base">-->
-<!--                  Court {{ getCourtNumber(booking.courtId, site.courts) ?? booking.courtId }}-->
-<!--                </mat-card-title>-->
-<!--                <mat-card-subtitle>-->
-<!--                  {{ booking.startTime | date:'EEEE, MMM d, y' }}-->
-<!--                </mat-card-subtitle>-->
-<!--              </mat-card-header>-->
-<!--              <mat-card-content>-->
-<!--                <div class="flex flex-col gap-2 text-sm mt-2">-->
-<!--                  <div class="flex items-center gap-2">-->
-<!--                    <mat-icon class="text-gray-500 text-lg w-5 h-5">schedule</mat-icon>-->
-<!--                    <span class="text-gray-600">-->
-<!--                      {{ booking.startTime | date:'HH:mm' }} - {{ booking.endTime | date:'HH:mm' }}-->
-<!--                    </span>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </mat-card-content>-->
-<!--            </mat-card>-->
-<!--          </ng-container>-->
+            <!-- Schedule table with horizontal scroll on mobile -->
+            <div class="overflow-x-auto">
+              <table mat-table [dataSource]="scheduleData.rows" class="w-full min-w-[800px]">
+                <!-- Slot Number Column -->
+                <ng-container matColumnDef="slotNumber">
+                  <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold text-center px-2 py-3">
+                    Slot #
+                  </th>
+                  <td mat-cell *matCellDef="let row" class="bg-gray-50 font-medium text-center px-2 py-2">
+                    {{ row.slotNumber }}
+                  </td>
+                </ng-container>
 
-<!--          <ng-template #noBookings>-->
-<!--            <mat-card>-->
-<!--              <mat-card-content class="text-center py-8">-->
-<!--                <mat-icon class="text-gray-400 text-5xl w-12 h-12 mx-auto mb-4">event_busy</mat-icon>-->
-<!--                <p class="text-gray-600 text-sm">No future bookings scheduled</p>-->
-<!--              </mat-card-content>-->
-<!--            </mat-card>-->
-<!--          </ng-template>-->
-<!--        </ng-container>-->
-<!--      </div>-->
-<!--    </mat-tab>-->
-<!--  </mat-tab-group>-->
-<!--</ng-container>-->
+                <!-- Day Columns -->
+                <ng-container *ngFor="let day of daysOfWeek" [matColumnDef]="day">
+                  <th mat-header-cell *matHeaderCellDef class="bg-gray-50 font-semibold text-center px-2 py-3">
+                    <div class="flex flex-col">
+                      <span class="hidden md:inline">{{ day }}</span>
+                      <span class="md:hidden">{{ day.substring(0, 3) }}</span>
+                    </div>
+                  </th>
+                  <td mat-cell *matCellDef="let row" class="text-center px-2 py-2">
+                    <ng-container *ngIf="getTimeSlot(row, day) as slot; else emptySlot">
+                      <div class="flex flex-col gap-1 text-xs">
+                        <span class="font-medium">{{ formatTime(slot.dateTime) }}</span>
+                        <span
+                          class="px-2 py-1 rounded text-xs font-medium"
+                          [ngClass]="getBookStateColor(slot.bookState)"
+                          [matTooltip]="'Court ID: ' + slot.courtId + ' | Week: ' + slot.weekNumber"
+                        >
+                          {{ slot.bookState }}
+                        </span>
+                      </div>
+                    </ng-container>
+                    <ng-template #emptySlot>
+                      <span class="text-gray-400 text-xs">—</span>
+                    </ng-template>
+                  </td>
+                </ng-container>
 
-<!--<ng-template #loadingOrError>-->
-<!--  <div class="p-4 flex items-center justify-center" *ngIf="loading(); else notFound">-->
-<!--    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>-->
-<!--  </div>-->
+                <tr mat-header-row *matHeaderRowDef="['slotNumber'].concat(daysOfWeek)" class="sticky top-0"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['slotNumber'].concat(daysOfWeek)" class="hover:bg-gray-50"></tr>
+              </table>
+            </div>
 
-<!--  <ng-template #notFound>-->
-<!--    <div class="p-4 max-w-md mx-auto">-->
-<!--      <mat-card>-->
-<!--        <mat-card-header>-->
-<!--          <mat-card-title class="text-base">Site not found</mat-card-title>-->
-<!--        </mat-card-header>-->
-<!--        <mat-card-content class="text-sm text-gray-600">-->
-<!--          The requested site doesn’t exist (or the id is invalid).-->
-<!--        </mat-card-content>-->
-<!--        <mat-card-actions align="end">-->
-<!--          <button mat-flat-button color="primary" (click)="goBack()">Back to list</button>-->
-<!--        </mat-card-actions>-->
-<!--      </mat-card>-->
-<!--    </div>-->
-<!--  </ng-template>-->
-<!--</ng-template>-->
+            <!-- Legend -->
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title class="text-base">Legend</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="flex flex-wrap gap-3 text-xs">
+                  <div class="flex items-center gap-1">
+                    <span class="px-2 py-1 rounded bg-green-100 text-green-800">Available</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="px-2 py-1 rounded bg-red-100 text-red-800">Booked</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-800">Unavailable</span>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-600 mt-2">
+                  Each time slot is 105 minutes. Hover over a slot to see court and week details.
+                </p>
+              </mat-card-content>
+            </mat-card>
+          </ng-container>
+
+          <ng-template #noSchedule>
+            <mat-card>
+              <mat-card-content class="text-center py-8">
+                <mat-icon class="text-gray-400 text-5xl w-12 h-12 mx-auto mb-4">calendar_today</mat-icon>
+                <p class="text-gray-600 text-sm">No schedule configured for this site</p>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </ng-container>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>
+
+<ng-template #loadingOrError>
+  <div class="p-4 flex items-center justify-center" *ngIf="loading(); else notFound">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+
+  <ng-template #notFound>
+    <div class="p-4 max-w-md mx-auto">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title class="text-base">Site not found</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="text-sm text-gray-600">
+          The requested site doesn’t exist (or the id is invalid).
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" (click)="goBack()">Back to list</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </ng-template>
+</ng-template>
