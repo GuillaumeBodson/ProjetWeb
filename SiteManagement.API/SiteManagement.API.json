@@ -1024,7 +1024,7 @@
             ],
             "items": {
               "type": "string",
-              "format": "date"
+              "format": "date-time"
             }
           },
           "courts": {

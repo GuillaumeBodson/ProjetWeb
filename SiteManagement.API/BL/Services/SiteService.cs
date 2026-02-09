@@ -4,6 +4,7 @@ using SiteManagement.API.BL.Models;
 using SiteManagement.API.BL.Services.Abstractions;
 using SiteManagement.API.DAL;
 using SiteManagement.API.DAL.Entities;
+using System.Globalization;
 using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.BL.Services;
@@ -63,7 +64,7 @@ public class SiteService(
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
-            ClosedDays = request.ClosedDays?.ToHashSet() ?? []
+            ClosedDays = [.. request.ClosedDays?.Select(d => DateOnly.FromDateTime(d.ToUniversalTime())) ?? []]
         };
 
         context.Sites.Add(site);
@@ -115,7 +116,7 @@ public class SiteService(
         }
 
         site.Name = request.Name;
-        site.ClosedDays = [.. request.ClosedDays?.Select(DateOnly.FromDateTime) ?? []];
+        site.ClosedDays = [.. request.ClosedDays?.Select(d => DateOnly.FromDateTime(d.ToUniversalTime())) ?? []];
 
         // Update courts using navigation property
         var existingCourtNumbers = site.Courts.Select(c => c.Number).ToHashSet();
@@ -161,7 +162,10 @@ public class SiteService(
             {
                 // Update existing planned day (only NumberOfTimeSplots can change)
                 existingPlannedDay.NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots;
-                existingPlannedDay.StartTime = TimeOnly.Parse(scheduleRequest.StartTime??"00:00"); //todo: change entity to be nullable
+                if (TimeOnly.TryParseExact(scheduleRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime))
+                {
+                    existingPlannedDay.StartTime = startTime;
+                }
 
                 logger.LogDebug(
                     "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",
@@ -174,6 +178,7 @@ public class SiteService(
                 {
                     Id = Guid.NewGuid(),
                     DayOfWeek = scheduleRequest.DayOfWeek,
+                    StartTime = TimeOnly.TryParseExact(scheduleRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime) ? startTime : TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
                     NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots
                 });
 

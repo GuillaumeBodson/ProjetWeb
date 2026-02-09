@@ -103,7 +103,7 @@ export class SiteDetails {
   );
 
   readonly futureBookings$ = this.site$.pipe(
-    map(site => site?.schedule?.flatMap((d: any) => d.timeSlots) ?? [])
+    map(site => site?.schedule?.flatMap(d => d.timeSlots) ?? [])
   );
 
   // Days of the week for schedule configuration
@@ -179,7 +179,7 @@ export class SiteDetails {
     revenue: number;
     closedDays: Date[] | string[];
     courts: CourtResponse[];
-    schedule: any[];
+    schedule: PlannedDayResponse[];
   }): void {
     if (!this.form.valid) {
       this.form.markAllAsTouched();
