@@ -7,7 +7,7 @@ public record UpdateSiteRequest(
     [StringLength(200, MinimumLength = 1)]
     string Name,
 
-    IReadOnlyCollection<DateOnly>? ClosedDays,
+    IReadOnlyCollection<DateTime>? ClosedDays,
 
     IReadOnlyCollection<CreateCourtRequest>? Courts,
 

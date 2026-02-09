@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { AsyncPipe, CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import {catchError, map, of, shareReplay, switchMap, take, tap} from 'rxjs';
+import { catchError, map, of, shareReplay, switchMap, take, tap } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,16 +14,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { SiteService } from '../../../sites-list/services/site-service';
 import {
   UpdateSiteRequest,
   DayOfWeek,
-  PlannedDayResponse,
-  TimeSlotResponse,
-  CourtResponse
+  CourtResponse, PlannedDayResponse
 } from '../../../../../core/api/site';
 import { SiteDetailsResponse } from '../../../../../core/api/site/model/model-override';
 
@@ -48,8 +44,6 @@ import { SiteDetailsResponse } from '../../../../../core/api/site/model/model-ov
     MatInputModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatTableModule,
-    MatTooltipModule,
   ],
   templateUrl: './site-details.html',
   styleUrl: './site-details.css',
@@ -92,11 +86,12 @@ export class SiteDetails {
           {
             name: site.name ?? '',
             revenue: site.revenue ?? 0,
-            closedDays: (site.closedDays ?? []).map(d => d.toISOString().split('T')[0]).join(', '),
-            courts: (site.courts ?? []).map(c => String(c.number)).join(', '),
+            closedDays: (site.closedDays ?? []).map((d: Date) => d.toISOString().split('T')[0]).join(', '),
+            courts: (site.courts ?? []).map((c: CourtResponse) => String(c.number)).join(', '),
           },
           { emitEvent: false }
         );
+        this.initializeScheduleForm(site);
       }
     }),
     catchError(err => {
@@ -108,10 +103,10 @@ export class SiteDetails {
   );
 
   readonly futureBookings$ = this.site$.pipe(
-    map(site => site?.schedule?.flatMap(d => d.timeSlots) ?? [])//.filter(d => d.d).bookings?.filter(b => new Date(b.startTime) > new Date()) ?? [])
+    map(site => site?.schedule?.flatMap(d => d.timeSlots) ?? [])
   );
 
-  // Schedule table data
+  // Days of the week for schedule configuration
   readonly daysOfWeek: DayOfWeek[] = [
     DayOfWeek.Monday,
     DayOfWeek.Tuesday,
@@ -122,43 +117,17 @@ export class SiteDetails {
     DayOfWeek.Sunday,
   ];
 
-  readonly scheduleData$ = this.site$.pipe(
-    map(site => {
-      if (!site?.schedule?.length) {
-        return { rows: [], maxTimeSlots: 0 };
-      }
-
-      // Since there are always 7 planned days (one per day of week), create a map
-      const dayMap = new Map<DayOfWeek, PlannedDayResponse>();
-      site.schedule.forEach(pd => {
-        dayMap.set(pd.dayOfWeek, pd);
-      });
-
-      // Find the maximum number of time slots across all days
-      const maxTimeSlots = Math.max(...site.schedule.map(pd => pd.numberOfTimeSlots), 0);
-
-      // Build rows: each row represents a time slot number (0 to maxTimeSlots - 1)
-      const rows: ScheduleRow[] = [];
-      for (let slotIndex = 0; slotIndex < maxTimeSlots; slotIndex++) {
-        const row: ScheduleRow = {
-          slotNumber: slotIndex + 1,
-          slots: {}
-        };
-
-        // For each day of the week, get the corresponding time slot
-        this.daysOfWeek.forEach(day => {
-          const plannedDay = dayMap.get(day);
-          if (plannedDay && slotIndex < plannedDay.timeSlots.length) {
-            row.slots[day] = plannedDay.timeSlots[slotIndex];
-          }
-        });
-
-        rows.push(row);
-      }
-
-      return { rows, maxTimeSlots };
-    })
+  // Schedule form for editing opening hours configuration
+  readonly scheduleForm = this.fb.array(
+    this.daysOfWeek.map(() =>
+      this.fb.group({
+        numberOfTimeSlots: this.fb.control<number>(0, [Validators.required, Validators.min(0), Validators.max(8)]),
+        startTime: this.fb.control<string>('08:00')
+      })
+    )
   );
+
+  readonly scheduleEditMode = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     name: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(2)]),
@@ -194,8 +163,8 @@ export class SiteDetails {
       this.form.reset({
         name: site.name ?? '',
         revenue: site.revenue ?? 0,
-        closedDays: (site.closedDays ?? []).map(d => d.toISOString().split('T')[0]).join(', '),
-        courts: (site.courts ?? []).map(c => String(c.number)).join(', '),
+        closedDays: (site.closedDays ?? []).map((d: Date) => d.toISOString().split('T')[0]).join(', '),
+        courts: (site.courts ?? []).map((c: CourtResponse) => String(c.number)).join(', '),
       });
     })).subscribe({ complete: () => {} });
   }
@@ -267,10 +236,6 @@ export class SiteDetails {
     return courts.find(c => c.id === courtId)?.number;
   }
 
-  getTimeSlot(row: ScheduleRow, day: DayOfWeek): TimeSlotResponse | undefined {
-    return row.slots[day];
-  }
-
   formatTime(dateTime: string): string {
     const date = new Date(dateTime);
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -288,9 +253,102 @@ export class SiteDetails {
         return 'bg-blue-100 text-blue-800';
     }
   }
-}
 
-interface ScheduleRow {
-  slotNumber: number;
-  slots: Partial<Record<DayOfWeek, TimeSlotResponse>>;
+  // Schedule management methods
+  private initializeScheduleForm(site: SiteDetailsResponse | null): void {
+    if (!site?.schedule?.length) {
+      return;
+    }
+
+    const dayMap = new Map<DayOfWeek, PlannedDayResponse>();
+    site.schedule.forEach(pd => dayMap.set(pd.dayOfWeek, pd));
+
+    this.daysOfWeek.forEach((day, index) => {
+      const plannedDay = dayMap.get(day);
+      if (plannedDay) {
+        this.scheduleForm.at(index).patchValue({
+          numberOfTimeSlots: plannedDay.numberOfTimeSlots,
+          startTime: plannedDay.startTime
+        }, { emitEvent: false });
+      }
+    });
+  }
+
+  startScheduleEdit(): void {
+    this.scheduleEditMode.set(true);
+    this.scheduleForm.markAsPristine();
+  }
+
+  cancelScheduleEdit(): void {
+    this.scheduleEditMode.set(false);
+    this.site$.pipe(
+      take(1),
+      tap(site => this.initializeScheduleForm(site))
+    ).subscribe();
+  }
+
+  saveSchedule(site: {
+    id: string;
+    name: string;
+    revenue: number;
+    closedDays: Date[] | string[];
+    courts: CourtResponse[];
+    schedule: any[];
+  }): void {
+    if (!this.scheduleForm.valid) {
+      this.scheduleForm.markAllAsTouched();
+      return;
+    }
+
+    const updated: UpdateSiteRequest = {
+      name: site.name,
+      closedDays: Array.isArray(site.closedDays) ?
+        site.closedDays.map(d => d instanceof Date ? d.toISOString() : d) :
+        [],
+      courts: site.courts.map(c => ({ number: c.number })),
+      schedule: this.daysOfWeek.map((day, index) => {
+        const formValue = this.scheduleForm.at(index).value;
+        return {
+          dayOfWeek: day,
+          numberOfTimeSlots: formValue.numberOfTimeSlots ?? 0,
+          startTime: formValue.startTime ?? null
+        };
+      })
+    };
+
+    this.saving.set(true);
+
+    this.id$.pipe(
+      take(1),
+      switchMap(id => {
+        if (!id) {
+          this.saving.set(false);
+          return of(null);
+        }
+        return this.siteService.update(id, updated);
+      }),
+      tap(() => {
+        this.saving.set(false);
+        this.scheduleEditMode.set(false);
+      }),
+      catchError(err => {
+        console.error('Failed to save schedule', err);
+        this.saving.set(false);
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  getDayName(day: DayOfWeek): string {
+    const names: Record<DayOfWeek, string> = {
+      [DayOfWeek.Monday]: 'Monday',
+      [DayOfWeek.Tuesday]: 'Tuesday',
+      [DayOfWeek.Wednesday]: 'Wednesday',
+      [DayOfWeek.Thursday]: 'Thursday',
+      [DayOfWeek.Friday]: 'Friday',
+      [DayOfWeek.Saturday]: 'Saturday',
+      [DayOfWeek.Sunday]: 'Sunday'
+    };
+    return names[day];
+  }
 }

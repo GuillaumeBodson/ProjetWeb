@@ -22,7 +22,7 @@ public class UpdateSiteRequestValidator : AbstractValidator<UpdateSiteRequest>
                     .IsInEnum();
                     
                 schedule.RuleFor(s => s.NumberOfTimeSlots)
-                    .GreaterThan(0)
+                    .GreaterThanOrEqualTo(0)
                     .LessThanOrEqualTo(8);
             });
 

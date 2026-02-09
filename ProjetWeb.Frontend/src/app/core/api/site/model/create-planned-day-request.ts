@@ -13,7 +13,7 @@ import { DayOfWeek } from './day-of-week';
 export interface CreatePlannedDayRequest { 
     dayOfWeek: DayOfWeek;
     numberOfTimeSlots: number;
-    startTime: string;
+    startTime: string | null;
 }
 
 

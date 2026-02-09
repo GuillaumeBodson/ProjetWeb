@@ -998,7 +998,10 @@
             "format": "int32"
           },
           "startTime": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -1021,7 +1024,7 @@
             ],
             "items": {
               "type": "string",
-              "format": "date"
+              "format": "date-time"
             }
           },
           "courts": {
@@ -1377,7 +1380,7 @@
             ],
             "items": {
               "type": "string",
-              "format": "date"
+              "format": "date-time"
             }
           },
           "courts": {
