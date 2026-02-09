@@ -21,6 +21,12 @@ public class PlannedDayConfiguration : IEntityTypeConfiguration<PlannedDay>
             .IsRequired()
             .HasMaxLength(2);
 
+        builder.Property(pd => pd.StartTime)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString("HH:mm"),
+                v => TimeOnly.ParseExact(v, "HH:mm"));
+
         // Configure relationship with Site (defined in SiteConfiguration)
         // Configure relationship with TimeSlots
         builder.HasMany(pd => pd.TimeSlots)

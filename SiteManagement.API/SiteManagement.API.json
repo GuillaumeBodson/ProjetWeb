@@ -1160,6 +1160,7 @@
           "id",
           "dayOfWeek",
           "numberOfTimeSlots",
+          "startTime",
           "timeSlots"
         ],
         "type": "object",
@@ -1174,6 +1175,10 @@
           "numberOfTimeSlots": {
             "type": "integer",
             "format": "int32"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "time"
           },
           "timeSlots": {
             "type": "array",
@@ -1319,7 +1324,8 @@
           "timeSlotNumber",
           "courtId",
           "weekNumber",
-          "bookState"
+          "bookState",
+          "dateTime"
         ],
         "type": "object",
         "properties": {
@@ -1341,6 +1347,10 @@
           },
           "bookState": {
             "$ref": "#/components/schemas/BookState"
+          },
+          "dateTime": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
