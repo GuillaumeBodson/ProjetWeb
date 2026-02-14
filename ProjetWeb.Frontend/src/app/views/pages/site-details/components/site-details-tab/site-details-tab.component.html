@@ -1,0 +1,101 @@
+<!-- View mode -->
+<ng-container *ngIf="!editMode(); else editForm">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="text-base">Closed days</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="flex flex-wrap gap-2" *ngIf="site().closedDays.length; else noClosedDays">
+        <mat-chip *ngFor="let d of site().closedDays">{{ d | date:'yyyy-MM-dd' }}</mat-chip>
+      </div>
+      <ng-template #noClosedDays>
+        <span class="text-sm text-gray-600">No closed days configured</span>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="text-base">Courts</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="flex flex-wrap gap-2" *ngIf="site().courts.length; else noCourts">
+        <mat-chip *ngFor="let c of site().courts">Court {{ c.number }}</mat-chip>
+      </div>
+      <ng-template #noCourts>
+        <span class="text-sm text-gray-600">No courts configured</span>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="text-base">Revenue</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="flex items-baseline gap-2">
+        <span class="text-xl font-semibold">{{ site().revenue | currency:'EUR':'symbol':'1.0-0' }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</ng-container>
+
+<!-- Edit mode -->
+<ng-template #editForm>
+  <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSave()">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="text-base">General</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="Site name" />
+          <mat-error *ngIf="form.controls.name.touched && form.controls.name.invalid">
+            Name is required (min 2 chars)
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Revenue</mat-label>
+          <input matInput type="number" formControlName="revenue" />
+          <mat-error *ngIf="form.controls.revenue.touched && form.controls.revenue.invalid">
+            Revenue must be a positive number
+          </mat-error>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="text-base">Closed days</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Closed dates (YYYY-MM-DD, comma separated)</mat-label>
+          <input matInput formControlName="closedDays" placeholder="2026-01-24, 2026-01-31" />
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="text-base">Courts</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="w-full">
+          <div class="text-xs text-gray-600 mb-1">Courts</div>
+          <p class="text-sm text-gray-800 break-words">
+            {{ form.get('courts')?.value || '—' }}
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="flex items-center gap-3">
+      <mat-progress-spinner *ngIf="saving()" mode="indeterminate" diameter="20"></mat-progress-spinner>
+      <span *ngIf="saving()" class="text-sm text-gray-600">Saving…</span>
+    </div>
+  </form>
+</ng-template>
+

@@ -29,6 +29,7 @@ model/site-response.ts
 model/sort-descriptor.ts
 model/sort-direction.ts
 model/time-slot-response.ts
+model/update-schedule-request.ts
 model/update-site-request.ts
 model/validation-problem-details.ts
 param.ts

@@ -12,20 +12,20 @@ public class CreatePlannedDayRequestValidator : AbstractValidator<CreatePlannedD
             .WithMessage("DayOfWeek must be a valid day of the week.");
 
         RuleFor(x => x.NumberOfTimeSlots)
-            .GreaterThan(0)
+            .GreaterThanOrEqualTo(0)
             .LessThanOrEqualTo(8)
-            .WithMessage("NumberOfTimeSlots must be between 1 and 8.");
+            .WithMessage("NumberOfTimeSlots must be between 0 and 8.");
 
         RuleFor(x => x.StartTime)
-            .NotEmpty()
-            .WithMessage("StartTime is required.")
+            .Must(time => !string.IsNullOrEmpty(time)).When(y => y.NumberOfTimeSlots> 0)
+            .WithMessage("StartTime is required when NumberOfTimeSlots is greater than 0.")
             .Must(BeValidTimeFormat)
             .WithMessage("StartTime must be in the format 'HH:mm' (e.g., '09:00', '14:30').");
     }
 
-    private static bool BeValidTimeFormat(string startTime)
+    private static bool BeValidTimeFormat(string? startTime)
     {
-        return TimeOnly.TryParseExact(
+        return string.IsNullOrEmpty(startTime) || TimeOnly.TryParseExact(
             startTime,
             "HH:mm",
             CultureInfo.InvariantCulture,

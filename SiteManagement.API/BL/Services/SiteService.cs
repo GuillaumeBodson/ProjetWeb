@@ -151,25 +151,50 @@ public class SiteService(
                 Id = Guid.NewGuid(),
                 Number = courtNumber
             });
-        }
+        }        
 
+        await context.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(
+            "Updated site {SiteId}: name and closed days updated, courts synchronized ({CourtCount} total), planned days preserved",
+            site.Id, site.Courts.Count);
+
+        return SiteMapper.ToResponseDetails(site);
+    }
+
+    public async Task<SiteDetailsResponse?> UpdateSiteScheduleAsync(Guid siteId, UpdateScheduleRequest request, CancellationToken cancellationToken)
+    {
+        var site = await context.Sites
+            .Include(s => s.Courts)
+            .Include(s => s.PlannedDays)
+                .ThenInclude(pd => pd.TimeSlots)
+            .FirstOrDefaultAsync(s => s.Id == siteId, cancellationToken);
+
+        if (site is null)
+        {
+            return null;
+        }
         // Update planned days using navigation property
         var plannedDaysByDayOfWeek = site.PlannedDays.ToDictionary(pd => pd.DayOfWeek);
 
-        foreach (var scheduleRequest in request.Schedule)
+        foreach (var plannedDayRequest in request.PlannedDays)
         {
-            if (plannedDaysByDayOfWeek.TryGetValue(scheduleRequest.DayOfWeek, out var existingPlannedDay))
+            if (plannedDaysByDayOfWeek.TryGetValue(plannedDayRequest.DayOfWeek, out var existingPlannedDay))
             {
-                // Update existing planned day (only NumberOfTimeSplots can change)
-                existingPlannedDay.NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots;
-                if (TimeOnly.TryParseExact(scheduleRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime))
+                // Update existing planned day
+                existingPlannedDay.NumberOfTimeSlots = plannedDayRequest.NumberOfTimeSlots;
+                if (TimeOnly.TryParseExact(plannedDayRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime))
                 {
                     existingPlannedDay.StartTime = startTime;
+                }
+                else if(plannedDayRequest.StartTime is null)
+                {
+                    existingPlannedDay.StartTime = null;
                 }
 
                 logger.LogDebug(
                     "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",
-                    scheduleRequest.DayOfWeek, site.Id, scheduleRequest.NumberOfTimeSlots);
+                    plannedDayRequest.DayOfWeek, site.Id, plannedDayRequest.NumberOfTimeSlots);
             }
             else
             {
@@ -177,22 +202,17 @@ public class SiteService(
                 site.PlannedDays.Add(new PlannedDay
                 {
                     Id = Guid.NewGuid(),
-                    DayOfWeek = scheduleRequest.DayOfWeek,
-                    StartTime = TimeOnly.TryParseExact(scheduleRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime) ? startTime : TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                    NumberOfTimeSlots = scheduleRequest.NumberOfTimeSlots
+                    DayOfWeek = plannedDayRequest.DayOfWeek,
+                    StartTime = null,
+                    NumberOfTimeSlots = plannedDayRequest.NumberOfTimeSlots
                 });
 
                 logger.LogWarning(
                     "Created missing PlannedDay for {DayOfWeek} on site {SiteId}",
-                    scheduleRequest.DayOfWeek, site.Id);
+                    plannedDayRequest.DayOfWeek, site.Id);
             }
         }
-
         await context.SaveChangesAsync(cancellationToken);
-
-        logger.LogInformation(
-            "Updated site {SiteId}: Name and schedule updated, {CourtCount} courts, all 7 planned days preserved",
-            site.Id, site.Courts.Count);
 
         return SiteMapper.ToResponseDetails(site);
     }
@@ -231,6 +251,12 @@ public class SiteService(
         {
             logger.LogWarning("PlannedDay {PlannedDayId} not found or does not belong to site {SiteId}",
                 request.PlannedDayId, siteId);
+            return null;
+        }
+
+        if (plannedDay.StartTime is null)
+        {
+            logger.LogWarning("PlannedDay {PlannedDayId} has no StartTime defined", request.PlannedDayId);
             return null;
         }
 
@@ -298,6 +324,6 @@ public class SiteService(
             timeSlot.CourtId,
             timeSlot.WeekNumber,
             timeSlot.BookState,
-            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime, plannedDay.DayOfWeek));
+            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek));
     }
 }

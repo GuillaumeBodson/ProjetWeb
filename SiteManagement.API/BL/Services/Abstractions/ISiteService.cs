@@ -12,4 +12,5 @@ public interface ISiteService
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     Task<TimeSlotResponse?> BookTimeSlotAsync(Guid siteId, BookTimeSlotRequest request, CancellationToken cancellationToken = default);
     Task<PageOf<SiteResponse>> GetPageAsync(PageRequest request, CancellationToken cancellationToken = default);
+    Task<SiteDetailsResponse?> UpdateSiteScheduleAsync(Guid siteId, UpdateScheduleRequest request, CancellationToken cancellationToken);
 }

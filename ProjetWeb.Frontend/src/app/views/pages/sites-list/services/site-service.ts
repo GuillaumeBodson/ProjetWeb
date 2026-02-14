@@ -13,7 +13,13 @@ import {
 } from 'rxjs';
 import {map} from 'rxjs/operators';
 import {SiteFacadeService} from '../../../../core/services/site-facade.service';
-import {FilterGroup, PageOfOfSiteResponse, PageRequest, UpdateSiteRequest} from '../../../../core/api/site';
+import {
+  FilterGroup,
+  PageOfOfSiteResponse,
+  PageRequest,
+  UpdateScheduleRequest,
+  UpdateSiteRequest
+} from '../../../../core/api/site';
 import {SiteDetailsResponse} from '../../../../core/api/site/model/model-override';
 
 @Injectable({
@@ -100,6 +106,14 @@ export class SiteService {
 
   update(siteId: string, updateRequest: UpdateSiteRequest): Observable<SiteDetailsResponse> {
     return this.siteFacade.updateSite(siteId, updateRequest).pipe(
+      map(updated => ({
+        ...updated,
+        closedDays: updated.closedDays?.map(d => new Date(d)) ?? []
+      }))
+    );
+  }
+  updateSchedule(siteId: string, updateScheduleRequest: UpdateScheduleRequest): Observable<SiteDetailsResponse> {
+    return this.siteFacade.updateSiteSchedule(siteId, updateScheduleRequest).pipe(
       map(updated => ({
         ...updated,
         closedDays: updated.closedDays?.map(d => new Date(d)) ?? []
