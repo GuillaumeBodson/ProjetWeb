@@ -69,7 +69,7 @@ export class SiteDetails {
   );
 
   readonly futureBookings$ = this.site$.pipe(
-    map(site => site?.schedule?.flatMap((d: any) => d.timeSlots) ?? [])
+    map(site => site?.schedule?.flatMap((d) => d.timeSlots) ?? [])
   );
 
   async goBack(): Promise<void> {

@@ -95,7 +95,7 @@ export class SiteFacadeService {
     );
   }
 
-  updateSiteSchedule(siteId: string, updateScheduleRequest: UpdateScheduleRequest){
+  updateSiteSchedule(siteId: string, updateScheduleRequest: UpdateScheduleRequest): Observable<SiteDetailsResponse>{
     return this.sitesService.apiSitesIdSchedulePut(siteId, updateScheduleRequest).pipe(
       map(site => this.transformSiteDetails(site)),
       catchError(error => this.handleError(`Failed to update schedule for site with ID: ${siteId}`, error))

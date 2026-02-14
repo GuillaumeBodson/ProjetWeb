@@ -17,6 +17,8 @@ public class CreatePlannedDayRequestValidator : AbstractValidator<CreatePlannedD
             .WithMessage("NumberOfTimeSlots must be between 0 and 8.");
 
         RuleFor(x => x.StartTime)
+            .Must(time => !string.IsNullOrEmpty(time)).When(y => y.NumberOfTimeSlots> 0)
+            .WithMessage("StartTime is required when NumberOfTimeSlots is greater than 0.")
             .Must(BeValidTimeFormat)
             .WithMessage("StartTime must be in the format 'HH:mm' (e.g., '09:00', '14:30').");
     }

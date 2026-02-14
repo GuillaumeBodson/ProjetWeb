@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { NgForOf, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -57,7 +57,8 @@ export class ScheduleTabComponent {
     this.daysOfWeek.map(() =>
       this.fb.group({
         numberOfTimeSlots: this.fb.control<number>(0, [Validators.required, Validators.min(0), Validators.max(8)]),
-        startTime: this.fb.control<string>('08:00')
+        startTime: this.fb.control<string | null>(null)
+
       })
     )
   );

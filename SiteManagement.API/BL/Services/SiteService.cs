@@ -156,7 +156,7 @@ public class SiteService(
         await context.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation(
-            "Updated site {SiteId}: Name and schedule updated, {CourtCount} courts, all 7 planned days preserved",
+            "Updated site {SiteId}: name and closed days updated, courts synchronized ({CourtCount} total), planned days preserved",
             site.Id, site.Courts.Count);
 
         return SiteMapper.ToResponseDetails(site);
@@ -167,6 +167,7 @@ public class SiteService(
         var site = await context.Sites
             .Include(s => s.Courts)
             .Include(s => s.PlannedDays)
+                .ThenInclude(pd => pd.TimeSlots)
             .FirstOrDefaultAsync(s => s.Id == siteId, cancellationToken);
 
         if (site is null)
@@ -186,6 +187,10 @@ public class SiteService(
                 {
                     existingPlannedDay.StartTime = startTime;
                 }
+                else if(plannedDayRequest.StartTime is null)
+                {
+                    existingPlannedDay.StartTime = null;
+                }
 
                 logger.LogDebug(
                     "Updated PlannedDay for {DayOfWeek} on site {SiteId}: NumberOfTimeSplots = {NumberOfTimeSplots}",
@@ -198,7 +203,7 @@ public class SiteService(
                 {
                     Id = Guid.NewGuid(),
                     DayOfWeek = plannedDayRequest.DayOfWeek,
-                    StartTime = TimeOnly.TryParseExact(plannedDayRequest.StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var startTime) ? startTime : TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
+                    StartTime = null,
                     NumberOfTimeSlots = plannedDayRequest.NumberOfTimeSlots
                 });
 
@@ -207,6 +212,8 @@ public class SiteService(
                     plannedDayRequest.DayOfWeek, site.Id);
             }
         }
+        await context.SaveChangesAsync(cancellationToken);
+
         return SiteMapper.ToResponseDetails(site);
     }
 
