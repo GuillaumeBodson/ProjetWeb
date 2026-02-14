@@ -1,16 +1,19 @@
 <!-- View mode -->
-<ng-container *ngIf="!editMode(); else editForm">
+@if (!editMode()) {
   <mat-card>
     <mat-card-header>
       <mat-card-title class="text-base">Closed days</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="flex flex-wrap gap-2" *ngIf="site().closedDays.length; else noClosedDays">
-        <mat-chip *ngFor="let d of site().closedDays">{{ d | date:'yyyy-MM-dd' }}</mat-chip>
-      </div>
-      <ng-template #noClosedDays>
+      @if (site().closedDays.length) {
+        <div class="flex flex-wrap gap-2">
+          @for (d of site().closedDays; track d) {
+            <mat-chip>{{ d | date:'yyyy-MM-dd' }}</mat-chip>
+          }
+        </div>
+      } @else {
         <span class="text-sm text-gray-600">No closed days configured</span>
-      </ng-template>
+      }
     </mat-card-content>
   </mat-card>
 
@@ -19,12 +22,15 @@
       <mat-card-title class="text-base">Courts</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="flex flex-wrap gap-2" *ngIf="site().courts.length; else noCourts">
-        <mat-chip *ngFor="let c of site().courts">Court {{ c.number }}</mat-chip>
-      </div>
-      <ng-template #noCourts>
+      @if (site().courts.length) {
+        <div class="flex flex-wrap gap-2">
+          @for (c of site().courts; track c.number) {
+            <mat-chip>Court {{ c.number }}</mat-chip>
+          }
+        </div>
+      } @else {
         <span class="text-sm text-gray-600">No courts configured</span>
-      </ng-template>
+      }
     </mat-card-content>
   </mat-card>
 
@@ -38,10 +44,15 @@
       </div>
     </mat-card-content>
   </mat-card>
-</ng-container>
 
-<!-- Edit mode -->
-<ng-template #editForm>
+  <div class="flex items-center gap-3 mt-4">
+    <button mat-raised-button color="primary" (click)="startEdit()">
+      <mat-icon>edit</mat-icon>
+      Edit
+    </button>
+  </div>
+} @else {
+  <!-- Edit mode -->
   <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSave()">
     <mat-card>
       <mat-card-header>
@@ -51,17 +62,11 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" placeholder="Site name" />
-          <mat-error *ngIf="form.controls.name.touched && form.controls.name.invalid">
-            Name is required (min 2 chars)
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Revenue</mat-label>
-          <input matInput type="number" formControlName="revenue" />
-          <mat-error *ngIf="form.controls.revenue.touched && form.controls.revenue.invalid">
-            Revenue must be a positive number
-          </mat-error>
+          @if (form.controls.name.touched && form.controls.name.invalid) {
+            <mat-error>
+              Name is required (min 2 chars)
+            </mat-error>
+          }
         </mat-form-field>
       </mat-card-content>
     </mat-card>
@@ -83,19 +88,30 @@
         <mat-card-title class="text-base">Courts</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="w-full">
-          <div class="text-xs text-gray-600 mb-1">Courts</div>
-          <p class="text-sm text-gray-800 break-words">
-            {{ form.get('courts')?.value || '—' }}
-          </p>
-        </div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Courts (comma separated numbers)</mat-label>
+          <input matInput formControlName="courts" placeholder="1, 2, 3" />
+        </mat-form-field>
       </mat-card-content>
     </mat-card>
 
     <div class="flex items-center gap-3">
-      <mat-progress-spinner *ngIf="saving()" mode="indeterminate" diameter="20"></mat-progress-spinner>
-      <span *ngIf="saving()" class="text-sm text-gray-600">Saving…</span>
+      @if (saving()) {
+        <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
+        <span class="text-sm text-gray-600">Saving…</span>
+      }
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button mat-raised-button color="primary" type="submit" [disabled]="saving() || form.invalid">
+        <mat-icon>save</mat-icon>
+        Save
+      </button>
+      <button mat-stroked-button type="button" (click)="cancelEdit()" [disabled]="saving()">
+        <mat-icon>close</mat-icon>
+        Cancel
+      </button>
     </div>
   </form>
-</ng-template>
+}
 

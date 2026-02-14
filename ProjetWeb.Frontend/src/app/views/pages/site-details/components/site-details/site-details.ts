@@ -44,7 +44,6 @@ export class SiteDetails {
 
   readonly loading = signal(true);
   readonly saving = signal(false);
-  readonly editMode = signal(false);
 
   readonly id$ = this.route.paramMap.pipe(
     map(pm => pm.get('id')),
@@ -76,27 +75,13 @@ export class SiteDetails {
     await this.router.navigate(['/sites']);
   }
 
-  startEdit(): void {
-    this.editMode.set(true);
-  }
-
-  cancelEdit(): void {
-    this.editMode.set(false);
-  }
-
-  onDetailsSave(data: { name: string; closedDays: Date[] }): void {
+  onDetailsSave(data: UpdateSiteRequest): void {
     this.site$.pipe(
       take(1),
       switchMap(site => {
         if (!site) {
           return of(null);
         }
-
-        const updated: UpdateSiteRequest = {
-          name: data.name,
-          closedDays: data.closedDays.map(d => d.toISOString()),
-          courts: site.courts.map(c => ({ number: c.number }))
-        };
 
         this.saving.set(true);
         return this.id$.pipe(
@@ -106,13 +91,12 @@ export class SiteDetails {
               this.saving.set(false);
               return of(null);
             }
-            return this.siteService.update(id, updated);
+            return this.siteService.update(id, data);
           })
         );
       }),
       tap(() => {
         this.saving.set(false);
-        this.editMode.set(false);
       }),
       catchError(err => {
         console.error('Failed to save site', err);

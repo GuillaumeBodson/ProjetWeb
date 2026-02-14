@@ -16,11 +16,8 @@
       <div class="p-4 flex flex-col gap-4 max-w-3xl mx-auto">
         <app-site-details-tab
           [site]="site"
-          [editMode]="editMode()"
           [saving]="saving()"
-          (startEdit)="startEdit()"
-          (cancelEdit)="cancelEdit()"
-          (save)="onDetailsSave($event)"
+          (saveSite)="onDetailsSave($event)"
         />
       </div>
     </mat-tab>
