@@ -88,8 +88,9 @@ export class SiteDetailsTabComponent {
     }
 
     const closedDays = this.splitCsv(this.form.controls.closedDays.value)
-      .map(s => s)
-      .filter(s => s.length > 0);
+      .map(value => new Date(value))
+      .filter(date => !Number.isNaN(date.getTime()))
+      .map(date => date.toISOString());
 
     const courts = this.splitCsv(this.form.controls.courts.value)
       .map(courtNum => ({
