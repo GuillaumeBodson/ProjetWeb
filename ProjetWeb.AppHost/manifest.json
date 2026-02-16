@@ -7,7 +7,7 @@
       "image": "mcr.microsoft.com/mssql/server:2025-latest",
       "volumes": [
         {
-          "name": "sqldata",
+          "name": "data",
           "target": "/var/opt/mssql",
           "readOnly": false
         }
@@ -33,6 +33,10 @@
     "sitemanagementdb": {
       "type": "value.v0",
       "connectionString": "{sql.connectionString};Initial Catalog=sitemanagementdb"
+    },
+    "bookingdb": {
+      "type": "value.v0",
+      "connectionString": "{sql.connectionString};Initial Catalog=bookingdb"
     },
     "auth-migrations": {
       "type": "project.v0",
@@ -66,6 +70,23 @@
         "SITEMANAGEMENTDB_URI": "mssql://sa:{sql-password.value}@{sql.bindings.tcp.host}:{sql.bindings.tcp.port}/sitemanagementdb",
         "SITEMANAGEMENTDB_JDBCCONNECTIONSTRING": "jdbc:sqlserver://{sql.bindings.tcp.host}:{sql.bindings.tcp.port};trustServerCertificate=true;databaseName=sitemanagementdb",
         "SITEMANAGEMENTDB_DATABASENAME": "sitemanagementdb"
+      }
+    },
+    "booking-migrations": {
+      "type": "project.v0",
+      "path": "../Booking.MigrationService/Booking.MigrationService.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ConnectionStrings__bookingdb": "{bookingdb.connectionString}",
+        "BOOKINGDB_HOST": "{sql.bindings.tcp.host}",
+        "BOOKINGDB_PORT": "{sql.bindings.tcp.port}",
+        "BOOKINGDB_USERNAME": "sa",
+        "BOOKINGDB_PASSWORD": "{sql-password.value}",
+        "BOOKINGDB_URI": "mssql://sa:{sql-password.value}@{sql.bindings.tcp.host}:{sql.bindings.tcp.port}/bookingdb",
+        "BOOKINGDB_JDBCCONNECTIONSTRING": "jdbc:sqlserver://{sql.bindings.tcp.host}:{sql.bindings.tcp.port};trustServerCertificate=true;databaseName=bookingdb",
+        "BOOKINGDB_DATABASENAME": "bookingdb"
       }
     },
     "authservice": {
@@ -130,6 +151,37 @@
         }
       }
     },
+    "bookingservice": {
+      "type": "project.v0",
+      "path": "../BookingService.API/Booking.API.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "HTTP_PORTS": "{bookingservice.bindings.http.targetPort}",
+        "ConnectionStrings__bookingdb": "{bookingdb.connectionString}",
+        "BOOKINGDB_HOST": "{sql.bindings.tcp.host}",
+        "BOOKINGDB_PORT": "{sql.bindings.tcp.port}",
+        "BOOKINGDB_USERNAME": "sa",
+        "BOOKINGDB_PASSWORD": "{sql-password.value}",
+        "BOOKINGDB_URI": "mssql://sa:{sql-password.value}@{sql.bindings.tcp.host}:{sql.bindings.tcp.port}/bookingdb",
+        "BOOKINGDB_JDBCCONNECTIONSTRING": "jdbc:sqlserver://{sql.bindings.tcp.host}:{sql.bindings.tcp.port};trustServerCertificate=true;databaseName=bookingdb",
+        "BOOKINGDB_DATABASENAME": "bookingdb"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    },
     "apigateway": {
       "type": "project.v0",
       "path": "../ApiGateway/ApiGateway.csproj",
@@ -146,7 +198,11 @@
         "SITEMANAGEMENT_HTTP": "{sitemanagement.bindings.http.url}",
         "services__sitemanagement__http__0": "{sitemanagement.bindings.http.url}",
         "SITEMANAGEMENT_HTTPS": "{sitemanagement.bindings.https.url}",
-        "services__sitemanagement__https__0": "{sitemanagement.bindings.https.url}"
+        "services__sitemanagement__https__0": "{sitemanagement.bindings.https.url}",
+        "BOOKINGSERVICE_HTTP": "{bookingservice.bindings.http.url}",
+        "services__bookingservice__http__0": "{bookingservice.bindings.http.url}",
+        "BOOKINGSERVICE_HTTPS": "{bookingservice.bindings.https.url}",
+        "services__bookingservice__https__0": "{bookingservice.bindings.https.url}"
       },
       "bindings": {
         "http": {

@@ -33,6 +33,13 @@
       },
       "sitemanagement": {
         "ConnectionStrings__sitemanagementdb": "T2racerPclpCmIbZS43ezKp7sWEcLjn5hXuhRmLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52Ta\u002BZitmBQgUj0t5VeDTSwA=="
+      },
+      "bookingdb": {},
+      "booking-migrations": {
+        "ConnectionStrings__bookingdb": "T2racerPclpCmIbZ7vXMD4E0zAn8t6kWLDSxPmLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52XKmChN2OSwAm"
+      },
+      "bookingservice": {
+        "ConnectionStrings__bookingdb": "T2racerPclpCmIbZ7vXMD4E0zAn8t6kWLDSxPmLqT8u4f3tDgV/jo3tsXOnmgH\u002BJZ5dMA/tpdoQR5qbEA0fO6wRxKIAhwYI\u002BTyUNHcGGs7KE48/hY\u002Bz1EeZSBfLlhnvawAOiMFq0kj1qoZIMSz006eXEKU37EDxLQ6leEPC0PERnOA52XKmChN2OSwAm"
       }
     }
   },
