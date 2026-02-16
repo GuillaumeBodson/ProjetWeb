@@ -4,6 +4,8 @@
     <ProjectReference Include="..\ApiGateway\ApiGateway.csproj" />
     <ProjectReference Include="..\Authentication.MigrationService\Authentication.MigrationService.csproj" />
     <ProjectReference Include="..\AuthService\Authentication.API.csproj" />
+    <ProjectReference Include="..\BookingService.API\Booking.API.csproj" />
+    <ProjectReference Include="..\Booking.MigrationService\Booking.MigrationService.csproj" />
     <ProjectReference Include="..\SiteManagement.API\SiteManagement.API.csproj" />
     <ProjectReference Include="..\SiteManagement.MigrationService\SiteManagement.MigrationService.csproj" />
   </ItemGroup>

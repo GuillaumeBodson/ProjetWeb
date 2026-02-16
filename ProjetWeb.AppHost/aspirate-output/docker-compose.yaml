@@ -17,7 +17,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "sql"
     volumes:
-    - "sqldata:/var/opt/mssql"
+    - "data:/var/opt/mssql"
     ports:
     - target: 1433
       published: 14330
@@ -57,6 +57,24 @@ services:
       SITEMANAGEMENTDB_DATABASENAME: "sitemanagementdb"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "site-migrations"
+    restart: unless-stopped
+  booking-migrations:
+    container_name: "booking-migrations"
+    image: "booking-migrations:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ConnectionStrings__bookingdb: "Server=sql,14330;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=bookingdb"
+      BOOKINGDB_HOST: "sql"
+      BOOKINGDB_PORT: "14330"
+      BOOKINGDB_USERNAME: "sa"
+      BOOKINGDB_PASSWORD: "Znng7j3ORPTvgHAhf00m6e"
+      BOOKINGDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:14330/bookingdb"
+      BOOKINGDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:14330;trustServerCertificate=true;databaseName=bookingdb"
+      BOOKINGDB_DATABASENAME: "bookingdb"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "booking-migrations"
     restart: unless-stopped
   authservice:
     container_name: "authservice"
@@ -108,6 +126,31 @@ services:
     - target: 8443
       published: 10003
     restart: unless-stopped
+  bookingservice:
+    container_name: "bookingservice"
+    image: "bookingservice:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      ConnectionStrings__bookingdb: "Server=sql,14330;User ID=sa;Password=Znng7j3ORPTvgHAhf00m6e;TrustServerCertificate=true;Initial Catalog=bookingdb"
+      BOOKINGDB_HOST: "sql"
+      BOOKINGDB_PORT: "14330"
+      BOOKINGDB_USERNAME: "sa"
+      BOOKINGDB_PASSWORD: "Znng7j3ORPTvgHAhf00m6e"
+      BOOKINGDB_URI: "mssql://sa:Znng7j3ORPTvgHAhf00m6e@sql:14330/bookingdb"
+      BOOKINGDB_JDBCCONNECTIONSTRING: "jdbc:sqlserver://sql:14330;trustServerCertificate=true;databaseName=bookingdb"
+      BOOKINGDB_DATABASENAME: "bookingdb"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_SERVICE_NAME: "bookingservice"
+    ports:
+    - target: 8080
+      published: 10004
+    - target: 8443
+      published: 10005
+    restart: unless-stopped
   apigateway:
     container_name: "apigateway"
     image: "apigateway:latest"
@@ -121,13 +164,15 @@ services:
       services__authservice__http__0: "http://authservice:8080"
       SITEMANAGEMENT_HTTP: "http://sitemanagement:8080"
       services__sitemanagement__http__0: "http://sitemanagement:8080"
+      BOOKINGSERVICE_HTTP: "http://bookingservice:8080"
+      services__bookingservice__http__0: "http://bookingservice:8080"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
       OTEL_SERVICE_NAME: "apigateway"
     ports:
     - target: 8080
-      published: 10004
+      published: 10006
     - target: 8443
-      published: 10005
+      published: 10007
     restart: unless-stopped
   frontend:
     container_name: "frontend"
@@ -143,4 +188,4 @@ services:
       published: 4200
     restart: unless-stopped
 volumes:
-  sqldata: {}
+  data: {}

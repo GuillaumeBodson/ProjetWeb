@@ -16,6 +16,9 @@ var authDb = sqlServer.AddDatabase("authdb");
 // Site Management database
 var siteManagementDb = sqlServer.AddDatabase("sitemanagementdb");
 
+// Booking database
+var bookingDb = sqlServer.AddDatabase("bookingdb");
+
 // Authentication migration service
 var authMigrationService = builder.AddProject<Projects.Authentication_MigrationService>("auth-migrations")
     .WithReference(authDb)
@@ -25,6 +28,11 @@ var authMigrationService = builder.AddProject<Projects.Authentication_MigrationS
 var siteMigrationService = builder.AddProject<Projects.SiteManagement_MigrationService>("site-migrations")
     .WithReference(siteManagementDb)
     .WaitFor(siteManagementDb);
+
+// Booking migration service
+var bookingMigrationService = builder.AddProject<Projects.Booking_MigrationService>("booking-migrations")
+    .WithReference(bookingDb)
+    .WaitFor(bookingDb);
 
 // Authentication API
 var authApi = builder.AddProject<Projects.Authentication_API>("authservice")
@@ -38,12 +46,20 @@ var siteManagementApi = builder.AddProject<Projects.SiteManagement_API>("siteman
     .WaitFor(siteManagementDb)
     .WaitForCompletion(siteMigrationService);
 
+// Booking API
+var bookingApi = builder.AddProject<Projects.Booking_API>("bookingservice")
+    .WithReference(bookingDb) // Inject connection string automatically
+    .WaitFor(bookingDb)
+    .WaitForCompletion(bookingMigrationService);
+
 // Add API Gateway with reference to backend services
 var apiGateway = builder.AddProject<Projects.ApiGateway>("apigateway")
     .WithReference(authApi)
     .WithReference(siteManagementApi)
+    .WithReference(bookingApi)
     .WaitFor(authApi)
-    .WaitFor(siteManagementApi);
+    .WaitFor(siteManagementApi)
+    .WaitFor(bookingApi);
 
 // Add the Angular frontend and reference the API Gateway
 var frontend = builder.AddJavaScriptApp("frontend", "../ProjetWeb.Frontend", "start")

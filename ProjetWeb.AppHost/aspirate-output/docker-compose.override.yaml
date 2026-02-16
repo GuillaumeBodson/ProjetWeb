@@ -28,6 +28,16 @@ services:
       site-migrations:
         condition: service_completed_successfully
 
+  booking-migrations:
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: "no"  # Run once and exit
+  bookingservice:
+    depends_on:
+      booking-migrations:
+        condition: service_completed_successfully
+
   frontend:    
     build:
       context: ../../ProjetWeb.Frontend
