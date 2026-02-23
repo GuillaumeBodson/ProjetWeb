@@ -18,7 +18,7 @@
           </td>
           @for (day of days; track day.id) {
             <td [ngClass]="classMap.slotCell">
-              @if (day.startTime; as hasStartTime) {
+              @if (day.startTime) {
                 @if (getTimeSlotForIndex(day, slotIndex); as timeSlot) {
                   <button
                     [class.available]="timeSlot.isAvailable"
