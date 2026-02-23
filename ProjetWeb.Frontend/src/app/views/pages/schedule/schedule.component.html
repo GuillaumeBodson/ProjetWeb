@@ -76,7 +76,7 @@
     <!-- Schedule Display -->
     @if (isSiteSelected() && !loading() && siteDetails(); as site) {
       <app-weekly-planner
-        [plannedDays]="filteredSchedule()"
+        [plannedDays]="siteDetails()?.schedule??[]"
         [weekNumber]="selectedWeekNumber()"
         [canGoToPreviousWeek]="canGoToPreviousWeek()"
         [canGoToNextWeek]="canGoToNextWeek()"

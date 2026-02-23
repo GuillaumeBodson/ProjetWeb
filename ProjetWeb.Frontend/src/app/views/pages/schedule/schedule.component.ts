@@ -39,17 +39,6 @@ export class ScheduleComponent implements OnInit {
   error = signal<string | null>(null);
   selectedWeekNumber = signal<number>(this.getCurrentISOWeek());
 
-  // Computed values
-  filteredSchedule = computed(() => {
-    const details = this.siteDetails();
-
-    if (!details) return [];
-
-    return details.schedule.filter(
-      (plannedDay: PlannedDayResponse) => plannedDay.id // Assuming we need all days for the week
-    );
-  });
-
   canGoToPreviousWeek = computed(() => this.selectedWeekNumber() > 1);
   canGoToNextWeek = computed(() => this.selectedWeekNumber() < 53);
 
