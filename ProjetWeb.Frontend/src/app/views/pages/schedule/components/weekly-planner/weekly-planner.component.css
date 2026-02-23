@@ -263,10 +263,6 @@
     &.paid {
       background-color: #2196f3 !important;
     }
-
-    &.plaid {
-      background-color: #9c27b0 !important;
-    }
   }
 
   &:disabled {
