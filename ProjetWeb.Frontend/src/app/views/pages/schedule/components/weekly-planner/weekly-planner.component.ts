@@ -63,10 +63,13 @@ export class WeeklyPlannerComponent implements OnChanges {
   });
 
   /**
-   * Handle input changes - reset day index when planned days change
+   * Handle input changes - reset day index when planned days or week number change
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['plannedDays'] && !changes['plannedDays'].firstChange) {
+    const plannedDaysChanged = changes['plannedDays'] && !changes['plannedDays'].firstChange;
+    const weekNumberChanged = changes['weekNumber'] && !changes['weekNumber'].firstChange;
+
+    if (plannedDaysChanged || weekNumberChanged) {
       this.currentDayPairIndex.set(0);
     }
   }

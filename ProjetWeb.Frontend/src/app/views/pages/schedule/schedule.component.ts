@@ -55,7 +55,6 @@ export class ScheduleComponent implements OnInit {
     nearestThursday.setDate(now.getDate() - now.getDay() + 4); // Thursday
 
     const yearStart = new Date(nearestThursday.getFullYear(), 0, 1);
-    nearestThursday.setDate(nearestThursday.getDate() - nearestThursday.getDay() + 4);
 
     const diff = nearestThursday.getTime() - yearStart.getTime();
     const oneWeek = 1000 * 60 * 60 * 24 * 7;
