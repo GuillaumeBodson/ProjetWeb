@@ -51,6 +51,7 @@ export class ScheduleTableComponent {
   @Input() slotIndices: number[] = [];
   @Input() slotDurationMinutes = 105;
   @Input() classMap: ScheduleTableClassMap = DEFAULT_CLASS_MAP;
+  @Input() weekNumber: number = 1;
 
   getDayOfWeekName(dayOfWeek: DayOfWeek): string {
     const dayNames: Record<DayOfWeek, string> = {
