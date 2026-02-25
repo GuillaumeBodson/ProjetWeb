@@ -30,22 +30,6 @@ public class SiteService(
         return SiteMapper.ToResponseDetails(site);
     }
 
-    public async Task<SiteDetailsResponse?> GetSiteScheduleAsync(Guid siteId, CancellationToken cancellationToken = default)
-    {
-        var currentWeekNumber = ISOWeek.GetWeekOfYear(DateTime.UtcNow);
-        var site = await context.Sites
-            .Include(s => s.Courts)
-            .Include(s => s.PlannedDays)
-                .ThenInclude(pd => pd.TimeSlots.Where(ts => ts.WeekNumber >= currentWeekNumber))
-            .FirstOrDefaultAsync(s => s.Id == siteId, cancellationToken);
-
-        if (site is null)
-        {
-            return null;
-        }
-        return SiteMapper.ToResponseDetails(site);
-    }
-
     public async Task<IEnumerable<SiteResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var sites = await context.Sites.Select(s => new SiteResponse(
