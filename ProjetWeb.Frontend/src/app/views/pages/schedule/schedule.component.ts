@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,7 +9,8 @@ import { ScheduleService } from './services/schedule.service';
 import { WeeklyPlannerComponent } from './components/weekly-planner/weekly-planner.component';
 import { PlannedDayResponse } from '../../../core/api/site';
 import { SiteResponse, SiteDetailsResponse } from '../../../core/api/site/model/model-override';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, Subject } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-schedule',
@@ -28,8 +29,10 @@ import { Observable } from 'rxjs';
   styleUrl: './schedule.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScheduleComponent implements OnInit {
+export class ScheduleComponent implements OnInit, OnDestroy {
   private readonly scheduleService = inject(ScheduleService);
+  private readonly siteSelection$ = new Subject<string>();
+  private readonly destroy$ = new Subject<void>();
 
   // Signals
   sites$ = new Observable<SiteResponse[]>();
@@ -44,6 +47,32 @@ export class ScheduleComponent implements OnInit {
 
   ngOnInit(): void {
     this.sites$ = this.scheduleService.getAllSites();
+
+    this.siteSelection$.pipe(
+      switchMap(siteId => {
+        this.loading.set(true);
+        this.error.set(null);
+        return this.scheduleService.getSiteWithSchedule(siteId).pipe(
+          catchError((err: any) => {
+            console.error('Failed to load site schedule:', err);
+            this.error.set('Failed to load site schedule. Please try again.');
+            this.loading.set(false);
+            return EMPTY;
+          })
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe((details: SiteDetailsResponse) => {
+      this.siteDetails.set(details);
+      this.loading.set(false);
+      // Reset to current week when selecting a new site
+      this.selectedWeekNumber.set(this.getCurrentISOWeek());
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
@@ -74,22 +103,7 @@ export class ScheduleComponent implements OnInit {
     }
 
     this.selectedSiteId.set(siteId);
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.scheduleService.getSiteWithSchedule(siteId).subscribe({
-      next: (details: SiteDetailsResponse) => {
-        this.siteDetails.set(details);
-        this.loading.set(false);
-        // Reset to current week when selecting a new site
-        this.selectedWeekNumber.set(this.getCurrentISOWeek());
-      },
-      error: (err: any) => {
-        console.error('Failed to load site schedule:', err);
-        this.error.set('Failed to load site schedule. Please try again.');
-        this.loading.set(false);
-      }
-    });
+    this.siteSelection$.next(siteId);
   }
 
   /**
