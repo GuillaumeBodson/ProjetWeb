@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DayOfWeek, PlannedDayResponse } from '../../../../../core/api/site';
 
@@ -46,12 +46,27 @@ const DEFAULT_CLASS_MAP: ScheduleTableClassMap = {
   styleUrl: './schedule-table.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScheduleTableComponent {
+export class ScheduleTableComponent implements OnChanges {
   @Input() days: PlannedDayResponse[] = [];
   @Input() slotIndices: number[] = [];
   @Input() slotDurationMinutes = 105;
   @Input() classMap: ScheduleTableClassMap = DEFAULT_CLASS_MAP;
   @Input() weekNumber: number = 1;
+
+  private slotCache = new Map<string, TimeSlotUI[]>();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['days'] || changes['weekNumber'] || changes['slotDurationMinutes']) {
+      this.rebuildSlotCache();
+    }
+  }
+
+  private rebuildSlotCache(): void {
+    this.slotCache.clear();
+    for (const day of this.days ?? []) {
+      this.slotCache.set(day.id, this.getTimeSlotUIData(day));
+    }
+  }
 
   getDayOfWeekName(dayOfWeek: DayOfWeek): string {
     const dayNames: Record<DayOfWeek, string> = {
@@ -80,8 +95,8 @@ export class ScheduleTableComponent {
   }
 
   getTimeSlotForIndex(plannedDay: PlannedDayResponse, slotIndex: number): TimeSlotUI | null {
-    const slots = this.getTimeSlotUIData(plannedDay);
-    return slots[slotIndex] || null;
+    const slots = this.slotCache.get(plannedDay.id);
+    return slots?.[slotIndex] ?? null;
   }
 
   getTimeSlotUIData(plannedDay: PlannedDayResponse): TimeSlotUI[] {
