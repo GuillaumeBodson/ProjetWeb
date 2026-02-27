@@ -9,6 +9,7 @@ import { ScheduleService } from './services/schedule.service';
 import { WeeklyPlannerComponent } from './components/weekly-planner/weekly-planner.component';
 import { PlannedDayResponse } from '../../../core/api/site';
 import { SiteResponse, SiteDetailsResponse } from '../../../core/api/site/model/model-override';
+import { getISOWeek } from 'date-fns';
 import { EMPTY, Observable, Subject } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 
@@ -79,17 +80,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
    * Get the current ISO week number
    */
   private getCurrentISOWeek(): number {
-    const now = new Date();
-    const nearestThursday = new Date(now);
-    nearestThursday.setDate(now.getDate() - now.getDay() + 4); // Thursday
-
-    const yearStart = new Date(nearestThursday.getFullYear(), 0, 1);
-
-    const diff = nearestThursday.getTime() - yearStart.getTime();
-    const oneWeek = 1000 * 60 * 60 * 24 * 7;
-    const week = Math.floor(diff / oneWeek) + 1;
-
-    return week;
+    return getISOWeek(new Date());
   }
 
   /**
