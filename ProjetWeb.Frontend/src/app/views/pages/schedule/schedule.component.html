@@ -1,0 +1,100 @@
+<div class="schedule-container min-h-screen bg-gray-100 p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Court Schedule</h1>
+      <p class="text-gray-600">View and manage available court time slots</p>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+        <!-- Site Selector -->
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>Select a Site</mat-label>
+            <mat-select
+              [value]="selectedSiteId()"
+              (selectionChange)="onSiteSelected($event.value)"
+              [disabled]="false"
+            >
+              <mat-option value="">Choose a site...</mat-option>
+              @for (site of (sites$ | async); track site.id) {
+                <mat-option [value]="site.id">{{ site.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Week Navigation -->
+        <div class="flex items-center justify-between gap-4">
+          <button
+            mat-icon-button
+            [disabled]="!canGoToPreviousWeek()"
+            (click)="goToPreviousWeek()"
+            class="week-nav-btn"
+            title="Previous week"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="text-sm font-semibold text-gray-700 whitespace-nowrap">Week {{ selectedWeekNumber() }}</span>
+          <button
+            mat-icon-button
+            [disabled]="!canGoToNextWeek()"
+            (click)="goToNextWeek()"
+            class="week-nav-btn"
+            title="Next week"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="flex justify-center items-center py-12">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+        <p class="text-red-800">{{ error() }}</p>
+        <button
+          mat-button
+          color="primary"
+          (click)="error.set(null)"
+          class="mt-2"
+        >
+          Dismiss
+        </button>
+      </div>
+    }
+
+    <!-- Schedule Display -->
+    @if (isSiteSelected() && !loading() && siteDetails(); as site) {
+      <app-weekly-planner
+        [plannedDays]="siteDetails()?.schedule??[]"
+        [weekNumber]="selectedWeekNumber()"
+        [canGoToPreviousWeek]="canGoToPreviousWeek()"
+        [canGoToNextWeek]="canGoToNextWeek()"
+        (previousWeek)="goToPreviousWeek()"
+        (nextWeek)="goToNextWeek()"
+      ></app-weekly-planner>
+    }
+
+    <!-- No Site Selected -->
+    @if (!isSiteSelected() && !loading()) {
+      <div class="bg-white rounded-lg shadow p-12 text-center">
+        <mat-icon class="text-gray-400 mb-4" style="font-size: 48px; width: 48px; height: 48px;">
+          calendar_today
+        </mat-icon>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">No Site Selected</h2>
+        <p class="text-gray-500">Select a site from the dropdown above to view the schedule</p>
+      </div>
+    }
+  </div>
+</div>
+

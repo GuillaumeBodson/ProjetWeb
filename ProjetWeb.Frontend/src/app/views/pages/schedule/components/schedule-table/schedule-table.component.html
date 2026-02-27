@@ -1,0 +1,46 @@
+<table [ngClass]="classMap.table">
+  <thead>
+    <tr [ngClass]="classMap.headerRow">
+      <th [ngClass]="classMap.timeHeader">Time</th>
+      @for (day of days; track day.id) {
+        <th [ngClass]="classMap.dayHeader">
+          <div [ngClass]="classMap.dayName">{{ getDayOfWeekName(day.dayOfWeek) }}</div>
+        </th>
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @if (days.length > 0 && days[0].startTime) {
+      @for (slotIndex of slotIndices; track slotIndex) {
+        <tr [ngClass]="classMap.slotRow">
+          <td [ngClass]="classMap.timeCell">
+            <div [ngClass]="classMap.timeLabel">{{ getTimeForSlotIndex(days[0].startTime!, slotIndex) }}</div>
+          </td>
+          @for (day of days; track day.id) {
+            <td [ngClass]="classMap.slotCell">
+              @if (day.startTime) {
+                @if (getTimeSlotForIndex(day, slotIndex); as timeSlot) {
+                  <button
+                    [class.available]="timeSlot.isAvailable"
+                    [class.booked]="timeSlot.isBooked"
+                    [class.book-in-progress]="timeSlot.bookState === 'BookInProgress'"
+                    [class.paid]="timeSlot.bookState === 'Paid'"
+                    [class.plaid]="timeSlot.bookState === 'Plaid'"
+                    [disabled]="timeSlot.isBooked"
+                    [title]="timeSlot.isAvailable ? 'Available' : getBookStateName(timeSlot.bookState)"
+                    mat-raised-button
+                    [ngClass]="classMap.slotButton"
+                  >
+                    <span class="block text-xs">{{ timeSlot.startTime }}</span>
+                    <span class="block text-xs">{{ timeSlot.endTime }}</span>
+                  </button>
+                }
+              }
+            </td>
+          }
+        </tr>
+      }
+    }
+  </tbody>
+</table>
+
