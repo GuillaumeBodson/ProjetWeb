@@ -116,7 +116,7 @@ export class ScheduleTableComponent {
       });
     }
 
-    plannedDay.timeSlots.forEach(timeSlot => {
+    plannedDay.timeSlots.filter(ts => ts.weekNumber === this.weekNumber).forEach(timeSlot => {
       const existing = slotMap.get(timeSlot.timeSlotNumber);
       if (existing) {
         existing.isAvailable = false;
