@@ -10,7 +10,7 @@ import { WeeklyPlannerComponent } from './components/weekly-planner/weekly-plann
 import { PlannedDayResponse } from '../../../core/api/site';
 import { SiteResponse, SiteDetailsResponse } from '../../../core/api/site/model/model-override';
 import { getISOWeek } from 'date-fns';
-import { EMPTY, Observable, Subject } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -36,7 +36,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   // Signals
-  sites$ = new Observable<SiteResponse[]>();
+  sites$ = this.scheduleService.getAllSites();
   selectedSiteId = signal<string>('');
   siteDetails = signal<SiteDetailsResponse | null>(null);
   loading = signal(false);
@@ -47,8 +47,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   canGoToNextWeek = computed(() => this.selectedWeekNumber() < 53);
 
   ngOnInit(): void {
-    this.sites$ = this.scheduleService.getAllSites();
-
     this.siteSelection$.pipe(
       switchMap(siteId => {
         this.loading.set(true);
