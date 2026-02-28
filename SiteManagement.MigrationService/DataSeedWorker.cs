@@ -15,12 +15,12 @@ public class DataSeedWorker(
         var pipeline = new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions
             {
-                MaxRetryAttempts = 3,
-                Delay = TimeSpan.FromSeconds(2),
-                BackoffType = DelayBackoffType.Linear,
+                MaxRetryAttempts = 5,
+                Delay = TimeSpan.FromSeconds(5),
+                BackoffType = DelayBackoffType.Exponential,
                 OnRetry = args =>
                 {
-                    logger.LogWarning("Seeding failed, retrying in {Delay}...", args.RetryDelay);
+                    logger.LogWarning("Seeding attempt failed, retrying in {Delay}...", args.RetryDelay);
                     return ValueTask.CompletedTask;
                 }
             })
@@ -28,34 +28,22 @@ public class DataSeedWorker(
 
         await pipeline.ExecuteAsync(async token =>
         {
-            logger.LogInformation("Starting data seeding...");
+            logger.LogInformation("Starting data seeding for SiteManagementDbContext...");
 
             await using var scope = serviceProvider.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<SiteManagementDbContext>();
 
-            // Ensure database is ready
-            var canConnect = await dbContext.Database.CanConnectAsync(token);
-            if (!canConnect)
-            {
-                throw new InvalidOperationException("Unable to connect to the site management database.");
-            }
+            // MigrateAsync is idempotent:
+            //   - creates the database if it does not exist (via master)
+            //   - applies any pending migrations
+            //   - is a no-op when already up to date
+            // This removes the race condition against SqlServerMigrationWorker.
+            await dbContext.Database.MigrateAsync(token);
 
-            // Ensure all migrations are applied before seeding
-            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
-
-            while (pendingMigrations.Any())
-            {
-                logger.LogWarning("Pending migrations detected. Waiting for migrations to complete...");
-                await Task.Delay(TimeSpan.FromSeconds(5), token);
-                pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
-            }
-
-            // Run seeder
             var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
             await seeder.SeedAsync();
 
             logger.LogInformation("Data seeding completed successfully");
-
         }, stoppingToken);
 
         lifetime.StopApplication();

@@ -12,8 +12,9 @@ builder.Services.AddOptions<MigrationOptions>().BindConfiguration(MigrationOptio
 
 builder.Services.AddScoped<DataSeeder>();
 
-// Register workers - DataSeedWorker checks for pending migrations before seeding
-builder.Services.AddHostedService<SqlServerMigrationWorker<SiteManagementDbContext>>();
+// DataSeedWorker handles both migration (MigrateAsync) and seeding in sequence.
+// SqlServerMigrationWorker is intentionally not registered here to avoid
+// a race condition where StopApplication() is called before seeding completes.
 builder.Services.AddHostedService<DataSeedWorker>();
 
 var app = builder.Build();

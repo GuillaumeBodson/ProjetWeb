@@ -21,7 +21,7 @@ public class CourtConfiguration : IEntityTypeConfiguration<Court>
         builder.HasMany(c => c.TimeSlots)
             .WithOne(ts => ts.Court)
             .HasForeignKey(ts => ts.CourtId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         builder.HasIndex(c => new { c.SiteId, c.Number })
             .IsUnique();

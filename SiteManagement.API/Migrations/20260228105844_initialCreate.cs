@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SiteManagement.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,7 +52,7 @@ namespace SiteManagement.API.Migrations
                     SiteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DayOfWeek = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     NumberOfTimeSlots = table.Column<int>(type: "int", maxLength: 2, nullable: false),
-                    StartTime = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    StartTime = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,8 +83,7 @@ namespace SiteManagement.API.Migrations
                         name: "FK_TimeSlots_Courts_CourtId",
                         column: x => x.CourtId,
                         principalTable: "Courts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TimeSlots_PlannedDays_PlannedDayId",
                         column: x => x.PlannedDayId,

@@ -154,7 +154,7 @@ namespace SiteManagement.API.Migrations
                     b.HasOne("SiteManagement.API.DAL.Entities.Court", "Court")
                         .WithMany("TimeSlots")
                         .HasForeignKey("CourtId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("SiteManagement.API.DAL.Entities.PlannedDay", "PlannedDay")
