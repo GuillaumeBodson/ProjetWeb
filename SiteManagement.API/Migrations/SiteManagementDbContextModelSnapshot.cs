@@ -112,16 +112,21 @@ namespace SiteManagement.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("TimeSlotNumber")
+                        .HasMaxLength(3)
                         .HasColumnType("int");
 
                     b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasMaxLength(4)
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourtId");
 
-                    b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber")
+                    b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber", "Year")
                         .IsUnique();
 
                     b.ToTable("TimeSlots");

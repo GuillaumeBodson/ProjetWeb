@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SiteManagement.API.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,9 +72,10 @@ namespace SiteManagement.API.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PlannedDayId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CourtId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TimeSlotNumber = table.Column<int>(type: "int", nullable: false),
+                    TimeSlotNumber = table.Column<int>(type: "int", maxLength: 3, nullable: false),
                     BookState = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WeekNumber = table.Column<int>(type: "int", nullable: false)
+                    WeekNumber = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", maxLength: 4, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,9 +116,9 @@ namespace SiteManagement.API.Migrations
                 column: "CourtId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeSlots_PlannedDayId_TimeSlotNumber_CourtId_WeekNumber",
+                name: "IX_TimeSlots_PlannedDayId_TimeSlotNumber_CourtId_WeekNumber_Year",
                 table: "TimeSlots",
-                columns: new[] { "PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber" },
+                columns: new[] { "PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber", "Year" },
                 unique: true);
         }
 

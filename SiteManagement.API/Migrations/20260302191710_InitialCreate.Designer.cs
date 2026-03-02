@@ -12,8 +12,8 @@ using SiteManagement.API.DAL;
 namespace SiteManagement.API.Migrations
 {
     [DbContext(typeof(SiteManagementDbContext))]
-    [Migration("20260228105844_initialCreate")]
-    partial class initialCreate
+    [Migration("20260302191710_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -115,16 +115,21 @@ namespace SiteManagement.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("TimeSlotNumber")
+                        .HasMaxLength(3)
                         .HasColumnType("int");
 
                     b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasMaxLength(4)
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourtId");
 
-                    b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber")
+                    b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber", "Year")
                         .IsUnique();
 
                     b.ToTable("TimeSlots");
