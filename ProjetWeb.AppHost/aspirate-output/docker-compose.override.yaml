@@ -8,37 +8,72 @@ services:
       start_period: 30s
 
   auth-migrations:
+    build:
+      context: ../../
+      dockerfile: Authentication.MigrationService/Dockerfile
     depends_on:
       sql:
         condition: service_healthy
-    restart: "no"  # Run once and exit
+    restart: "no"
+
+  site-migrations:
+    build:
+      context: ../../
+      dockerfile: SiteManagement.MigrationService/Dockerfile
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: "no"
+
+  booking-migrations:
+    build:
+      context: ../../
+      dockerfile: Booking.MigrationService/Dockerfile
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: "no"
 
   authservice:
+    build:
+      context: ../../
+      dockerfile: AuthService/Dockerfile
     depends_on:
       auth-migrations:
         condition: service_completed_successfully
 
-  site-migrations:
-    depends_on:
-      sql:
-        condition: service_healthy
-    restart: "no"  # Run once and exit
-  sitemanagementservice:
+  sitemanagement:
+    build:
+      context: ../../
+      dockerfile: SiteManagement.API/Dockerfile
     depends_on:
       site-migrations:
         condition: service_completed_successfully
 
-  booking-migrations:
-    depends_on:
-      sql:
-        condition: service_healthy
-    restart: "no"  # Run once and exit
   bookingservice:
+    build:
+      context: ../../
+      dockerfile: BookingService.API/Dockerfile
     depends_on:
       booking-migrations:
         condition: service_completed_successfully
 
-  frontend:    
+  apigateway:
+    build:
+      context: ../../
+      dockerfile: ApiGateway/Dockerfile
+    depends_on:
+      authservice:
+        condition: service_started
+      sitemanagement:
+        condition: service_started
+      bookingservice:
+        condition: service_started
+
+  frontend:
     build:
       context: ../../ProjetWeb.Frontend
       dockerfile: Dockerfile
+    depends_on:
+      apigateway:
+        condition: service_started
