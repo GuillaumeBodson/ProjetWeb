@@ -46,6 +46,21 @@ public class SitesController(ISiteService siteService) : ControllerBase
         return Ok(page);
     }
 
+    [HttpGet("{siteId:guid}/schedule")]
+    [ProducesResponseType<List<TimeSlotResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetSchedule(Guid siteId, int? weekNumber, int numberOfWeeks, CancellationToken cancellationToken)
+    {
+        var schedule = await siteService.GetSiteScheduleAsync(siteId, weekNumber, numberOfWeeks, cancellationToken);
+        
+        if (schedule is null)
+        {
+            return NotFound();
+        }
+        return Ok(schedule);
+    }
+
     [HttpPost]
     [ProducesResponseType<SiteDetailsResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]

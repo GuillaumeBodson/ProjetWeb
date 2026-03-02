@@ -21,7 +21,6 @@ public class SiteService(
                 .ThenInclude(pd => pd.TimeSlots)
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
-
         if (site is null)
         {
             return null;
@@ -30,20 +29,51 @@ public class SiteService(
         return SiteMapper.ToResponseDetails(site);
     }
 
-    public async Task<SiteDetailsResponse?> GetSiteScheduleAsync(Guid siteId, CancellationToken cancellationToken = default)
+    public async Task<List<TimeSlotResponse>> GetSiteScheduleAsync(Guid siteId, int? weekNumber = null, int numberOfWeeks = 1, CancellationToken cancellationToken = default)
     {
-        var currentWeekNumber = ISOWeek.GetWeekOfYear(DateTime.UtcNow);
-        var site = await context.Sites
-            .Include(s => s.Courts)
-            .Include(s => s.PlannedDays)
-                .ThenInclude(pd => pd.TimeSlots.Where(ts => ts.WeekNumber >= currentWeekNumber))
-            .FirstOrDefaultAsync(s => s.Id == siteId, cancellationToken);
+        var now = DateTime.UtcNow;
+        var currentYear = now.Year;
+        var currentWeekNumber = ISOWeek.GetWeekOfYear(now);
 
-        if (site is null)
+        var weekNumberFrom = weekNumber ?? currentWeekNumber;
+
+        // A week number below the current one means it already passed this year → it targets next year
+        var yearFrom = weekNumberFrom >= currentWeekNumber ? currentYear : currentYear + 1;
+
+        var weekNumberTo = weekNumberFrom + numberOfWeeks;
+        var maxWeeksInFromYear = ISOWeek.GetWeeksInYear(yearFrom);
+
+        int yearTo;
+        if (weekNumberTo > maxWeeksInFromYear)
         {
-            return null;
+            weekNumberTo -= maxWeeksInFromYear;
+            yearTo = yearFrom + 1;
         }
-        return SiteMapper.ToResponseDetails(site);
+        else
+        {
+            yearTo = yearFrom;
+        }
+
+        // Composite key (year * 100 + weekNumber) enables correct cross-year range filtering
+        // Safe because ISO week numbers are always 1–53
+        var fromKey = yearFrom * 100 + weekNumberFrom;
+        var toKey = yearTo * 100 + weekNumberTo;
+
+        var timeSlots = await context.TimeSlots
+            .Include(ts => ts.PlannedDay)
+            .Where(ts => ts.PlannedDay.SiteId == siteId &&
+                ts.Year * 100 + ts.WeekNumber >= fromKey &&
+                ts.Year * 100 + ts.WeekNumber <= toKey)
+            .Select(ts => new TimeSlotResponse(
+                ts.Id,
+                ts.TimeSlotNumber,
+                ts.CourtId,
+                ts.WeekNumber,
+                ts.BookState,
+                TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, ts.PlannedDay.StartTime, ts.PlannedDay.DayOfWeek, ts.Year)))
+            .ToListAsync(cancellationToken);
+
+        return timeSlots;
     }
 
     public async Task<IEnumerable<SiteResponse>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -340,6 +370,6 @@ public class SiteService(
             timeSlot.CourtId,
             timeSlot.WeekNumber,
             timeSlot.BookState,
-            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek));
+            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek, timeSlot.Year));
     }
 }

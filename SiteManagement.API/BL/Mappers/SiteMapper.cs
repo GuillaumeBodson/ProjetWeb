@@ -28,7 +28,7 @@ public static class SiteMapper
                         ts.CourtId,
                         ts.WeekNumber,
                         ts.BookState,
-                        TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, pd.StartTime, pd.DayOfWeek)))
+                        TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, pd.StartTime, pd.DayOfWeek, ts.Year)))
                     .ToList()
             ))
             .ToList();
