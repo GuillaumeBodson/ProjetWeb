@@ -13,9 +13,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AuthService\Authentication.API.csproj" />
-    <ProjectReference Include="..\SiteManagement.MigrationService\SiteManagement.MigrationService.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AuthService\Authentication.API.csproj" />
+		<ProjectReference Include="..\ProjetWeb.Shared.Migration\ProjetWeb.Shared.Migration.csproj" />
+		<ProjectReference Include="..\ProjetWeb.ServiceDefaults\ProjetWeb.ServiceDefaults.csproj" />
+	</ItemGroup>
 
 </Project>

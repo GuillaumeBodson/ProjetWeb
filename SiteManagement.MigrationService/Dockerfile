@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/runtime:10.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
 
@@ -8,14 +8,19 @@ WORKDIR /src
 COPY ["SiteManagement.MigrationService/SiteManagement.MigrationService.csproj", "SiteManagement.MigrationService/"]
 COPY ["SiteManagement.API/SiteManagement.API.csproj", "SiteManagement.API/"]
 COPY ["ProjetWeb.ServiceDefaults/ProjetWeb.ServiceDefaults.csproj", "ProjetWeb.ServiceDefaults/"]
+COPY ["ProjetWeb.Shared/ProjetWeb.Shared.csproj", "ProjetWeb.Shared/"]
+COPY ["ProjetWeb.Shared.Migration/ProjetWeb.Shared.Migration.csproj", "ProjetWeb.Shared.Migration/"]
 RUN dotnet restore "./SiteManagement.MigrationService/SiteManagement.MigrationService.csproj"
 COPY . .
 WORKDIR "/src/SiteManagement.MigrationService"
-RUN dotnet build "./SiteManagement.MigrationService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./SiteManagement.MigrationService.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:OpenApiGenerateDocuments=false
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SiteManagement.MigrationService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./SiteManagement.MigrationService.csproj" -c $BUILD_CONFIGURATION -o /app/publish \
+    /p:UseAppHost=false \
+    /p:OpenApiGenerateDocuments=false \
+    /p:ErrorOnDuplicatePublishOutputFiles=false
 
 FROM base AS final
 WORKDIR /app

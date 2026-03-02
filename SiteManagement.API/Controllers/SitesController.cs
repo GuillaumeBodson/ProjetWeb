@@ -6,6 +6,7 @@ using ToolBox.EntityFramework.Filters;
 
 namespace SiteManagement.API.Controllers;
 
+[AllowAnonymous] // Remove this attribute when authentication is properly implemented
 [ApiController]
 [Route("api/[controller]")]
 public class SitesController(ISiteService siteService) : ControllerBase

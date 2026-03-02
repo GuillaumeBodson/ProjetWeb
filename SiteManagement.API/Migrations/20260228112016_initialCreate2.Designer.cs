@@ -12,8 +12,8 @@ using SiteManagement.API.DAL;
 namespace SiteManagement.API.Migrations
 {
     [DbContext(typeof(SiteManagementDbContext))]
-    [Migration("20260209073524_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260228112016_initialCreate2")]
+    partial class initialCreate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,7 +63,6 @@ namespace SiteManagement.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("StartTime")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -158,7 +157,7 @@ namespace SiteManagement.API.Migrations
                     b.HasOne("SiteManagement.API.DAL.Entities.Court", "Court")
                         .WithMany("TimeSlots")
                         .HasForeignKey("CourtId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("SiteManagement.API.DAL.Entities.PlannedDay", "PlannedDay")

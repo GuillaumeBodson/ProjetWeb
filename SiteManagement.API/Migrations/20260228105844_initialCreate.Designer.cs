@@ -12,8 +12,8 @@ using SiteManagement.API.DAL;
 namespace SiteManagement.API.Migrations
 {
     [DbContext(typeof(SiteManagementDbContext))]
-    [Migration("20260214101951_MakeStartTimeNullable")]
-    partial class MakeStartTimeNullable
+    [Migration("20260228105844_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -157,7 +157,7 @@ namespace SiteManagement.API.Migrations
                     b.HasOne("SiteManagement.API.DAL.Entities.Court", "Court")
                         .WithMany("TimeSlots")
                         .HasForeignKey("CourtId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("SiteManagement.API.DAL.Entities.PlannedDay", "PlannedDay")

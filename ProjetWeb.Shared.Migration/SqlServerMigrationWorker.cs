@@ -9,7 +9,7 @@ using Polly.Retry;
 namespace ProjetWeb.Shared.Migration;
 
 public class SqlServerMigrationWorker<TDbContext>(IOptions<MigrationOptions> migrationOptions, IServiceProvider serviceProvider, IHostApplicationLifetime lifetime, ILogger<SqlServerMigrationWorker<TDbContext>> logger) : BackgroundService
-where TDbContext : DbContext
+    where TDbContext : DbContext
 {
     private readonly MigrationOptions _migrationOptions = migrationOptions?.Value ?? new MigrationOptions();
 
@@ -31,30 +31,18 @@ where TDbContext : DbContext
 
         await pipeline.ExecuteAsync(async token =>
         {
-            logger.LogInformation("Starting database migration...");
+            logger.LogInformation("Starting database migration for {DbContext}...", typeof(TDbContext).Name);
 
             await using var scope = serviceProvider.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-            // Ensure database is created and can connect
-            var canConnect = await dbContext.Database.CanConnectAsync(token);
-            if (!canConnect)
-            {
-                throw new InvalidOperationException($"Unable to connect to the {typeof(TDbContext).Name} database.");
-            }
+            // MigrateAsync handles everything:
+            //   - creates the database if it does not exist (via master)
+            //   - applies all pending migrations
+            //   - is a no-op when already up to date
+            await dbContext.Database.MigrateAsync(token);
 
-            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(token);
-
-            if (pendingMigrations.Any())
-            {
-                logger.LogInformation("Applying {Count} pending migrations", pendingMigrations.Count());
-                await dbContext.Database.MigrateAsync(token);
-                logger.LogInformation("Migrations applied successfully");
-            }
-            else
-            {
-                logger.LogInformation("No pending migrations");
-            }
+            logger.LogInformation("Migration completed successfully for {DbContext}", typeof(TDbContext).Name);
         }, stoppingToken);
 
         if (_migrationOptions.StopAfterExecution)
