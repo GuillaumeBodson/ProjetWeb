@@ -33,12 +33,16 @@ public class DataSeedWorker(
             await using var scope = serviceProvider.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<SiteManagementDbContext>();
 
-            // MigrateAsync is idempotent:
-            //   - creates the database if it does not exist (via master)
-            //   - applies any pending migrations
-            //   - is a no-op when already up to date
-            // This removes the race condition against SqlServerMigrationWorker.
-            await dbContext.Database.MigrateAsync(token);
+
+            try
+            {
+                await dbContext.Database.MigrateAsync(token);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Database migration failed.");
+                throw;
+            }
 
             var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
             await seeder.SeedAsync();

@@ -132,6 +132,44 @@ namespace SiteManagement.API.Migrations
                     b.ToTable("TimeSlots");
                 });
 
+            modelBuilder.Entity("SiteManagement.API.DAL.Entities.TimeSlotHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ArchivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CourtId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FinalBookState")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PlannedDayId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TimeSlotNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourtId", "Year", "WeekNumber");
+
+                    b.ToTable("TimeSlotHistory", (string)null);
+                });
+
             modelBuilder.Entity("SiteManagement.API.DAL.Entities.Court", b =>
                 {
                     b.HasOne("SiteManagement.API.DAL.Entities.Site", "Site")

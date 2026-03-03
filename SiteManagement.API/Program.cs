@@ -6,6 +6,7 @@ using ProjetWeb.Shared.Extensions;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SiteManagement.API.BL.Services;
 using SiteManagement.API.BL.Services.Abstractions;
+using SiteManagement.API.BL.Workers;
 using SiteManagement.API.DAL;
 using System.Text.Json.Serialization;
 using ToolBox.EntityFramework.Filters;
@@ -25,6 +26,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 // Database
 builder.AddSqlServerDbContext<SiteManagementDbContext>("sitemanagementdb");
+
+builder.Services.AddHostedService<TimeSlotArchiveWorker>();
 
 // Add FluentValidation
 builder.Services.AddFilterValidators();

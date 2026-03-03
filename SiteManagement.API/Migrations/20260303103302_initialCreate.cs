@@ -26,6 +26,25 @@ namespace SiteManagement.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TimeSlotHistory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlannedDayId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourtId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TimeSlotNumber = table.Column<int>(type: "int", nullable: false),
+                    FinalBookState = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WeekNumber = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ArchivedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimeSlotHistory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Courts",
                 columns: table => new
                 {
@@ -72,9 +91,10 @@ namespace SiteManagement.API.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PlannedDayId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CourtId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TimeSlotNumber = table.Column<int>(type: "int", nullable: false),
+                    TimeSlotNumber = table.Column<int>(type: "int", maxLength: 3, nullable: false),
                     BookState = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WeekNumber = table.Column<int>(type: "int", nullable: false)
+                    WeekNumber = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", maxLength: 4, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -110,20 +130,28 @@ namespace SiteManagement.API.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TimeSlotHistory_CourtId_Year_WeekNumber",
+                table: "TimeSlotHistory",
+                columns: new[] { "CourtId", "Year", "WeekNumber" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TimeSlots_CourtId",
                 table: "TimeSlots",
                 column: "CourtId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeSlots_PlannedDayId_TimeSlotNumber_CourtId_WeekNumber",
+                name: "IX_TimeSlots_PlannedDayId_TimeSlotNumber_CourtId_WeekNumber_Year",
                 table: "TimeSlots",
-                columns: new[] { "PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber" },
+                columns: new[] { "PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber", "Year" },
                 unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "TimeSlotHistory");
+
             migrationBuilder.DropTable(
                 name: "TimeSlots");
 
