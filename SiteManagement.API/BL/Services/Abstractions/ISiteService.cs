@@ -14,4 +14,5 @@ public interface ISiteService
     Task<PageOf<SiteResponse>> GetPageAsync(PageRequest request, CancellationToken cancellationToken = default);
     Task<SiteDetailsResponse?> UpdateSiteScheduleAsync(Guid siteId, UpdateScheduleRequest request, CancellationToken cancellationToken);
     Task<List<TimeSlotResponse>> GetSiteScheduleAsync(Guid siteId, int? weekNumber = null, int numberOfWeeks = 1, CancellationToken cancellationToken = default);
+    Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
 }

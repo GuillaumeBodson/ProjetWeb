@@ -29,6 +29,11 @@ public class SiteService(
         return SiteMapper.ToResponseDetails(site);
     }
 
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Sites.AnyAsync(s => s.Id == id, cancellationToken);
+    }
+
     public async Task<List<TimeSlotResponse>> GetSiteScheduleAsync(Guid siteId, int? weekNumber = null, int numberOfWeeks = 1, CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -283,9 +288,7 @@ public class SiteService(
 
     public async Task<TimeSlotResponse?> BookTimeSlotAsync(Guid siteId, BookTimeSlotRequest request, CancellationToken cancellationToken = default)
     {
-        // Validate that the site exists
-        var site = await context.Sites.FindAsync([siteId], cancellationToken);
-        if (site is null)
+        if (!await ExistsAsync(siteId, cancellationToken))
         {
             logger.LogWarning("Site {SiteId} not found", siteId);
             return null;
@@ -300,9 +303,9 @@ public class SiteService(
             return null;
         }
 
-        if (plannedDay.StartTime is null)
+        if (plannedDay.StartTime is null || plannedDay.NumberOfTimeSlots <= 0)
         {
-            logger.LogWarning("PlannedDay {PlannedDayId} has no StartTime defined", request.PlannedDayId);
+            logger.LogWarning("Site ({SiteId}) is not open on {DayOfWeek}", siteId, plannedDay.DayOfWeek);
             return null;
         }
 
@@ -316,7 +319,7 @@ public class SiteService(
         }
 
         // Validate time slot number is within range (business rule validation)
-        if (request.TimeSlotNumber < 1 || request.TimeSlotNumber > plannedDay.NumberOfTimeSlots)
+        if (request.TimeSlotNumber > plannedDay.NumberOfTimeSlots)
         {
             logger.LogWarning(
                 "TimeSlotNumber {TimeSlotNumber} is out of range for PlannedDay {PlannedDayId} (max: {Max})",
@@ -335,6 +338,7 @@ public class SiteService(
 
         if (timeSlot is null)
         {
+            var year = request.WeekNumber >= ISOWeek.GetWeekOfYear(DateTime.UtcNow) ? DateTime.UtcNow.Year : DateTime.UtcNow.Year + 1;
             // Create new time slot (business rule: only create when booking is made)
             timeSlot = new TimeSlot
             {
@@ -343,7 +347,8 @@ public class SiteService(
                 CourtId = request.CourtId,
                 TimeSlotNumber = request.TimeSlotNumber,
                 WeekNumber = request.WeekNumber,
-                BookState = request.BookState
+                BookState = request.BookState,
+                Year = year
             };
 
             context.TimeSlots.Add(timeSlot);
