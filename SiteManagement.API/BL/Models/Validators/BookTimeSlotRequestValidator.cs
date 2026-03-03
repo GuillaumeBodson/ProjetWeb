@@ -16,8 +16,8 @@ public class BookTimeSlotRequestValidator : AbstractValidator<BookTimeSlotReques
 
         RuleFor(x => x.TimeSlotNumber)
             .GreaterThan(0)
-            .LessThanOrEqualTo(100)
-            .WithMessage("TimeSlotNumber must be between 1 and 100.");
+            .LessThanOrEqualTo(8)
+            .WithMessage("TimeSlotNumber must be between 1 and 8.");
 
         RuleFor(x => x.WeekNumber)
             .InclusiveBetween(1, 53)

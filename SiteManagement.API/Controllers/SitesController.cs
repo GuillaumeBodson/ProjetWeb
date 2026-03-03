@@ -27,7 +27,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var site = await siteService.GetByIdAsync(id, cancellationToken);
-        
+
         if (site is null)
         {
             return NotFound();
@@ -44,6 +44,34 @@ public class SitesController(ISiteService siteService) : ControllerBase
     {
         var page = await siteService.GetPageAsync(request, cancellationToken);
         return Ok(page);
+    }
+
+    [HttpGet("{siteId:guid}/schedule")]
+    [ProducesResponseType<List<TimeSlotResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetSchedule(Guid siteId, int? weekNumber = null, int numberOfWeeks = 1, CancellationToken cancellationToken = default)
+    {
+        if (weekNumber.HasValue && (weekNumber < 1 || weekNumber > 53))
+        {
+            ModelState.AddModelError(nameof(weekNumber), "Week number must be between 1 and 53.");
+            return ValidationProblem(ModelState);
+        }
+        if (numberOfWeeks < 1 || numberOfWeeks > 52)
+        {
+            ModelState.AddModelError(nameof(numberOfWeeks), "Number of weeks must be between 1 and 52.");
+            return ValidationProblem(ModelState);
+        }
+
+        if (!await siteService.ExistsAsync(siteId, cancellationToken))
+        {
+            return NotFound();
+        }
+
+        var schedule = await siteService.GetSiteScheduleAsync(siteId, weekNumber, numberOfWeeks, cancellationToken);
+
+        return Ok(schedule);
     }
 
     [HttpPost]
@@ -64,7 +92,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSiteRequest request, CancellationToken cancellationToken)
     {
         var site = await siteService.UpdateAsync(id, request, cancellationToken);
-        
+
         if (site is null)
         {
             return NotFound();
@@ -86,7 +114,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
             return ValidationProblem(ModelState);
         }
         var site = await siteService.UpdateSiteScheduleAsync(id, request, cancellationToken);
-        
+
         if (site is null)
         {
             return NotFound();
@@ -101,7 +129,7 @@ public class SitesController(ISiteService siteService) : ControllerBase
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var deleted = await siteService.DeleteAsync(id, cancellationToken);
-        
+
         if (!deleted)
         {
             return NotFound();

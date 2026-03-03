@@ -8,6 +8,7 @@ public class TimeSlot
     public int TimeSlotNumber { get; set; }
     public BookState BookState { get; set; }
     public int WeekNumber { get; set; }
+    public int Year { get; set; } = DateTime.UtcNow.Year;
 
     // Navigation properties
     public PlannedDay PlannedDay { get; set; } = null!;

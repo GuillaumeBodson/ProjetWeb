@@ -17,16 +17,20 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
             .IsRequired();
 
         builder.Property(ts => ts.TimeSlotNumber)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(3);
 
         builder.Property(ts => ts.BookState)
             .IsRequired()
             .HasConversion<string>();
+        builder.Property(ts => ts.Year)
+            .IsRequired()
+            .HasMaxLength(4);
 
         builder.Property(ts => ts.WeekNumber)
             .IsRequired();
 
-        builder.HasIndex(ts => new { ts.PlannedDayId, ts.TimeSlotNumber, ts.CourtId, ts.WeekNumber })
+        builder.HasIndex(ts => new { ts.PlannedDayId, ts.TimeSlotNumber, ts.CourtId, ts.WeekNumber, ts.Year })
             .IsUnique();
     }
 }

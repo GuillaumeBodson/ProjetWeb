@@ -21,7 +21,6 @@ public class SiteService(
                 .ThenInclude(pd => pd.TimeSlots)
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
-
         if (site is null)
         {
             return null;
@@ -30,20 +29,56 @@ public class SiteService(
         return SiteMapper.ToResponseDetails(site);
     }
 
-    public async Task<SiteDetailsResponse?> GetSiteScheduleAsync(Guid siteId, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var currentWeekNumber = ISOWeek.GetWeekOfYear(DateTime.UtcNow);
-        var site = await context.Sites
-            .Include(s => s.Courts)
-            .Include(s => s.PlannedDays)
-                .ThenInclude(pd => pd.TimeSlots.Where(ts => ts.WeekNumber >= currentWeekNumber))
-            .FirstOrDefaultAsync(s => s.Id == siteId, cancellationToken);
+        return await context.Sites.AnyAsync(s => s.Id == id, cancellationToken);
+    }
 
-        if (site is null)
+    public async Task<List<TimeSlotResponse>> GetSiteScheduleAsync(Guid siteId, int? weekNumber = null, int numberOfWeeks = 1, CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        var currentYear = now.Year;
+        var currentWeekNumber = ISOWeek.GetWeekOfYear(now);
+
+        var weekNumberFrom = weekNumber ?? currentWeekNumber;
+
+        // A week number below the current one means it already passed this year → it targets next year
+        var yearFrom = weekNumberFrom >= currentWeekNumber ? currentYear : currentYear + 1;
+
+        var weekNumberTo = weekNumberFrom + numberOfWeeks;
+        var maxWeeksInFromYear = ISOWeek.GetWeeksInYear(yearFrom);
+
+        int yearTo;
+        if (weekNumberTo > maxWeeksInFromYear)
         {
-            return null;
+            weekNumberTo -= maxWeeksInFromYear;
+            yearTo = yearFrom + 1;
         }
-        return SiteMapper.ToResponseDetails(site);
+        else
+        {
+            yearTo = yearFrom;
+        }
+
+        // Composite key (year * 100 + weekNumber) enables correct cross-year range filtering
+        // Safe because ISO week numbers are always 1–53
+        var fromKey = yearFrom * 100 + weekNumberFrom;
+        var toKey = yearTo * 100 + weekNumberTo;
+
+        var timeSlots = await context.TimeSlots
+            .Include(ts => ts.PlannedDay)
+            .Where(ts => ts.PlannedDay.SiteId == siteId &&
+                ts.Year * 100 + ts.WeekNumber >= fromKey &&
+                ts.Year * 100 + ts.WeekNumber <= toKey)
+            .Select(ts => new TimeSlotResponse(
+                ts.Id,
+                ts.TimeSlotNumber,
+                ts.CourtId,
+                ts.WeekNumber,
+                ts.BookState,
+                TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, ts.PlannedDay.StartTime, ts.PlannedDay.DayOfWeek, ts.Year)))
+            .ToListAsync(cancellationToken);
+
+        return timeSlots;
     }
 
     public async Task<IEnumerable<SiteResponse>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -253,9 +288,7 @@ public class SiteService(
 
     public async Task<TimeSlotResponse?> BookTimeSlotAsync(Guid siteId, BookTimeSlotRequest request, CancellationToken cancellationToken = default)
     {
-        // Validate that the site exists
-        var site = await context.Sites.FindAsync([siteId], cancellationToken);
-        if (site is null)
+        if (!await ExistsAsync(siteId, cancellationToken))
         {
             logger.LogWarning("Site {SiteId} not found", siteId);
             return null;
@@ -270,9 +303,9 @@ public class SiteService(
             return null;
         }
 
-        if (plannedDay.StartTime is null)
+        if (plannedDay.StartTime is null || plannedDay.NumberOfTimeSlots <= 0)
         {
-            logger.LogWarning("PlannedDay {PlannedDayId} has no StartTime defined", request.PlannedDayId);
+            logger.LogWarning("Site ({SiteId}) is not open on {DayOfWeek}", siteId, plannedDay.DayOfWeek);
             return null;
         }
 
@@ -286,7 +319,7 @@ public class SiteService(
         }
 
         // Validate time slot number is within range (business rule validation)
-        if (request.TimeSlotNumber < 1 || request.TimeSlotNumber > plannedDay.NumberOfTimeSlots)
+        if (request.TimeSlotNumber > plannedDay.NumberOfTimeSlots)
         {
             logger.LogWarning(
                 "TimeSlotNumber {TimeSlotNumber} is out of range for PlannedDay {PlannedDayId} (max: {Max})",
@@ -305,6 +338,7 @@ public class SiteService(
 
         if (timeSlot is null)
         {
+            var year = request.WeekNumber >= ISOWeek.GetWeekOfYear(DateTime.UtcNow) ? DateTime.UtcNow.Year : DateTime.UtcNow.Year + 1;
             // Create new time slot (business rule: only create when booking is made)
             timeSlot = new TimeSlot
             {
@@ -313,7 +347,8 @@ public class SiteService(
                 CourtId = request.CourtId,
                 TimeSlotNumber = request.TimeSlotNumber,
                 WeekNumber = request.WeekNumber,
-                BookState = request.BookState
+                BookState = request.BookState,
+                Year = year
             };
 
             context.TimeSlots.Add(timeSlot);
@@ -340,6 +375,6 @@ public class SiteService(
             timeSlot.CourtId,
             timeSlot.WeekNumber,
             timeSlot.BookState,
-            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek));
+            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek, timeSlot.Year));
     }
 }

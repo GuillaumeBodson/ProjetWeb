@@ -12,14 +12,12 @@ public record TimeSlotResponse(
     DateTime DateTime
 )
 {
-    public static DateTime CalculateDateTime(int weekNumber, int timeSlotNumber, TimeOnly? startTime, DayOfWeek dayOfWeek)
+    public static DateTime CalculateDateTime(int weekNumber, int timeSlotNumber, TimeOnly? startTime, DayOfWeek dayOfWeek, int year)
     {
         if(startTime is null)
         {
             return default;
         }
-        var year = ISOWeek.GetWeekOfYear(DateTime.UtcNow);
-        
         // Get the first day (Monday) of the specified ISO week
         var firstDayOfWeek = ISOWeek.ToDateTime(year, weekNumber, DayOfWeek.Monday);
         

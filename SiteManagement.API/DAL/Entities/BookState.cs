@@ -5,5 +5,5 @@ public enum BookState
     BookInProgress,
     Booked,
     Paid,
-    Plaid,
+    Played,
 }
