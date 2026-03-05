@@ -64,7 +64,7 @@ export class ScheduleService {
     // Convert to DaySchedule array and sort by date
     return Array.from(slotsByDate.entries())
       .map(([dateKey, slots]) => {
-        const date = new Date(dateKey);
+        const date = new Date(slots[0].dateTime);
         return {
           date,
           dayName: format(date, 'EEEE'),
