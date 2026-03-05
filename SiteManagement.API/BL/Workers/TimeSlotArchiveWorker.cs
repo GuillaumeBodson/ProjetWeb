@@ -55,7 +55,8 @@ public class TimeSlotArchiveWorker(
             .Include(ts => ts.PlannedDay)
             .Where(ts => ts.Year < currentYear
                       || (ts.Year == currentYear && ts.WeekNumber < currentWeek)
-                      || (ts.WeekNumber == currentWeek
+                      || (ts.Year == currentYear
+                          && ts.WeekNumber == currentWeek
                           && pastDaysOfWeek.Contains(ts.PlannedDay.DayOfWeek))).ToListAsync(cancellationToken);
 
         if (pastTimeSlots.Count == 0)
