@@ -9,10 +9,9 @@
   <div class="hidden md:block">
     <div class="table-container p-6 overflow-x-auto">
       <app-schedule-table
-        [days]="plannedDays"
+        [days]="daySchedules"
         [slotIndices]="getSlotIndices()"
         [slotDurationMinutes]="slotDurationMinutes"
-        [classMap]="desktopClassMap"
         [weekNumber]="weekNumber"
       ></app-schedule-table>
     </div>
@@ -80,7 +79,6 @@
         [days]="getCurrentDayPair()"
         [slotIndices]="getMobileSlotIndices()"
         [slotDurationMinutes]="slotDurationMinutes"
-        [classMap]="mobileClassMap"
         [weekNumber]="weekNumber"
       ></app-schedule-table>
     </div>
@@ -90,7 +88,7 @@
   <!-- Legend -->
   <div class="legend mt-6 md:mt-8 p-4 bg-blue-50 rounded-lg mx-4 md:mx-6 mb-4 md:mb-6">
     <h3 class="font-semibold mb-3">Legend</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
       <div class="flex items-center gap-2">
         <button mat-raised-button class="w-8 h-8 p-0 available">A</button>
         <span class="text-sm">Available</span>
@@ -106,6 +104,10 @@
       <div class="flex items-center gap-2">
         <button mat-raised-button disabled class="w-8 h-8 p-0 booked paid">P</button>
         <span class="text-sm">Paid</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button mat-raised-button disabled class="w-8 h-8 p-0 booked played">P</button>
+        <span class="text-sm">Played</span>
       </div>
     </div>
   </div>
