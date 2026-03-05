@@ -17,10 +17,10 @@ schedule/
 ```
 schedule/
 ├── models/
-│   ├── day-schedule.model.ts              # ✅ DaySchedule interface
-│   ├── time-slot-ui.model.ts              # ✅ TimeSlotUI interface
-│   ├── schedule-table-class-map.model.ts  # ✅ ScheduleTableClassMap + constant
-│   └── index.ts                           # ✅ Barrel export (convenience)
+│   ├── day-schedule.model.ts        # ✅ DaySchedule interface
+│   ├── time-slot-ui.model.ts        # ✅ TimeSlotUI interface
+│   ├── slot-display-state.model.ts  # ✅ SlotDisplayState enum + helpers
+│   └── index.ts                     # ✅ Barrel export (convenience)
 ```
 
 ## Created Files
@@ -41,25 +41,31 @@ export interface TimeSlotUI {
   number: number;
   startTime: string;
   endTime: string;
-  isAvailable: boolean;
-  isBooked: boolean;
-  bookState?: BookState;
+  displayState: SlotDisplayState;
 }
 ```
 **Purpose:** UI representation of a time slot for rendering
 
-### 3. `schedule-table-class-map.model.ts`
+### 3. `slot-display-state.model.ts`
 ```typescript
-export interface ScheduleTableClassMap { ... }
-export const DEFAULT_SCHEDULE_TABLE_CLASS_MAP = { ... }
+export enum SlotDisplayState {
+  Available = 'Available',
+  BookInProgress = 'BookInProgress',
+  Booked = 'Booked',
+  Paid = 'Paid',
+  Played = 'Played'
+}
+
+export function mapToSlotDisplayState(bookState: BookState | undefined | null): SlotDisplayState { ... }
+export function getSlotDisplayStateName(state: SlotDisplayState): string { ... }
 ```
-**Purpose:** CSS class mapping for customizing table appearance
+**Purpose:** Frontend enum for UI display states, mapping from backend `BookState` + helper utilities
 
 ### 4. `index.ts` (Barrel Export)
 ```typescript
 export * from './day-schedule.model';
 export * from './time-slot-ui.model';
-export * from './schedule-table-class-map.model';
+export * from './slot-display-state.model';
 ```
 **Purpose:** Provides single entry point for imports
 
@@ -68,7 +74,7 @@ export * from './schedule-table-class-map.model';
 ### Option 1: Import from Barrel (Recommended)
 ```typescript
 // Clean and concise - import multiple models at once
-import { DaySchedule, TimeSlotUI, ScheduleTableClassMap } from './models';
+import { DaySchedule, TimeSlotUI, SlotDisplayState } from './models';
 ```
 
 ### Option 2: Import from Specific Files
@@ -76,7 +82,7 @@ import { DaySchedule, TimeSlotUI, ScheduleTableClassMap } from './models';
 // Explicit - can see exactly which file each model comes from
 import { DaySchedule } from './models/day-schedule.model';
 import { TimeSlotUI } from './models/time-slot-ui.model';
-import { ScheduleTableClassMap } from './models/schedule-table-class-map.model';
+import { SlotDisplayState } from './models/slot-display-state.model';
 ```
 
 **Both are valid!** The barrel export (index.ts) provides convenience while still maintaining separate files.
@@ -87,6 +93,7 @@ import { ScheduleTableClassMap } from './models/schedule-table-class-map.model';
 ```
 Need DaySchedule? → Look in day-schedule.model.ts
 Need TimeSlotUI? → Look in time-slot-ui.model.ts
+Need SlotDisplayState? → Look in slot-display-state.model.ts
 ```
 File naming matches the interface name exactly.
 
@@ -126,7 +133,7 @@ interface-name.model.ts
 Examples:
 - `day-schedule.model.ts` → `DaySchedule`
 - `time-slot-ui.model.ts` → `TimeSlotUI`
-- `schedule-table-class-map.model.ts` → `ScheduleTableClassMap`
+- `slot-display-state.model.ts` → `SlotDisplayState`
 
 **Pattern:**
 - Kebab-case file name
@@ -149,7 +156,7 @@ import { DaySchedule } from './models';
 
 ### WeeklyPlannerComponent
 ```typescript
-import { DaySchedule, ScheduleTableClassMap } from '../../models';
+import { DaySchedule } from '../../models';
 ```
 
 ### ScheduleTableComponent
@@ -157,8 +164,9 @@ import { DaySchedule, ScheduleTableClassMap } from '../../models';
 import { 
   DaySchedule, 
   TimeSlotUI, 
-  ScheduleTableClassMap, 
-  DEFAULT_SCHEDULE_TABLE_CLASS_MAP 
+  SlotDisplayState,
+  mapToSlotDisplayState,
+  getSlotDisplayStateName
 } from '../../models';
 ```
 
@@ -270,6 +278,8 @@ feature/
 ✅ **Verified build** - no errors, everything compiles  
 ✅ **Followed naming conventions** - kebab-case files, PascalCase interfaces  
 ✅ **Added documentation** to each model file  
+✅ **Added `slot-display-state.model.ts`** with `SlotDisplayState` enum and mapping helpers  
+✅ **Simplified `TimeSlotUI`** to use `displayState: SlotDisplayState` instead of multiple boolean flags  
 
 Your schedule feature now follows a granular, scalable file organization pattern! 🎉
 
