@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SiteManagement.API.BL.Helpers;
 using SiteManagement.API.BL.Mappers;
 using SiteManagement.API.BL.Models;
 using SiteManagement.API.BL.Services.Abstractions;
@@ -19,6 +20,7 @@ public class SiteService(
             .Include(s => s.Courts)
             .Include(s => s.PlannedDays)
                 .ThenInclude(pd => pd.TimeSlots)
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
         if (site is null)
@@ -64,21 +66,24 @@ public class SiteService(
         var fromKey = yearFrom * 100 + weekNumberFrom;
         var toKey = yearTo * 100 + weekNumberTo;
 
-        var timeSlots = await context.TimeSlots
+        var timeSlotEntities = await context.TimeSlots
             .Include(ts => ts.PlannedDay)
             .Where(ts => ts.PlannedDay.SiteId == siteId &&
                 ts.Year * 100 + ts.WeekNumber >= fromKey &&
                 ts.Year * 100 + ts.WeekNumber <= toKey)
-            .Select(ts => new TimeSlotResponse(
+            .Select(ts => new { ts.Id, ts.TimeSlotNumber, ts.CourtId, ts.WeekNumber, ts.BookState, ts.PlannedDay.StartTime, ts.PlannedDay.DayOfWeek, ts.Year})
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        var result = timeSlotEntities.Select(ts => new TimeSlotResponse(
                 ts.Id,
                 ts.TimeSlotNumber,
                 ts.CourtId,
                 ts.WeekNumber,
                 ts.BookState,
-                TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, ts.PlannedDay.StartTime, ts.PlannedDay.DayOfWeek, ts.Year)))
-            .ToListAsync(cancellationToken);
+                TimeCalculationHelper.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, ts.StartTime, ts.DayOfWeek, ts.Year)));
 
-        return timeSlots;
+        return result.ToList();
     }
 
     public async Task<IEnumerable<SiteResponse>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -90,6 +95,7 @@ public class SiteService(
             s.ClosedDays.ToList(),
             s.Courts.Count()
         ))
+        .AsNoTracking()
         .ToListAsync(cancellationToken);
 
         return sites;
@@ -104,6 +110,7 @@ public class SiteService(
             s.ClosedDays.ToList(),
             s.Courts.Count()
         ))
+        .AsNoTracking()
         .ToPageAsync(request, cancellationToken: cancellationToken);
 
         return page;
@@ -375,6 +382,6 @@ public class SiteService(
             timeSlot.CourtId,
             timeSlot.WeekNumber,
             timeSlot.BookState,
-            TimeSlotResponse.CalculateDateTime(timeSlot.WeekNumber, timeSlot.TimeSlotNumber, plannedDay.StartTime.Value, plannedDay.DayOfWeek, timeSlot.Year));
+            TimeCalculationHelper.CalculateDateTime(timeSlot));
     }
 }

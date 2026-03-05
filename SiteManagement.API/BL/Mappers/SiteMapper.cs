@@ -1,3 +1,4 @@
+using SiteManagement.API.BL.Helpers;
 using SiteManagement.API.BL.Models;
 using SiteManagement.API.DAL.Entities;
 
@@ -28,7 +29,7 @@ public static class SiteMapper
                         ts.CourtId,
                         ts.WeekNumber,
                         ts.BookState,
-                        TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, pd.StartTime, pd.DayOfWeek, ts.Year)))
+                        TimeCalculationHelper.CalculateDateTime(ts)))
                     .ToList()
             ))
             .ToList();
