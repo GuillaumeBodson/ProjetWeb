@@ -84,6 +84,7 @@ export class ScheduleTableComponent implements OnChanges {
     return format(day.date, 'yyyy-MM-dd');
   }
 
+  protected readonly SlotDisplayState = SlotDisplayState;
   protected readonly getSlotDisplayStateName = getSlotDisplayStateName;
 }
 
