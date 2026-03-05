@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,8 +9,9 @@ import { ScheduleService } from './services/schedule.service';
 import { WeeklyPlannerComponent } from './components/weekly-planner/weekly-planner.component';
 import { DaySchedule } from './models';
 import { getISOWeek } from 'date-fns';
-import { EMPTY } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { EMPTY, combineLatest } from 'rxjs';
+import { catchError, filter, switchMap, tap } from 'rxjs/operators';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-schedule',
@@ -31,6 +32,7 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class ScheduleComponent {
   private readonly scheduleService = inject(ScheduleService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly sites$ = this.scheduleService.getAllSites();
   readonly selectedSiteId = signal<string>('');
@@ -43,38 +45,38 @@ export class ScheduleComponent {
   readonly canGoToNextWeek = computed(() => this.selectedWeekNumber() < 53);
 
   constructor() {
-    // Effect to load schedule when site or week changes
-    effect(() => {
-      const siteId = this.selectedSiteId();
-      const weekNumber = this.selectedWeekNumber();
-
-      if (siteId) {
-        this.loadSchedule(siteId, weekNumber);
-      } else {
-        this.daySchedules.set([]);
-      }
-    });
-  }
-
-  /**
-   * Load schedule for a specific site and week
-   */
-  private loadSchedule(siteId: string, weekNumber: number): void {
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.scheduleService.getScheduleForWeek(siteId, weekNumber, 1).pipe(
-      tap((schedules) => {
-        this.daySchedules.set(schedules);
-        this.loading.set(false);
+    combineLatest([
+      toObservable(this.selectedSiteId),
+      toObservable(this.selectedWeekNumber)
+    ]).pipe(
+      tap(([siteId]) => {
+        if (!siteId) {
+          this.daySchedules.set([]);
+          this.loading.set(false);
+          this.error.set(null);
+        }
       }),
-      catchError((err: unknown) => {
-        console.error('Failed to load site schedule:', err);
-        this.error.set('Failed to load site schedule. Please try again.');
-        this.loading.set(false);
-        this.daySchedules.set([]);
-        return EMPTY;
-      })
+      filter(([siteId]) => !!siteId),
+      tap(() => {
+        this.loading.set(true);
+        this.error.set(null);
+      }),
+      switchMap(([siteId, weekNumber]) =>
+        this.scheduleService.getScheduleForWeek(siteId, weekNumber, 1).pipe(
+          tap((schedules) => {
+            this.daySchedules.set(schedules);
+            this.loading.set(false);
+          }),
+          catchError((err: unknown) => {
+            console.error('Failed to load site schedule:', err);
+            this.error.set('Failed to load site schedule. Please try again.');
+            this.loading.set(false);
+            this.daySchedules.set([]);
+            return EMPTY;
+          })
+        )
+      ),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe();
   }
 
