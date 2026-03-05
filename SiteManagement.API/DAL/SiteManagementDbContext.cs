@@ -10,6 +10,7 @@ public class SiteManagementDbContext(DbContextOptions<SiteManagementDbContext> o
     public DbSet<Court> Courts { get; set; }
     public DbSet<PlannedDay> PlannedDays { get; set; }
     public DbSet<TimeSlot> TimeSlots { get; set; }
+    public DbSet<TimeSlotHistory> TimeSlotHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

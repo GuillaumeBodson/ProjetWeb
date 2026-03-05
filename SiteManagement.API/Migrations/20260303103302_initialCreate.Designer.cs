@@ -12,7 +12,7 @@ using SiteManagement.API.DAL;
 namespace SiteManagement.API.Migrations
 {
     [DbContext(typeof(SiteManagementDbContext))]
-    [Migration("20260228105844_initialCreate")]
+    [Migration("20260303103302_initialCreate")]
     partial class initialCreate
     {
         /// <inheritdoc />
@@ -115,19 +115,62 @@ namespace SiteManagement.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("TimeSlotNumber")
+                        .HasMaxLength(3)
                         .HasColumnType("int");
 
                     b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasMaxLength(4)
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourtId");
 
-                    b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber")
+                    b.HasIndex("PlannedDayId", "TimeSlotNumber", "CourtId", "WeekNumber", "Year")
                         .IsUnique();
 
                     b.ToTable("TimeSlots");
+                });
+
+            modelBuilder.Entity("SiteManagement.API.DAL.Entities.TimeSlotHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ArchivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CourtId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FinalBookState")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PlannedDayId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TimeSlotNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourtId", "Year", "WeekNumber");
+
+                    b.ToTable("TimeSlotHistory", (string)null);
                 });
 
             modelBuilder.Entity("SiteManagement.API.DAL.Entities.Court", b =>
