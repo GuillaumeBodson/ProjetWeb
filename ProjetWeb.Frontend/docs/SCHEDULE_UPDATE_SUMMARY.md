@@ -19,7 +19,7 @@ Successfully updated the schedule components to use the new `apiSitesSiteIdSched
 
 ### 1. **ScheduleService** (`src/app/views/pages/schedule/services/schedule.service.ts`)
 **Key Improvements:**
-- Added `DaySchedule` interface definition (single source of truth)
+- Uses `DaySchedule` interface defined in `models/day-schedule.model.ts` (single source of truth)
 - `getScheduleForWeek()` now returns `Observable<DaySchedule[]>` instead of raw `TimeSlotResponse[]`
 - Added private `transformToDaySchedules()` method to handle data transformation:
   - Groups time slots by date
@@ -30,7 +30,7 @@ Successfully updated the schedule components to use the new `apiSitesSiteIdSched
 
 ### 2. **ScheduleComponent** (`src/app/views/pages/schedule/schedule.component.ts`)
 - Changed from `timeSlots` signal to `daySchedules` signal of type `DaySchedule[]`
-- Imports `DaySchedule` from `ScheduleService`
+- Imports `DaySchedule` from `./models`
 - Receives presentation-ready data from service
 - No data transformation logic in component
 - Simplified effect that loads schedule when site/week changes
@@ -44,10 +44,10 @@ Successfully updated the schedule components to use the new `apiSitesSiteIdSched
 - Removed `date-fns` imports (no longer doing transformations)
 - Removed 80+ lines of transformation logic
 - Now purely focused on presentation and navigation
-- Uses `DaySchedule` from `ScheduleService`
+- Uses `DaySchedule` from `./models`
 
 ### 4. **ScheduleTableComponent** (`src/app/views/pages/schedule/components/schedule-table/schedule-table.component.ts`)
-- Imports `DaySchedule` from `ScheduleService` (single source of truth)
+- Imports `DaySchedule` from `./models` (single source of truth)
 - No changes to rendering logic
 - Works seamlessly with pre-transformed data
 
@@ -94,7 +94,7 @@ Each layer has one clear responsibility:
 ### 2. **Reusability**
 The `DaySchedule` interface and transformation logic can be reused across the application:
 ```typescript
-import { DaySchedule, ScheduleService } from './services/schedule.service';
+import { DaySchedule } from './models';
 ```
 
 ### 3. **Testability**
@@ -114,7 +114,7 @@ import { DaySchedule, ScheduleService } from './services/schedule.service';
 - No unnecessary re-computations
 
 ### 6. **Type Safety**
-- `DaySchedule` interface defined once in service
+- `DaySchedule` interface defined once in `models/day-schedule.model.ts`
 - All components import from single source
 - TypeScript enforces correct usage throughout
 
@@ -142,7 +142,7 @@ import { DaySchedule, ScheduleService } from './services/schedule.service';
 
 ## DaySchedule Interface
 
-Defined in `ScheduleService`:
+Defined in `models/day-schedule.model.ts`:
 ```typescript
 export interface DaySchedule {
   date: Date;           // The date for this day
@@ -177,7 +177,7 @@ The service and components correctly handle all BookState values:
 ## Migration Notes
 
 ### For Other Developers:
-- Always import `DaySchedule` from `ScheduleService`, not from components
+- Always import `DaySchedule` from `./models`, not from components or services directly
 - The service returns presentation-ready data; don't transform in components
 - Use `ScheduleService.getScheduleForWeek()` for all schedule fetching
 
