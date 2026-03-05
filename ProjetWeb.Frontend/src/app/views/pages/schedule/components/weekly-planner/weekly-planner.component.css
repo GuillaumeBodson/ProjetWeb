@@ -131,6 +131,10 @@
       background-color: #2196f3 !important;
     }
 
+    &.played {
+      background-color: #9c27b0 !important;
+    }
+
     &.plaid {
       background-color: #9c27b0 !important;
     }
@@ -262,6 +266,10 @@
 
     &.paid {
       background-color: #2196f3 !important;
+    }
+
+    &.played {
+      background-color: #9c27b0 !important;
     }
   }
 

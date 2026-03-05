@@ -115,6 +115,19 @@ export class SiteFacadeService {
   }
 
   /**
+   * Get time slots for a specific site and week.
+   * @param siteId - The UUID of the site
+   * @param weekNumber - The ISO week number to fetch (optional)
+   * @param numberOfWeeks - The number of weeks to fetch (optional, defaults to 1)
+   * @returns Observable of time slot responses
+   */
+  getSiteSchedule(siteId: string, weekNumber?: number, numberOfWeeks?: number): Observable<TimeSlotResponse[]> {
+    return this.sitesService.apiSitesSiteIdScheduleGet(siteId, weekNumber, numberOfWeeks).pipe(
+      catchError(error => this.handleError(`Failed to fetch schedule for site: ${siteId}`, error))
+    );
+  }
+
+  /**
    * Book a time slot at a specific site.
    * @param siteId - The UUID of the site
    * @param bookingData - The time slot booking request data

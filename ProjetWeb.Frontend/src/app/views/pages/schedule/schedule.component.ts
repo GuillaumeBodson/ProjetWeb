@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,12 +7,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ScheduleService } from './services/schedule.service';
 import { WeeklyPlannerComponent } from './components/weekly-planner/weekly-planner.component';
-import { PlannedDayResponse } from '../../../core/api/site';
-import { SiteDetailsResponse } from '../../../core/api/site/model/model-override';
+import { DaySchedule } from './models';
 import { getISOWeek } from 'date-fns';
-import { EMPTY, Subject, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { EMPTY } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-schedule',
@@ -33,41 +31,52 @@ import { toSignal } from '@angular/core/rxjs-interop';
 })
 export class ScheduleComponent {
   private readonly scheduleService = inject(ScheduleService);
-  private readonly siteSelection$ = new Subject<string | null>();
 
   readonly sites$ = this.scheduleService.getAllSites();
   readonly selectedSiteId = signal<string>('');
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly selectedWeekNumber = signal<number>(this.getCurrentISOWeek());
+  readonly daySchedules = signal<DaySchedule[]>([]);
 
   readonly canGoToPreviousWeek = computed(() => this.selectedWeekNumber() > 1);
   readonly canGoToNextWeek = computed(() => this.selectedWeekNumber() < 53);
 
-  readonly siteDetails = toSignal(
-    this.siteSelection$.pipe(
-      switchMap(siteId => {
-        if (!siteId) {
-          return of(null);
-        }
-        this.loading.set(true);
-        this.error.set(null);
-        return this.scheduleService.getSiteWithSchedule(siteId).pipe(
-          tap(() => {
-            this.loading.set(false);
-            this.selectedWeekNumber.set(this.getCurrentISOWeek());
-          }),
-          catchError((err: unknown) => {
-            console.error('Failed to load site schedule:', err);
-            this.error.set('Failed to load site schedule. Please try again.');
-            this.loading.set(false);
-            return EMPTY;
-          })
-        );
+  constructor() {
+    // Effect to load schedule when site or week changes
+    effect(() => {
+      const siteId = this.selectedSiteId();
+      const weekNumber = this.selectedWeekNumber();
+
+      if (siteId) {
+        this.loadSchedule(siteId, weekNumber);
+      } else {
+        this.daySchedules.set([]);
+      }
+    });
+  }
+
+  /**
+   * Load schedule for a specific site and week
+   */
+  private loadSchedule(siteId: string, weekNumber: number): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.scheduleService.getScheduleForWeek(siteId, weekNumber, 1).pipe(
+      tap((schedules) => {
+        this.daySchedules.set(schedules);
+        this.loading.set(false);
+      }),
+      catchError((err: unknown) => {
+        console.error('Failed to load site schedule:', err);
+        this.error.set('Failed to load site schedule. Please try again.');
+        this.loading.set(false);
+        this.daySchedules.set([]);
+        return EMPTY;
       })
-    ),
-    { initialValue: null as SiteDetailsResponse | null }
-  );
+    ).subscribe();
+  }
 
   /**
    * Get the current ISO week number
@@ -81,7 +90,6 @@ export class ScheduleComponent {
    */
   onSiteSelected(siteId: string): void {
     this.selectedSiteId.set(siteId);
-    this.siteSelection$.next(siteId || null);
   }
 
   /**

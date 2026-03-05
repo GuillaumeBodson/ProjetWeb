@@ -1,42 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { DayOfWeek, PlannedDayResponse } from '../../../../../core/api/site';
-
-interface TimeSlotUI {
-  number: number;
-  startTime: string;
-  endTime: string;
-  isAvailable: boolean;
-  isBooked: boolean;
-  bookState?: string;
-}
-
-export interface ScheduleTableClassMap {
-  table: string;
-  headerRow: string;
-  timeHeader: string;
-  dayHeader: string;
-  dayName: string;
-  slotRow: string;
-  timeCell: string;
-  timeLabel: string;
-  slotCell: string;
-  slotButton: string;
-}
-
-const DEFAULT_CLASS_MAP: ScheduleTableClassMap = {
-  table: '',
-  headerRow: '',
-  timeHeader: '',
-  dayHeader: '',
-  dayName: '',
-  slotRow: '',
-  timeCell: '',
-  timeLabel: '',
-  slotCell: '',
-  slotButton: ''
-};
+import { format } from 'date-fns';
+import {
+  DaySchedule,
+  TimeSlotUI,
+  SlotDisplayState,
+  mapToSlotDisplayState,
+  getSlotDisplayStateName
+} from '../../models';
 
 @Component({
   selector: 'app-schedule-table',
@@ -47,10 +19,9 @@ const DEFAULT_CLASS_MAP: ScheduleTableClassMap = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScheduleTableComponent implements OnChanges {
-  @Input() days: PlannedDayResponse[] = [];
+  @Input() days: DaySchedule[] = [];
   @Input() slotIndices: number[] = [];
   @Input() slotDurationMinutes = 105;
-  @Input() classMap: ScheduleTableClassMap = DEFAULT_CLASS_MAP;
   @Input() weekNumber: number = 1;
 
   private slotCache = new Map<string, TimeSlotUI[]>();
@@ -64,98 +35,55 @@ export class ScheduleTableComponent implements OnChanges {
   private rebuildSlotCache(): void {
     this.slotCache.clear();
     for (const day of this.days ?? []) {
-      this.slotCache.set(day.id, this.getTimeSlotUIData(day));
+      const dateKey = format(day.date, 'yyyy-MM-dd');
+      this.slotCache.set(dateKey, this.getTimeSlotUIData(day));
     }
   }
 
-  getDayOfWeekName(dayOfWeek: DayOfWeek): string {
-    const dayNames: Record<DayOfWeek, string> = {
-      [DayOfWeek.Sunday]: 'Sunday',
-      [DayOfWeek.Monday]: 'Monday',
-      [DayOfWeek.Tuesday]: 'Tuesday',
-      [DayOfWeek.Wednesday]: 'Wednesday',
-      [DayOfWeek.Thursday]: 'Thursday',
-      [DayOfWeek.Friday]: 'Friday',
-      [DayOfWeek.Saturday]: 'Saturday'
-    };
-    return dayNames[dayOfWeek];
+  getTimeForSlotIndex(day: DaySchedule, slotIndex: number): string {
+    if (!day.slots || day.slots.length === 0) return '';
+
+    const slot = day.slots[slotIndex];
+    if (!slot) return '';
+
+    const date = new Date(slot.dateTime);
+    return format(date, 'HH:mm');
   }
 
-  getTimeForSlotIndex(startTime: string, slotIndex: number): string {
-    if (!startTime) return '';
-
-    const [startHours, startMinutes] = startTime.split(':').map(Number);
-    const minutesFromStart = slotIndex * this.slotDurationMinutes;
-    const totalMinutes = startHours * 60 + startMinutes + minutesFromStart;
-
-    const slotStartHours = Math.floor(totalMinutes / 60);
-    const slotStartMins = totalMinutes % 60;
-
-    return `${this.padZero(slotStartHours)}:${this.padZero(slotStartMins)}`;
-  }
-
-  getTimeSlotForIndex(plannedDay: PlannedDayResponse, slotIndex: number): TimeSlotUI | null {
-    const slots = this.slotCache.get(plannedDay.id);
+  getTimeSlotForIndex(day: DaySchedule, slotIndex: number): TimeSlotUI | null {
+    const dateKey = format(day.date, 'yyyy-MM-dd');
+    const slots = this.slotCache.get(dateKey);
     return slots?.[slotIndex] ?? null;
   }
 
-  getTimeSlotUIData(plannedDay: PlannedDayResponse): TimeSlotUI[] {
-    if (!plannedDay.startTime) {
+  getTimeSlotUIData(day: DaySchedule): TimeSlotUI[] {
+    if (!day.slots || day.slots.length === 0) {
       return [];
     }
 
-    const slotMap = new Map<number, TimeSlotUI>();
-    const [startHours, startMinutes] = plannedDay.startTime.split(':').map(Number);
+    // Sort slots by datetime
+    const sortedSlots = [...day.slots].sort((a, b) =>
+      new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+    );
 
-    for (let i = 1; i <= plannedDay.numberOfTimeSlots; i++) {
-      const minutesFromStart = (i - 1) * this.slotDurationMinutes;
-      const totalMinutes = startHours * 60 + startMinutes + minutesFromStart;
+    // Transform each slot into TimeSlotUI
+    return sortedSlots.map((slot, index) => {
+      const startDate = new Date(slot.dateTime);
+      const endDate = new Date(startDate.getTime() + this.slotDurationMinutes * 60000);
 
-      const slotStartHours = Math.floor(totalMinutes / 60);
-      const slotStartMins = totalMinutes % 60;
-
-      const slotEndMinutes = totalMinutes + this.slotDurationMinutes;
-      const slotEndHours = Math.floor(slotEndMinutes / 60);
-      const slotEndMins = slotEndMinutes % 60;
-
-      const start = `${this.padZero(slotStartHours)}:${this.padZero(slotStartMins)}`;
-      const end = `${this.padZero(slotEndHours)}:${this.padZero(slotEndMins)}`;
-
-      slotMap.set(i, {
-        number: i,
-        startTime: start,
-        endTime: end,
-        isAvailable: true,
-        isBooked: false,
-        bookState: undefined
-      });
-    }
-
-    plannedDay.timeSlots.filter(ts => ts.weekNumber === this.weekNumber).forEach(timeSlot => {
-      const existing = slotMap.get(timeSlot.timeSlotNumber);
-      if (existing) {
-        existing.isAvailable = false;
-        existing.isBooked = true;
-        existing.bookState = timeSlot.bookState;
-      }
+      return {
+        number: index + 1,
+        startTime: format(startDate, 'HH:mm'),
+        endTime: format(endDate, 'HH:mm'),
+        displayState: mapToSlotDisplayState(slot.bookState)
+      };
     });
-
-    return Array.from(slotMap.values());
   }
 
-  getBookStateName(bookState: string | undefined): string {
-    if (!bookState) return 'Booked';
-    const stateNames: Record<string, string> = {
-      'BookInProgress': 'In Progress',
-      'Booked': 'Booked',
-      'Paid': 'Paid',
-      'Plaid': 'Plaid'
-    };
-    return stateNames[bookState] || bookState;
+  getDateKey(day: DaySchedule): string {
+    return format(day.date, 'yyyy-MM-dd');
   }
 
-  private padZero(num: number): string {
-    return num.toString().padStart(2, '0');
-  }
+  protected readonly getSlotDisplayStateName = getSlotDisplayStateName;
 }
 

@@ -2,8 +2,8 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { PlannedDayResponse } from '../../../../../core/api/site';
-import { ScheduleTableComponent, ScheduleTableClassMap } from '../schedule-table/schedule-table.component';
+import { ScheduleTableComponent } from '../schedule-table/schedule-table.component';
+import { DaySchedule } from '../../models';
 
 const SLOT_DURATION_MINUTES = 105;
 
@@ -16,7 +16,7 @@ const SLOT_DURATION_MINUTES = 105;
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WeeklyPlannerComponent implements OnChanges {
-  @Input() plannedDays: PlannedDayResponse[] = [];
+  @Input() daySchedules: DaySchedule[] = [];
   @Input() weekNumber: number = 1;
   @Input() canGoToPreviousWeek: boolean = false;
   @Input() canGoToNextWeek: boolean = false;
@@ -26,31 +26,6 @@ export class WeeklyPlannerComponent implements OnChanges {
 
   readonly slotDurationMinutes = SLOT_DURATION_MINUTES;
 
-  readonly desktopClassMap: ScheduleTableClassMap = {
-    table: 'schedule-table w-full border-collapse',
-    headerRow: 'header-row',
-    timeHeader: 'time-header',
-    dayHeader: 'day-header',
-    dayName: 'day-name',
-    slotRow: 'slot-row',
-    timeCell: 'time-cell',
-    timeLabel: 'time-label',
-    slotCell: 'slot-cell',
-    slotButton: 'slot-button w-full'
-  };
-
-  readonly mobileClassMap: ScheduleTableClassMap = {
-    table: 'mobile-schedule-table w-full border-collapse',
-    headerRow: 'header-row',
-    timeHeader: 'time-header-mobile',
-    dayHeader: 'day-header-mobile',
-    dayName: 'day-name-mobile text-xs',
-    slotRow: 'slot-row-mobile',
-    timeCell: 'time-cell-mobile',
-    timeLabel: 'time-label-mobile text-xs',
-    slotCell: 'slot-cell-mobile',
-    slotButton: 'slot-button-mobile w-full'
-  };
 
   // Signals for mobile day navigation
   currentDayPairIndex = signal<number>(0);
@@ -58,18 +33,15 @@ export class WeeklyPlannerComponent implements OnChanges {
   // Mobile 2-day pair navigation
   canGoToPreviousDayPair = computed(() => this.currentDayPairIndex() > 0);
   canGoToNextDayPair = computed(() => {
-    const maxPairs = Math.ceil(this.plannedDays.length / 2);
+    const maxPairs = Math.ceil(this.daySchedules.length / 2);
     return this.currentDayPairIndex() < maxPairs - 1;
   });
 
   /**
-   * Handle input changes - reset day index when planned days or week number change
+   * Handle input changes - reset day index when day schedules or week number change
    */
   ngOnChanges(changes: SimpleChanges): void {
-    const plannedDaysChanged = changes['plannedDays'] && !changes['plannedDays'].firstChange;
-    const weekNumberChanged = changes['weekNumber'] && !changes['weekNumber'].firstChange;
-
-    if (plannedDaysChanged || weekNumberChanged) {
+    if (changes['daySchedules'] || changes['weekNumber']) {
       this.currentDayPairIndex.set(0);
     }
   }
@@ -95,9 +67,9 @@ export class WeeklyPlannerComponent implements OnChanges {
   /**
    * Get the current pair of days for mobile view (2 days at a time)
    */
-  getCurrentDayPair(): PlannedDayResponse[] {
+  getCurrentDayPair(): DaySchedule[] {
     const startIndex = this.currentDayPairIndex() * 2;
-    return this.plannedDays.slice(startIndex, startIndex + 2);
+    return this.daySchedules.slice(startIndex, startIndex + 2);
   }
 
   /**
@@ -115,18 +87,18 @@ export class WeeklyPlannerComponent implements OnChanges {
   }
 
   /**
-   * Get array of slot indices for table rows (based on max slots across all days)
+   * Get array of slot indices for table rows
    */
   getSlotIndices(): number[] {
-    if (this.plannedDays.length === 0) return [];
-    const maxSlots = Math.max(...this.plannedDays.map(d => d.numberOfTimeSlots));
+    if (this.daySchedules.length === 0) return [];
+    const maxSlots = Math.max(...this.daySchedules.map(d => d.slots.length));
     return Array.from({ length: maxSlots }, (_, i) => i);
   }
 
   getMobileSlotIndices(): number[] {
     const dayPair = this.getCurrentDayPair();
     if (dayPair.length === 0) return [];
-    const maxSlots = Math.max(...dayPair.map(d => d.numberOfTimeSlots));
+    const maxSlots = Math.max(...dayPair.map(d => d.slots.length));
     return Array.from({ length: maxSlots }, (_, i) => i);
   }
 }

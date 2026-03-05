@@ -17,6 +17,6 @@ export enum BookState {
 
     Paid = 'Paid',
 
-    Plaid = 'Plaid'
+    Played = 'Played'
 }
 
