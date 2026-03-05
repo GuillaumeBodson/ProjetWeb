@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SiteManagement.API.BL.Helpers;
 using SiteManagement.API.BL.Models;
 using SiteManagement.API.DAL;
 using SiteManagement.API.DAL.Entities;
@@ -46,13 +47,16 @@ public class TimeSlotArchiveWorker(
         var currentYear = now.Year;
         var currentDayOfWeekIso = now.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)now.DayOfWeek;
 
+        var pastDaysOfWeek = Enum.GetValues<DayOfWeek>()
+            .Where(d => (d == DayOfWeek.Sunday ? 7 : (int)d) < currentDayOfWeekIso)
+            .ToArray();
+
         var pastTimeSlots = await context.TimeSlots
             .Include(ts => ts.PlannedDay)
             .Where(ts => ts.Year < currentYear
                       || (ts.Year == currentYear && ts.WeekNumber < currentWeek)
                       || (ts.WeekNumber == currentWeek
-                          && (ts.PlannedDay.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)ts.PlannedDay.DayOfWeek) < currentDayOfWeekIso))
-            .ToListAsync(cancellationToken);
+                          && pastDaysOfWeek.Contains(ts.PlannedDay.DayOfWeek))).ToListAsync(cancellationToken);
 
         if (pastTimeSlots.Count == 0)
         {
@@ -69,7 +73,7 @@ public class TimeSlotArchiveWorker(
             FinalBookState = ts.BookState,
             WeekNumber = ts.WeekNumber,
             Year = ts.Year,
-            StartDateTime = TimeSlotResponse.CalculateDateTime(ts.WeekNumber, ts.TimeSlotNumber, ts.PlannedDay.StartTime, ts.PlannedDay.DayOfWeek, currentYear),
+            StartDateTime = TimeCalculationHelper.CalculateDateTime(ts),
             ArchivedAt = now
         }).ToList();
 
@@ -84,7 +88,11 @@ public class TimeSlotArchiveWorker(
             logger.LogInformation("Archived {Count} past time slots (week < {Week}/{Year})",
                 pastTimeSlots.Count, currentWeek, currentYear);
         }
-        catch (Exception ex)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
             await transaction.RollbackAsync(cancellationToken);
             logger.LogError(ex, "Failed to archive past time slots — transaction rolled back");
