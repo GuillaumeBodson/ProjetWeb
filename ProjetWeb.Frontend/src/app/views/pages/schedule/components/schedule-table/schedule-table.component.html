@@ -12,12 +12,12 @@
   <tbody>
     @if (days.length > 0) {
       @for (slotIndex of slotIndices; track slotIndex) {
-        <tr class="border-b border-gray-200 hover:bg-gray-50">
+        <tr class="border-b border-gray-200">
           <td class="p-2 md:p-3 text-center font-medium bg-gray-50 border-r-2 border-blue-700 min-w-[60px] md:min-w-[80px] whitespace-nowrap">
             <div class="text-[11px] md:text-sm text-gray-800">{{ getTimeForSlotIndex(days[0], slotIndex) }}</div>
           </td>
           @for (day of days; track getDateKey(day)) {
-            <td class="p-1 md:p-2 border-r border-gray-300 last:border-r-0 min-w-0 md:min-w-[150px] align-middle">
+            <td class="p-1 md:p-2 border-r border-gray-300 last:border-r-0 min-w-0 md:min-w-[150px] align-middle hover:bg-gray-50">
               @if (getTimeSlotForIndex(day, slotIndex); as timeSlot) {
                 <button
                   [class.available]="timeSlot.displayState === SlotDisplayState.Available"
@@ -32,6 +32,9 @@
                 >
                   <span class="block">{{ timeSlot.startTime }}</span>
                   <span class="block">{{ timeSlot.endTime }}</span>
+                  @if (timeSlot.displayState === SlotDisplayState.Available) {
+                    <span class="block opacity-75">{{ timeSlot.availableCourtCount }}/{{ timeSlot.totalCourtCount }}</span>
+                  }
                 </button>
               }
             </td>

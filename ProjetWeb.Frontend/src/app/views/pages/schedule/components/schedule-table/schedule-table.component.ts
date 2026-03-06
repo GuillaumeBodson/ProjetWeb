@@ -4,11 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { format } from 'date-fns';
 import {
   DaySchedule,
+  ConsolidatedTimeSlot,
   TimeSlotUI,
   SlotDisplayState,
-  mapToSlotDisplayState,
   getSlotDisplayStateName
 } from '../../models';
+import { BookState } from '../../../../../core/api/site';
 
 @Component({
   selector: 'app-schedule-table',
@@ -36,18 +37,15 @@ export class ScheduleTableComponent implements OnChanges {
     this.slotCache.clear();
     for (const day of this.days ?? []) {
       const dateKey = format(day.date, 'yyyy-MM-dd');
-      this.slotCache.set(dateKey, this.getTimeSlotUIData(day));
+      this.slotCache.set(dateKey, this.buildTimeSlotUIList(day));
     }
   }
 
   getTimeForSlotIndex(day: DaySchedule, slotIndex: number): string {
     if (!day.slots || day.slots.length === 0) return '';
-
     const slot = day.slots[slotIndex];
     if (!slot) return '';
-
-    const date = new Date(slot.dateTime);
-    return format(date, 'HH:mm');
+    return format(new Date(slot.dateTime), 'HH:mm');
   }
 
   getTimeSlotForIndex(day: DaySchedule, slotIndex: number): TimeSlotUI | null {
@@ -56,32 +54,70 @@ export class ScheduleTableComponent implements OnChanges {
     return slots?.[slotIndex] ?? null;
   }
 
-  getTimeSlotUIData(day: DaySchedule): TimeSlotUI[] {
+  getDateKey(day: DaySchedule): string {
+    return format(day.date, 'yyyy-MM-dd');
+  }
+
+  /**
+   * Build the UI slot list for a single day from its consolidated slots.
+   * One TimeSlotUI is produced per ConsolidatedTimeSlot (i.e. per unique slot number).
+   * The displayState is Available when at least one court is free.
+   */
+  private buildTimeSlotUIList(day: DaySchedule): TimeSlotUI[] {
     if (!day.slots || day.slots.length === 0) {
       return [];
     }
 
-    // Sort slots by datetime
-    const sortedSlots = [...day.slots].sort((a, b) =>
-      new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
-    );
-
-    // Transform each slot into TimeSlotUI
-    return sortedSlots.map((slot, index) => {
+    return day.slots.map((slot: ConsolidatedTimeSlot, index: number) => {
       const startDate = new Date(slot.dateTime);
       const endDate = new Date(startDate.getTime() + this.slotDurationMinutes * 60000);
+
+      const isAvailable = slot.availableCourtCount > 0;
+      const displayState = isAvailable
+        ? SlotDisplayState.Available
+        : this.dominantBookedState(slot);
 
       return {
         number: index + 1,
         startTime: format(startDate, 'HH:mm'),
         endTime: format(endDate, 'HH:mm'),
-        displayState: mapToSlotDisplayState(slot.bookState)
+        displayState,
+        availableCourtCount: slot.availableCourtCount,
+        totalCourtCount: slot.totalCourtCount
       };
     });
   }
 
-  getDateKey(day: DaySchedule): string {
-    return format(day.date, 'yyyy-MM-dd');
+  /**
+   * Return the most "advanced" booked state among all courts for display purposes.
+   * Priority: Played > Paid > Booked > BookInProgress
+   */
+  private dominantBookedState(slot: ConsolidatedTimeSlot): SlotDisplayState {
+    const priority: Record<BookState, number> = {
+      [BookState.Played]: 4,
+      [BookState.Paid]: 3,
+      [BookState.Booked]: 2,
+      [BookState.BookInProgress]: 1
+    };
+
+    let dominant = SlotDisplayState.BookInProgress;
+    let maxPriority = 0;
+
+    for (const courtSlot of slot.courtSlots) {
+      if (courtSlot.bookState) {
+        const p = priority[courtSlot.bookState] ?? 0;
+        if (p > maxPriority) {
+          maxPriority = p;
+          switch (courtSlot.bookState) {
+            case BookState.Played: dominant = SlotDisplayState.Played; break;
+            case BookState.Paid: dominant = SlotDisplayState.Paid; break;
+            case BookState.Booked: dominant = SlotDisplayState.Booked; break;
+            default: dominant = SlotDisplayState.BookInProgress;
+          }
+        }
+      }
+    }
+    return dominant;
   }
 
   protected readonly SlotDisplayState = SlotDisplayState;

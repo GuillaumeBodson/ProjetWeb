@@ -200,10 +200,6 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.slot-row-mobile:hover {
-  background-color: #f5f5f5;
-}
-
 /* Mobile time column */
 .time-cell-mobile {
   padding: 8px;
