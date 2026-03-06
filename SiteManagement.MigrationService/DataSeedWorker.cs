@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using SiteManagement.API.DAL;
@@ -8,6 +9,7 @@ namespace SiteManagement.MigrationService;
 public class DataSeedWorker(
     IServiceProvider serviceProvider,
     IHostApplicationLifetime lifetime,
+    IOptions<SeedingOptions> seedingOptions,
     ILogger<DataSeedWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,6 +38,13 @@ public class DataSeedWorker(
 
             try
             {
+                var forceRecreate = seedingOptions.Value.ForceRecreate;
+
+                if (forceRecreate)
+                {
+                    logger.LogWarning("ForceRecreate is enabled - dropping and recreating database...");
+                    await dbContext.Database.EnsureDeletedAsync(token);
+                }
                 await dbContext.Database.MigrateAsync(token);
             }
             catch (Exception ex)

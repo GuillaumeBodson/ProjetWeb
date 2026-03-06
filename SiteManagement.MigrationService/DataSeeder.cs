@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using SiteManagement.API.DAL;
 using SiteManagement.API.DAL.Entities;
 
@@ -7,20 +6,10 @@ namespace SiteManagement.MigrationService;
 
 public class DataSeeder(
     SiteManagementDbContext context,
-    ILogger<DataSeeder> logger,
-    IOptions<SeedingOptions> seedingOptions)
+    ILogger<DataSeeder> logger)
 {
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        var forceRecreate = seedingOptions.Value.ForceRecreate;
-
-        if (forceRecreate)
-        {
-            logger.LogWarning("ForceRecreate is enabled - dropping and recreating database...");
-            await context.Database.EnsureDeletedAsync(cancellationToken);
-            await context.Database.MigrateAsync(cancellationToken);
-        }
-
         if (await context.Sites.AnyAsync(cancellationToken))
         {
             logger.LogInformation("Database already contains data. Skipping seeding.");

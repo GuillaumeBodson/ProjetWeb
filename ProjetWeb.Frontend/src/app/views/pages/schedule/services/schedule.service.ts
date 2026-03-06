@@ -5,7 +5,7 @@ import { SiteFacadeService } from '../../../../core/services/site-facade.service
 import { TimeSlotResponse } from '../../../../core/api/site';
 import { SiteResponse } from '../../../../core/api/site/model/model-override';
 import { format } from 'date-fns';
-import { DaySchedule } from '../models';
+import { ConsolidatedTimeSlot, DaySchedule } from '../models';
 
 /**
  * Service for managing schedule-related operations.
@@ -26,7 +26,8 @@ export class ScheduleService {
   }
 
   /**
-   * Get schedule organized by day for a specific site and week.
+   * Get schedule organised by day for a specific site and week.
+   * Multiple courts for the same slot number are consolidated into a single row.
    * @param siteId - The ID of the site
    * @param weekNumber - The ISO week number to fetch (optional)
    * @param numberOfWeeks - The number of weeks to fetch (optional, defaults to 1)
@@ -39,7 +40,11 @@ export class ScheduleService {
   }
 
   /**
-   * Transform flat TimeSlotResponse array into day-based structure.
+   * Transform flat TimeSlotResponse array into day-based structure with consolidated slots.
+   * Slots sharing the same date and timeSlotNumber (i.e. different courts) are merged
+   * into a single ConsolidatedTimeSlot.  A merged slot is Available when at least one
+   * of its court slots has no booking (bookState is absent / falsy).
+   *
    * @param timeSlots - Array of time slot responses
    * @returns Array of day schedules sorted by date
    */
@@ -48,27 +53,48 @@ export class ScheduleService {
       return [];
     }
 
-    // Group time slots by date
+    // ── Group raw slots by calendar date ──────────────────────────────────────
     const slotsByDate = new Map<string, TimeSlotResponse[]>();
 
     for (const slot of timeSlots) {
-      const date = new Date(slot.dateTime);
-      const dateKey = format(date, 'yyyy-MM-dd');
-
+      const dateKey = format(new Date(slot.dateTime), 'yyyy-MM-dd');
       if (!slotsByDate.has(dateKey)) {
         slotsByDate.set(dateKey, []);
       }
       slotsByDate.get(dateKey)!.push(slot);
     }
 
-    // Convert to DaySchedule array and sort by date
+    // ── For each day, consolidate per timeSlotNumber ──────────────────────────
     return Array.from(slotsByDate.entries())
-      .map(([dateKey, slots]) => {
-        const date = new Date(slots[0].dateTime);
+      .map(([, daySlots]) => {
+        const date = new Date(daySlots[0].dateTime);
+
+        // Group by timeSlotNumber
+        const bySlotNumber = new Map<number, TimeSlotResponse[]>();
+        for (const slot of daySlots) {
+          if (!bySlotNumber.has(slot.timeSlotNumber)) {
+            bySlotNumber.set(slot.timeSlotNumber, []);
+          }
+          bySlotNumber.get(slot.timeSlotNumber)!.push(slot);
+        }
+
+        const consolidated: ConsolidatedTimeSlot[] = Array.from(bySlotNumber.entries())
+          .map(([slotNumber, courtSlots]) => {
+            const availableCourtCount = courtSlots.filter(s => !s.bookState).length;
+            return {
+              timeSlotNumber: slotNumber,
+              dateTime: courtSlots[0].dateTime,
+              availableCourtCount,
+              totalCourtCount: courtSlots.length,
+              courtSlots
+            };
+          })
+          .sort((a, b) => a.timeSlotNumber - b.timeSlotNumber);
+
         return {
           date,
           dayName: format(date, 'EEEE'),
-          slots: slots.sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+          slots: consolidated
         };
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
